@@ -13,14 +13,7 @@ Differences with PyDbLite:
     result = db.cursor.fetchall()
 
 Syntax :
-    from PyDbLite import Base
-    try:
-        from sqlite3 import dbapi2 as sqlite
-    except ImportError:
-        from pysqlite2 import dbapi2 as sqlite
-    except ImportError:
-        print "SQLite is not installed"
-        raise
+    from PyDbLite_SQLite import Base
     # connect to SQLite database "test"
     connection = sqlite.connect("test")
     # pass the connection as argument to Base creation
@@ -58,6 +51,15 @@ import cPickle
 import bisect
 
 import datetime
+
+# test if sqlite is installed or raise exception
+try:
+    from sqlite3 import dbapi2 as sqlite
+except ImportError:
+    from pysqlite2 import dbapi2 as sqlite
+except ImportError:
+    print "SQLite is not installed"
+    raise
 
 def make_date(d):
     if d is None:
@@ -355,8 +357,10 @@ if __name__ == '__main__':
         print "record 21 removed"
 
     print db[22]
+    print "add field adate"
     db.add_field(('adate',"DATE"),datetime.date.today())
-    print type(db[22]["adate"])
+    
+    print db[22]
     
     
     
