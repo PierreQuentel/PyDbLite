@@ -193,12 +193,12 @@ class Base:
         fname,ftype = field
         if fname in self.all_fields:
             raise ValueError,'Field "%s" already defined' %fname
-        self.all_fields.append(fname)
         sql = "ALTER TABLE %s ADD %s %s" %(self.name,fname,ftype)
         if default is not None:
             sql += " DEFAULT %s" %self._conv(default)
         self.cursor.execute(sql)
         self.commit()
+        self._get_table_info()
     
     def drop_field(self,field):
         if field in ["__id__","__version__"]:
@@ -207,7 +207,7 @@ class Base:
             raise ValueError,"Field %s not found in base" %field
         sql = "ALTER TABLE %s DROP %s" %(self.name,field)
         self.cursor.execute(sql)
-        self.fields.remove(field)
+        self._get_table_info()
 
     def __call__(self,**kw):
         """Selection by field values
@@ -251,7 +251,7 @@ if __name__ == '__main__':
 
     db = Base("pydbtest",connection).create(("name","TEXT"),("age","INTEGER"),
         ("size","REAL"),("birth","DATE"),
-        mode="open")
+        mode="override")
 
     try:
         db.add_field(("name","TEXT"))
@@ -313,7 +313,7 @@ if __name__ == '__main__':
     print "\nDeleting record #21"
     del db[21]
     if not 21 in db:
-        print "record 20 removed"
+        print "record 21 removed"
 
     print db[22]
     db.drop_field('name')
