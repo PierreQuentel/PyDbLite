@@ -11,7 +11,7 @@ Differences with PyDbLite:
 
 Fields must be declared 
 Syntax :
-    from PyDbLite import Base
+    from PyDbLite.MySQL import Base
     import MySQLdb
     # connect to a MySQL server and use database "test"
     connection = MySQLdb.connect("localhost","root","admin")

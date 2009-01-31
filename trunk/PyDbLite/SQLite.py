@@ -4,7 +4,7 @@ Differences with PyDbLite:
 - pass the connection to the SQLite db as argument to Base()
 - in create(), field definitions must specify a type
     DATE for datetime.date
-    TIMESTAMP for datetime.date
+    TIMESTAMP or DATETIME for datetime.date
 - no index
 - no drop_field (not supported by SQLite)
 - the Base() instance has a cursor attribute, so that SQL requests
@@ -13,7 +13,7 @@ Differences with PyDbLite:
     result = db.cursor.fetchall()
 
 Syntax :
-    from PyDbLite_SQLite import Base
+    from PyDbLite.SQLite import Base
     # connect to SQLite database "test"
     connection = sqlite.connect("test")
     # pass the connection as argument to Base creation
@@ -56,10 +56,11 @@ import datetime
 try:
     from sqlite3 import dbapi2 as sqlite
 except ImportError:
-    from pysqlite2 import dbapi2 as sqlite
-except ImportError:
-    print "SQLite is not installed"
-    raise
+    try:
+        from pysqlite2 import dbapi2 as sqlite
+    except ImportError:
+        print "SQLite is not installed"
+        raise
 
 def make_date(d):
     if d is None:
@@ -84,7 +85,8 @@ except NameError:
     
 class Base:
 
-    conv_func = {"DATE":make_date,"TIMESTAMP":make_datetime}
+    conv_func = {"DATE":make_date,"TIMESTAMP":make_datetime,
+        "DATETIME":make_datetime}
 
     def __init__(self,basename,connection):
         """basename = name of the PyDbLite database = a MySQL table
@@ -106,13 +108,23 @@ class Base:
             if mode == "override":
                 self.cursor.execute("DROP TABLE %s" %self.name)
             elif mode == "open":
+                import sys
+                sys.stderr.write("base exists")
                 return self.open()
             else:
                 raise IOError,"Base %s already exists" %self.name
         self.fields = [ f[0] for f in fields ]
-        self.all_fields = ["__id__","__version__"]+self.fields
-        _types = ["INTEGER PRIMARY KEY AUTOINCREMENT","INTEGER"] + \
-            [f[1] for f in fields]
+        self.all_fields = ["__id__","__version__"] #+self.fields
+        _types = ["INTEGER PRIMARY KEY AUTOINCREMENT","INTEGER"] #+ \
+        # [f[1] for f in fields]
+        for field in fields:
+            if len(field) !=2:
+                raise SyntaxError,"Error in field definition %s" %field
+            self.all_fields.append(field[0])
+            _type = field[1]
+            if _type.upper() == "DATETIME":
+                _type = "TIMESTAMP"
+            _types.append(_type)
         f_string = [ "%s %s" %(f,t) for (f,t) in zip(self.all_fields,_types)]
         self.types = dict([ (f[0],self.conv_func[f[1].upper()]) 
             for f in fields if f[1].upper() in self.conv_func ])
@@ -141,12 +153,15 @@ class Base:
     def _get_table_info(self):
         """Inspect the base to get field names"""
         self.cursor.execute('PRAGMA table_info (%s)' %self.name)
-        self.all_fields = [ f[1] for f in self.cursor.fetchall() ]
+        fields = [ (f[1],f[2].encode()) for f in self.cursor.fetchall() ]
+        self.all_fields = [ f[0] for f in fields ]
         self.fields = self.all_fields[2:]
+        self.types = dict([ (f[0],self.conv_func[f[1].upper()]) 
+            for f in fields if f[1].upper() in self.conv_func ])
 
     def commit(self):
-        """No use here ???"""
-        pass
+        """Commit changes on disk"""
+        self.conn.commit()
 
     def insert(self,*args,**kw):
         """Insert a record in the database
@@ -244,11 +259,14 @@ class Base:
     def __call__(self,**kw):
         """Selection by field values
         db(key=value) returns the list of records where r[key] = value"""
-        for key in kw:
-            if not key in self.all_fields:
-                raise ValueError,"Field %s not in the database" %key
-        vals = self._make_sql_params(kw)
-        sql = "SELECT * FROM %s WHERE %s" %(self.name,",".join(vals))
+        if kw:
+            for key in kw:
+                if not key in self.all_fields:
+                    raise ValueError,"Field %s not in the database" %key
+            vals = self._make_sql_params(kw)
+            sql = "SELECT * FROM %s WHERE %s" %(self.name," AND ".join(vals))
+        else:
+            sql = "SELECT * FROM %s" %self.name
         self.cursor.execute(sql)
         return [self._make_record(row) for row in self.cursor.fetchall() ]
     
