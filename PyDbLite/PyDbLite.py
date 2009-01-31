@@ -123,7 +123,7 @@ class Base:
         reset = False
         for f in fields:
             if not f in self.fields:
-                raise NameError,"%s is not a field name" %f
+                raise NameError,"%s is not a field name %s" %(f,self.fields)
             # initialize the indices
             if self.mode == "open" and f in self.indices:
                 continue
