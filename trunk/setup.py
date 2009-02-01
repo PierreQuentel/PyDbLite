@@ -3,7 +3,7 @@
 from distutils.core import setup
 
 setup(name='PyDbLite',
-      version='2.2',
+      version='2.3',
       description='PyDbLite, a pure-Python in-memory database',
       author='Pierre Quentel',
       author_email='quentel.pierre@wanadoo.fr',
