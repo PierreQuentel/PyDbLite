@@ -24,6 +24,8 @@ Syntax :
     res = [ r for r in db if 30 > r['age'] >= 18 and r['size'] < 2 ]
     # or generator expression
     for r in (r for r in db if r['name'] in ('homer','marge') ):
+    # or by operators applied to db(field)
+    for r in (30 > db('age') >= 18) & (db('size') < 2) :
     # delete a record or a list of records
     db.delete(one_record)
     db.delete(list_of_records)
@@ -42,9 +44,11 @@ Syntax :
     db.commit()
 
 version 2.2 : added __contains__
+
+version 2.3 : introduce syntax (db('name')>'f') & (db('age') == 30)
 """
 
-__version__ = "2.2"
+version = "2.3"
 
 import os
 import cPickle
@@ -75,6 +79,65 @@ class Index:
         field value is equal to this key, or an empty list"""
         ids = self.db.indices[self.field].get(key,[])
         return [ self.db.records[_id] for _id in ids ]
+
+class Tester:
+
+    def __init__(self,db,key):
+        self.db = db
+        self.key = key
+        self.records = db.records.values()
+
+    def __eq__(self,other):
+        if len(self.records)==len(self.db.records):
+            # use db indices if applicable
+            self.records = eval ("self.db(%s=other)" %self.key)
+        else:
+            self.records = [r for r in self.records if r[self.key]==other]
+        return self
+
+    def __ne__(self,other):
+        self.records = [r for r in self.records if r[self.key]!=other]
+        return self
+
+    def __lt__(self,other):
+        self.records = [r for r in self.records if r[self.key]<other]
+        return self
+
+    def __le__(self,other):
+        self.records = [r for r in self.records if r[self.key]<=other]
+        return self
+
+    def __gt__(self,other):
+        self.records = [r for r in self.records if r[self.key]>other]
+        return self
+        
+    def __ge__(self,other):
+        self.records = [r for r in self.records if r[self.key]>=other]
+        return self
+
+    def __and__(self,other_tester):
+        ids1 = dict([(id(r),r) for r in self.records])
+        ids2 = dict([(id(r),r) for r in other_tester.records])
+        ids = set(ids1.keys()) & set(ids2.keys())
+        res = Tester(self.db,self.key)
+        res.records = [ids1[_id] for _id in ids]
+        return res
+
+    def __or__(self,other_tester):
+        ids = dict([(id(r),r) for r in self.records])
+        ids.update(dict([(id(r),r) for r in other_tester.records]))
+        res = Tester(self.db,self.key)
+        res.records = ids.values()
+        return res
+
+    def extract(self,*fields):
+        return [ [r[f] for f in fields] for r in self.records ]
+
+    def __len__(self):
+        return len(self.records)
+
+    def __iter__(self):
+        return iter(self.records)
 
 class Base:
 
@@ -288,9 +351,18 @@ class Base:
             del self.indices[field]
         self.commit()
 
-    def __call__(self,**kw):
+    def __call__(self,*args,**kw):
         """Selection by field values
         db(key=value) returns the list of records where r[key] = value"""
+        if args and kw:
+            raise SyntaxError,"Can't specify positional AND keyword arguments"
+        if args:
+            if len(args)>1:
+                raise SyntaxError,"Only one field can be specified"
+            elif args[0] not in self.fields:
+                raise ValueError,"%s is not a field" %args[0]
+            else:
+                return Tester(self,args[0])
         if not kw:
             return self.records.values() # db() returns all the values
         # indices and non-indices
@@ -316,9 +388,9 @@ class Base:
                 if self.records[_id][field] == kw[field] ])
         return [ self[_id] for _id in res ]
     
-    def __getitem__(self,record_id):
-        """Direct access by record id"""
-        return self.records[record_id]
+    def __getitem__(self,key):
+        # direct access by record id
+        return self.records[key]
     
     def __len__(self):
         return len(self.records)
@@ -359,11 +431,17 @@ if __name__ == '__main__':
     for rec in db(age=30):
         print '%-10s | %2s | %s' %(rec['name'],rec['age'],round(rec['size'],2))
     print len(db._age[30]) == len(db(age=30))
-    raw_input()
 
     db.insert(name=unicode(random.choice(names))) # missing fields
     print '\nNumber of records with 30 <= age < 33 :',
     print sum([1 for r in db if 33 > r['age'] >= 30])
+    print len(33 > db('age') >= 30)
+
+    print sum([1 for r in db if r['age'] > 30 and r['name']>'f'])
+    print len((db('age')>30) & (db('name')>'f'))
+
+    print len(db('age')==30),len(db(age=30))
+    raw_input()
     
     print db.delete([])
 
@@ -407,4 +485,5 @@ if __name__ == '__main__':
     print k in db._age
 
     db.delete_index("age")
+
     
