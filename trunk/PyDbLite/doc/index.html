@@ -65,8 +65,11 @@ it</a> and install it by running <span class="console">>python setup.py install<
 
 <ul>
 <li> import class <CODE>Base</CODE> from module PyDbLite : <span class="python">from PyDbLite import Base</span>
+</ul>
 
-<li> create a database instance, passing it a path in the file system : <span class="python">db = Base('dummy')</span>
+<h3>Create or open a database</h3>
+<ul>
+<li> create a database instance, passing it a path in the file system : <span class="python">db = Base('dummy.pdl')</span>
 
 <li>for a new database, define the field names : <span class="python">db.create('name','age','size')</span>
 
@@ -90,6 +93,10 @@ you want to do if the base already exists in the file system
 <li> if mode is not specified and the base already exists, an <CODE>IOError</CODE> is raised
 </ul>
 
+</ul>
+
+<h3>Insert, update, delete a record</h3>
+<ul>
 <li> insert a new record
 <ul>
 <li> by keywords : <span class="python">db.insert(name='homer',age=23,size=1.84)</span>
@@ -111,7 +118,39 @@ databases)
 
 <li> another internal field called <CODE>__version__</CODE> is also managed by the database engine. It is a integer which is set to 0 when the record is created, then incremented by 1 each time the record is updated. This is used to detect concurrency control, for instance in a web application where 2 users select the same record and want to update it at the same time
 
-<li>the selection of records uses Python list comprehension syntax :
+<li>to delete a record : <span class="python">db.delete(record)</span> or, if you know the record identifier : <span class="python">del db[rec_id]</span>
+
+<li>to delete a list of records : <span class="python">db.delete(list_of_records)</span>
+
+<br><CODE>list_of_records</CODE> can be any iterable (list, tuple, set, etc) yielding records
+
+<li>to update a record : <span class="python">db.update(record,age=24)</span>
+
+</ul>
+
+<h3>Selection</h3>
+
+<ul><h5>Direct access</h5>
+<li> a record can be accessed by its identifier : <span class="python">record = db[rec_id]</span>
+
+returns the record such that record['__id__'] == rec_id
+
+<li>for simple selections :
+<span class="python">db(key1=val1,key2=val2)</span> returns the list of records where the keys take the given values
+
+<li><span class="python">db(key1) >= val1</span> returns an iterator on all records where the value of the field key1 is greater or equal to val1. Example :
+<blockquote><span class="python">for rec in (db("age")>30):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;	print rec["name"]	</span></blockquote>
+<li>such "rich comparison" operations can be combined with & (and) and | (or) :<br>
+<blockquote><span class="python">for rec in (db("age")>30) & (db("country") == "France"):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;print rec["name"]</span></blockquote>
+</ul>
+
+<ul><h5>List comprehension</h5>
+<li>The instance of Base is a Python iterator ; to iterate on all the records :
+<br><span class="python">for r in db:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;do_something_with(r)</span>
+<li>the selection of records can use Python list comprehension syntax :
 <br><span class="python">recs = [ r for r in db if 30 > r['age'] >= 18 and r['size'] < 2 ]</span>
 
 <br>returns the records in the base where the age is between 18 and 30, and size is below 2 meters. The record is a dictionary, where the key is the field name and value is the field value
@@ -122,36 +161,23 @@ databases)
 
 <br>iterates on the records where the name is one of 'homer' or 'marge'
 
-<li> to iterate on all the records :
-<br><span class="python">for r in db:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;do_something_with(r)</span>
+</ul>
 
-<li> a record can be accessed by its identifier : <span class="python">record = db[rec_id]</span>
+<ul><h5>Index</h5>
+	<li>to speed up selections, an index can be created on a field : <span class="python">db.create_index('age')</span>
 
-returns the record such that record['__id__'] == rec_id
+	<br>When an index is created, the database instance has an attribute (here <CODE>_age</CODE> : note the heading underscore, to avoid name conflicts with internal names). This attribute is a dictionary-like object, where keys are the values taken by the field, and values are the records whose field values are egal to the key :
+	<br><span class="python">records = db._age[23]</span> returns the list of records with age == 23
 
-<li> finally, a shortcut can be used for simple selections :
-<span class="python">db(key1=val1,key2=val2)</span> returns the list of records where the keys take the given value. It is equivalent to <span class="python">[ r for r in db if r["key1"]==val1 and r["key2"]==val2]</span>, but much more concise
+	<br>If no record has this value, lookup by this value returns an empty list
 
-<li>to speed up selections, an index can be created on a field : <span class="python">db.create_index('age')</span>
+	<br>The index supports iteration on the field values, and the <CODE>keys()</CODE> method
+	returns all existing values for the field
+</ul>
 
-<br>When an index is created, the database instance has an attribute (here <CODE>_age</CODE> : note the heading underscore, to avoid name conflicts with internal names). This attribute is a dictionary-like object, where keys are the values taken by the field, and values are the records whose field values are egal to the key :
-<br><span class="python">records = db._age[23]</span> returns the list of records with age == 23
-
-<br>If no record has this value, lookup by this value returns an empty list
-
-<br>The index supports iteration on the field values, and the <CODE>keys()</CODE> method
-returns all existing values for the field
+<h3>Other functions</h3>
 
 <li>number of records in the base : <span class="python">len(db)</span>
-
-<li>to delete a record : <span class="python">db.delete(record)</span> or, if you know the record identifier : <span class="python">del db[rec_id]</span>
-
-<li>to delete a list of records : <span class="python">db.delete(list_of_records)</span>
-
-<br><CODE>list_of_records</CODE> can be any iterable (list, tuple, set, etc) yielding records
-
-<li>to update a record : <span class="python">db.update(record,age=24)</span>
 
 <li>to add a new field to an existing base and specify a default value : <span class="python">db.add_field('new_field'[,default=v])</span>. If no default is provided, the field value is <CODE>None</CODE>
 
@@ -168,7 +194,7 @@ returns all existing values for the field
 <span class="python">from PyDbLite.SQLite import Base</span>
 <li>connect to the SQLite database :
 <span class="python">connection = sqlite.connect("test")</span>
-<li>to create a <code>Base</code> instance (a table in the SQLite database) you pass the connection as argument : <span class="python">db = Base('dummy',connection)</code>
+<li>to create a <code>Base</code> instance (a table in the SQLite database) you pass the connection as argument : <span class="python">db = Base('dummy',connection)</span>
 <li>to create the base you must specify an SQLite field type : NULL, INTEGER, REAL, TEXT
 or BLOB : <span class="python">db.create(('name','TEXT'),('age',"INTEGER'),('size','REAL'))</span>
 <p>For convenience, you can also use the types DATE and DATETIME (or TIMESTAMP), the package will
@@ -191,7 +217,7 @@ by <span class="python">results = db.cursor.fetchall()</span>
  connection.cursor().execute("USE test")
  </span>
 
-<li>pass the connection as argument to Base creation : <span class="python">db = Base('dummy',connection)</code>
+<li>pass the connection as argument to Base creation : <span class="python">db = Base('dummy',connection)</span>
 <li>to create a new base (a table in the MySQL database),specify a valid MySQL field type :
 <span class="python">db.create(('name','INTEGER'),('age',"INTEGER'),('size','REAL'))</span>
 </ul>
