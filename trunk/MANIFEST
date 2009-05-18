@@ -1,0 +1,12 @@
+README.txt
+LICENCE.txt
+setup.py
+PyDbLite\MySQL.py
+PyDbLite\PyDbLite.py
+PyDbLite\PyDbLiteConv.py
+PyDbLite\PyDbLite_SQL.py
+PyDbLite\PyDbLite_conversions.py
+PyDbLite\SQLite.py
+PyDbLite\__init__.py
+PyDbLite\doc\index.html
+PyDbLite\doc\index_fr.html

@@ -49,7 +49,7 @@ ol { margin-left : 20px;
 </style>
 
 <table width="100%" cellspacing="0"><tr><td class="navigation" align="center">PyDbLite</td>
-<td class="lnk" align="right"></td>
+<td class="lnk" align="right"><a href="index_fr.html">Français</a></td>
 </tr></table>
 <p>PyDbLite is a pure-Python in-memory database engine, using Python list
 comprehensions as query language, instead of SQL
@@ -196,7 +196,7 @@ returns the record such that record['__id__'] == rec_id
 <span class="python">connection = sqlite.connect("test")</span>
 <li>to create a <code>Base</code> instance (a table in the SQLite database) you pass the connection as argument : <span class="python">db = Base('dummy',connection)</span>
 <li>to create the base you must specify an SQLite field type : NULL, INTEGER, REAL, TEXT
-or BLOB : <span class="python">db.create(('name','TEXT'),('age',"INTEGER'),('size','REAL'))</span>
+or BLOB : <span class="python">db.create(('name','TEXT'),('age','INTEGER'),('size','REAL'))</span>
 <p>For convenience, you can also use the types DATE and DATETIME (or TIMESTAMP), the package will
 transparently manage the conversions between the <code>datetime.date</code> and
 <code>datetime.datetime</code> and the TEXT type
@@ -211,7 +211,7 @@ by <span class="python">results = db.cursor.fetchall()</span>
 <ul>
 <li>import the class <code>Base</code> :
 <span class="python">from PyDbLite.MySQL import Base</span>
-<li>connect to the SQLite database :
+<li>connect to the MySQL database :
 <p><span class="python">import MySQLdb<br>
  connection = MySQLdb.connect("localhost","root","admin")<br>
  connection.cursor().execute("USE test")
@@ -219,7 +219,7 @@ by <span class="python">results = db.cursor.fetchall()</span>
 
 <li>pass the connection as argument to Base creation : <span class="python">db = Base('dummy',connection)</span>
 <li>to create a new base (a table in the MySQL database),specify a valid MySQL field type :
-<span class="python">db.create(('name','INTEGER'),('age',"INTEGER'),('size','REAL'))</span>
+<span class="python">db.create(('name','INTEGER'),('age','INTEGER'),('size','REAL'))</span>
 </ul>
 
 <p>For record insertion, selection, update and deletion, adding or dropping fields,
