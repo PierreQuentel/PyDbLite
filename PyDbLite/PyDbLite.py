@@ -24,8 +24,6 @@ Syntax :
     res = [ r for r in db if 30 > r['age'] >= 18 and r['size'] < 2 ]
     # or generator expression
     for r in (r for r in db if r['name'] in ('homer','marge') ):
-    # or by operators applied to db(field)
-    for r in (30 > db('age') >= 18) & (db('size') < 2) :
     # delete a record or a list of records
     db.delete(one_record)
     db.delete(list_of_records)
@@ -43,12 +41,14 @@ Syntax :
     # save changes on disk
     db.commit()
 
-version 2.2 : added __contains__
+version 2.2 : add __contains__
 
 version 2.3 : introduce syntax (db('name')>'f') & (db('age') == 30)
+
+version 2.4 : add BSD Licence
 """
 
-version = "2.3"
+version = "2.4"
 
 import os
 import cPickle
