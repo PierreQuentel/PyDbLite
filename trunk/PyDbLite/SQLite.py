@@ -82,6 +82,10 @@ try:
     set([])
 except NameError:
     from sets import Set as set
+
+class SQLiteError(Exception):
+
+    pass
     
 class Base:
 
@@ -108,8 +112,6 @@ class Base:
             if mode == "override":
                 self.cursor.execute("DROP TABLE %s" %self.name)
             elif mode == "open":
-                import sys
-                sys.stderr.write("base exists")
                 return self.open()
             else:
                 raise IOError,"Base %s already exists" %self.name
@@ -119,7 +121,9 @@ class Base:
         # [f[1] for f in fields]
         for field in fields:
             if len(field) !=2:
-                raise SyntaxError,"Error in field definition %s" %field
+                msg = "Error in field definition %s" %field
+                msg += ": should be a 2-element tuple (field_name,field_type)"
+                raise SQLiteError,msg
             self.all_fields.append(field[0])
             _type = field[1]
             if _type.upper() == "DATETIME":
@@ -153,7 +157,8 @@ class Base:
     def _get_table_info(self):
         """Inspect the base to get field names"""
         self.cursor.execute('PRAGMA table_info (%s)' %self.name)
-        fields = [ (f[1],f[2].encode()) for f in self.cursor.fetchall() ]
+        fields = [ (f[1].encode('utf-8'),f[2].encode('utf-8')) 
+            for f in self.cursor.fetchall() ]
         self.all_fields = [ f[0] for f in fields ]
         self.fields = self.all_fields[2:]
         self.types = dict([ (f[0],self.conv_func[f[1].upper()]) 
@@ -176,8 +181,9 @@ class Base:
 
         ks = kw.keys()
         vals = [ str(self._conv(kw[k])) for k in kw.keys() ]
-        sql = "INSERT INTO %s (%s) VALUES (%s)" %(self.name,
-            ",".join(ks),",".join(vals))
+        s1 = ",".join(ks)
+        s2 = ",".join(vals)
+        sql = "INSERT INTO %s (%s) VALUES (%s)" %(self.name,s1,s2)
         self.cursor.execute(sql)
         # return last row id
         return self.cursor.lastrowid
@@ -254,7 +260,7 @@ class Base:
         self.commit()
     
     def drop_field(self,field):
-        raise SyntaxError,"Dropping fields is not supported by SQLite"
+        raise SQLiteError,"Dropping fields is not supported by SQLite"
 
     def __call__(self,**kw):
         """Selection by field values
