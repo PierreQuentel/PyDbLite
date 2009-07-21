@@ -228,7 +228,11 @@ class Base:
 
     def _conv(self,v):
         if isinstance(v,str):
-            return '"%s"' %v.replace("'","''")
+            v = v.replace("'","''")
+            v = v.replace('"','""')
+            return '"%s"' %v
+        elif isinstance(v,unicode):
+            return self._conv(v.encode('utf-8'))
         elif isinstance(v,datetime.datetime):
             if v.tzinfo is not None:
                 raise ValueError,\
