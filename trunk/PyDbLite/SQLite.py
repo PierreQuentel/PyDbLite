@@ -228,7 +228,6 @@ class Base:
 
     def _conv(self,v):
         if isinstance(v,str):
-            v = v.replace("'","''")
             v = v.replace('"','""')
             return '"%s"' %v
         elif isinstance(v,unicode):
