@@ -13,12 +13,10 @@ Differences with PyDbLite:
     result = db.cursor.fetchall()
 
 Syntax :
-    from PyDbLite.SQLite import Base
-    # connect to SQLite database "test"
-    connection = sqlite.connect("test")
-    # pass the connection as argument to Base creation
-    db = Base('dummy',connection)
-    # create new base with field names
+    from PyDbLite.SQLite import Table
+    # create instance of Table with table name and path to the database file
+    table = Table('dummy','test.sqlite')
+    # create new base with field names and types
     db.create(('name','TEXT'),('age',"INTEGER'),('size','REAL'))
     # existing base
     db.open()
@@ -44,6 +42,12 @@ Syntax :
     db.add_field('new_field')
     # save changes on disk
     db.commit()
+
+Version 2.3 : 
+. change name Base to Table (compliant with SQLite vocabulary)
+. in Table(table_name,db), db can either be the connection to the db, or the
+  path of the db in the file system
+
 """
 
 import os
@@ -87,17 +91,20 @@ class SQLiteError(Exception):
 
     pass
     
-class Base:
+class Table:
 
     conv_func = {"DATE":make_date,"TIMESTAMP":make_datetime,
         "DATETIME":make_datetime}
 
-    def __init__(self,basename,connection):
+    def __init__(self,table_name,db):
         """basename = name of the PyDbLite database = a MySQL table
-        connection = a connection to a MySQL database"""
-        self.name = basename
-        self.conn = connection
-        self.cursor = connection.cursor()
+        db = a connection to a SQLite database, or its path"""
+        self.name = table_name
+        if isinstance(db,str):
+            self.conn = sqlite.connect(db)
+        elif isinstance(db,sqlite.Connection):
+            self.conn = db
+        self.cursor = self.conn.cursor()
         self._iterating = False
 
     def create(self,*fields,**kw):
@@ -228,6 +235,7 @@ class Base:
 
     def _conv(self,v):
         if isinstance(v,str):
+            #v = v.replace("'","''")
             v = v.replace('"','""')
             return '"%s"' %v
         elif isinstance(v,unicode):
@@ -290,7 +298,8 @@ class Base:
             return self._make_record(res)
     
     def __len__(self):
-        return len(self.records)
+        self.cursor.execute("SELECT '__id__' FROM %s" %self.name)
+        return len(self.cursor.fetchall())
 
     def __delitem__(self,record_id):
         """Delete by record id"""
@@ -302,21 +311,12 @@ class Base:
         results = [ self._make_record(r) for r in self.cursor.fetchall() ]
         return iter(results)
 
+# compatibility with previous versions
+Base = Table
+
 if __name__ == '__main__':
 
-    try:
-        from sqlite3 import dbapi2 as sqlite
-    except ImportError:
-        try:
-            from pysqlite2 import dbapi2 as sqlite
-        except ImportError:
-            print "SQLite is not installed"
-            raise
-
-    connection = sqlite.connect("test_sqlite")
-    cursor = connection.cursor()
-
-    db = Base("pydbsqlite_test",connection).create(("name","TEXT"),("age","INTEGER"),
+    db = Table("pydbsqlite_test","test_sqlite").create(("name","TEXT"),("age","INTEGER"),
         ("size","REAL"),("birth","TIMESTAMP"),
         mode="override")
 
@@ -325,6 +325,8 @@ if __name__ == '__main__':
     except:
         pass
 
+    print len(db)
+    
     import random
     import datetime
 
