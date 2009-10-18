@@ -1,5 +1,9 @@
 """PyDbLite.py
 
+BSD licence
+
+Author : Pierre Quentel (pierre.quentel@gmail.com)
+
 In-memory database management, with selection by list comprehension 
 or generator expression
 

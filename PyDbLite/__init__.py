@@ -1,1 +1,1 @@
-from PyDbLite import Base
+from PyDbLite import *
