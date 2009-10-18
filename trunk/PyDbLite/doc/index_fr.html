@@ -29,11 +29,11 @@ td.navigation
 { background-color: #99ccff;
   font-weight: bold;
   font-family: avantgarde, sans-serif;
-  font-size: 110%;
+  font-size: 150%;
   width: 90%}
 
 td.lnk { background-color: #99ccff;
-  font-size: 70%;
+  font-size: 100%;
     }
 
 td.tablename { vertical-align: top;
@@ -46,12 +46,20 @@ ol { margin-left : 20px;
 
 </style>
 
-<table width="100%" cellspacing="0"><tr><td class="navigation" align="center">PyDbLite</td>
-<td class="lnk" align="right"><a href="index.html">English</a></td>
-</tr></table>
-<p>PyDbLite est un moteur de base de données en mémoire, en pur Python, qui utilise les "list comprehensions" de Python comme langage de requêtes au lieu de SQL
+<table width="100%" cellspacing="0" cellpadding="10">
 
-<p>Il consiste en un petit module, <code>PyDbLite.py</code>. Le paquetage fournit également deux modules<code>SQLite.py</code> et <code>MySQL.py</code>. Ils permettent de manipuler des bases de données SQLite et MySQL avec la même syntaxe pythonique que le moteur PyDbLite en pur Python
+<tr>
+<td class="lnk" ><a href="licence_fr.html">Licence</a>
+</td>
+
+<td class="navigation" align="center">PyDbLite</td>
+<td class="lnk" align="right"><a href="index.html">English</a></td>
+
+</tr>
+</table>
+<p>PyDbLite est un moteur de base de données en mémoire, en pur Python, qui utilise les "list comprehensions" de Python comme langage de requêtes au lieu de SQL. Il consiste en un petit module, <code>PyDbLite.py</code>
+
+<p>Le paquetage fournit également deux modules<code>SQLite.py</code> et <code>MySQL.py</code>. Ils permettent de manipuler des bases de données SQLite et MySQL avec la même syntaxe pythonique que le moteur PyDbLite en pur Python
 
 <p>Pour l'installer, il suffit de le <a href="http://sourceforge.net/project/platformdownload.php?group_id=210258">télécharger</a> et de le mettre dans le répertoire <code>Lib/site-packages</code> de votre distribution Python
 
@@ -177,20 +185,19 @@ retourne l'enregistrement tel que record['__id__'] == rec_id
 </ul>
 
 <a name="sqlite"><p><h2>Adaptateur SQLite</h2>
-<p>La seule différence avec le module en pur Python est la syntaxe pour identifier une <code>Base</code> et la nécessité de spécifier le type des champs quand on crée une base
+<p>La seule différence avec le module en pur Python est la syntaxe pour identifier une table et la nécessité de spécifier le type des champs quand on crée une base
+<p>Pour rester cohérent avec le vocabulaire de SQLite, on utilise plutôt le nom <code>Table</code> que <code>Base</code>
 <ul>
-<li>importer la classe <code>Base</code> :
-<span class="python">from PyDbLite.SQLite import Base</span>
-<li>connection à la base de données SQLite :
-<span class="python">connection = sqlite.connect("test")</span>
-<li>pour créer une instance de <code>Base</code> (une table dans la base de données SQLite) il faut passer la connection en argument : <span class="python">db = Base('machpro',connection)</span>
-<li>pour créer une base il faut spécifier un type de champ SQLite : NULL, INTEGER, REAL, TEXT
+<li>importer la classe <code>Table</code> :
+<span class="python">from PyDbLite.SQLite import Table</span>
+<li>pour créer une instance de <code>Base</code> (une table dans la base de données SQLite) il faut passer 2 argument : le nom de la table, et le chemin de la base dans le système de fichiers : <span class="python">db = Base('machpro','test')</span>
+<li>pour créer une table il faut spécifier un type de champ SQLite : NULL, INTEGER, REAL, TEXT
 ou BLOB : <span class="python">db.create(('nom','TEXT'),('age','INTEGER'),('taille','REAL'))</span>
 <p>Pour simplifier, vous pouvez aussi utiliser les types DATE et DATETIME (ou TIMESTAMP), le programme fera lui-même les conversions entre les instances de <code>datetime.date</code> et
 <code>datetime.datetime</code> et le type TEXT
 </ul>
 <p>Pour l'insertion, la sélection, la mise à jour et la suppression, la syntaxe est la même que ci-dessus. La seule différence est qu'on ne peut pas utiliser la méthode <code>drop_field()</code>, parce que la suppression de champs n'est pas supportée par SQLite
-<p>L'instance de <code>Base</code> a un attribute <code>cursor</code>, ce qui permet d'exécuter des commandes SQL par <span class="python">db.cursor.execute(expression_sql)</span> et récupérer le résultat par <span class="python">results = db.cursor.fetchall()</span>
+<p>L'instance de <code>Table</code> a un attribut <code>cursor</code>, ce qui permet d'exécuter des commandes SQL par <span class="python">db.cursor.execute(expression_sql)</span> et récupérer le résultat par <span class="python">results = db.cursor.fetchall()</span>
 
 <p><a name="mysql"><h2>Adaptateur MySQL</h2>
 <p>La seule différence avec le module en pur Python est la syntaxe pour identifier une <code>Base</code> et la nécessité de spécifier le type des champs quand on crée une base
