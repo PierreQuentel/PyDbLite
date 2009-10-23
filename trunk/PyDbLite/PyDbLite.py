@@ -49,7 +49,9 @@ version 2.2 : add __contains__
 
 version 2.3 : introduce syntax (db('name')>'f') & (db('age') == 30)
 
-version 2.4 : add BSD Licence
+version 2.4 : 
+- add BSD Licence
+- raise exception if unknown fields in insert
 """
 
 version = "2.4"
@@ -252,8 +254,10 @@ class Base:
             kw = dict([(f,arg) for f,arg in zip(self.fields,args)])
         # initialize all fields to None
         record = dict([(f,None) for f in self.fields])
-        # ignore unknown fields
-        kw = dict([(k,v) for (k,v) in kw.iteritems() if k in self.fields])        
+        # raise exception if unknown field
+        for key in kw:
+            if not key in self.fields:
+                raise NameError,"Invalid field name : %s" %key
         # set keys and values
         for (k,v) in kw.iteritems():
             record[k]=v
