@@ -3,8 +3,6 @@
 Differences with PyDbLite:
 - pass the connection to the SQLite db as argument to Base()
 - in create(), field definitions must specify a type
-    DATE for datetime.date
-    TIMESTAMP or DATETIME for datetime.date
 - no index
 - no drop_field (not supported by SQLite)
 - the Base() instance has a cursor attribute, so that SQL requests
@@ -48,13 +46,16 @@ Version 2.3 :
 . in Table(table_name,db), db can either be the connection to the db, or the
   path of the db in the file system
 
+Version 2.5 :
+. add class Database, rename Base to Table
+. changes to accept all legacy SQLite dbs (eg remove __version__, only accept
+  SQLite types TEXT, BLOB, REAL, INTEGER, more inspection in _get_table_info())
 """
 
 import os
 import cPickle
 import bisect
-
-import datetime
+import re
 
 # test if sqlite is installed or raise exception
 try:
@@ -66,21 +67,6 @@ except ImportError:
         print "SQLite is not installed"
         raise
 
-def make_date(d):
-    if d is None:
-        return None
-    d = str(d)
-    y,m,d = int(d[:4]),int(d[4:6]),int(d[6:])
-    return datetime.date(y,m,d)
-
-def make_datetime(d):
-    if d is None:
-        return None
-    d = str(d)
-    y,m,d,h,mn,s = int(d[:4]),int(d[4:6]),int(d[6:8]),\
-        int(d[8:10]),int(d[10:12]),int(d[12:14])
-    return datetime.datetime(y,m,d,h,mn,s)
-
 # compatibility with Python 2.3
 try:
     set([])
@@ -88,13 +74,84 @@ except NameError:
     from sets import Set as set
 
 class SQLiteError(Exception):
-
     pass
-    
-class Table:
 
-    conv_func = {"DATE":make_date,"TIMESTAMP":make_datetime,
-        "DATETIME":make_datetime}
+# conversion functions
+conv_func = {'INTEGER':int,'REAL':float,'BLOB':str,'TIMESTAMP':float}
+def conv(txt):
+    if isinstance(txt,str):
+        return str
+    elif isinstance(txt,unicode):
+        return txt.encode('utf-8')
+conv_func['TEXT'] = conv
+
+# if default value is CURRENT_DATE etc. SQLite doesn't
+# give the information, default is the value of the
+# variable as a string. We have to guess...
+# CURRENT_TIME format is HH:MM:SS
+# CURRENT_DATE : YYYY-MM-DD
+# CURRENT_TIMESTAMP : YYYY-MM-DD HH:MM:SS
+c_time_fmt = re.compile('(\d\d):(\d\d):(\d\d)')
+c_date_fmt = re.compile('(\d\d\d\d)-(\d\d)-(\d\d)')
+c_tmsp_fmt = re.compile('(\d\d\d\d)-(\d\d)-(\d\d) (\d\d):(\d\d):(\d\d)')
+
+def guess_default_fmt(value):
+    mo = c_time_fmt.match(value)
+    if mo:
+        h,m,s = [int(x) for x in mo.groups()]
+        if (0<=h<=23) and (0<=m<=59) and (0<=s<=59):
+            return CURRENT_TIME
+    mo = c_date_fmt.match(value)
+    if mo:
+        y,m,d = [int(x) for x in mo.groups()]
+        try:
+            date(y,m,d)
+            return CURRENT_DATE
+        except:
+            pass
+    mo = c_tmsp_fmt.match(value)
+    if mo:
+        y,mth,d,h,mn,s = [int(x) for x in mo.groups()]
+        try:
+            datetime(y,mth,d,h,mn,s)
+            return CURRENT_TIMESTAMP
+        except:
+            pass
+    return value
+
+# classes for default CURRENT_TIME, CURRENT_DATE or CURRENT_TIMESTAMP
+import datetime
+
+class CURRENT_DATE:
+
+    def __call__(self):
+        return datetime.date.today().strftime('%Y-%M-%D')
+
+class CURRENT_TIME:
+
+    def __call__(self):
+        return datetime.datetime.now().strftime('%h:%m:%s')
+
+class CURRENT_TIMESTAMP:
+
+    def __call__(self):
+        return datetime.datetime.now().strftime('%Y-%M-%D %h:%m:%s')
+
+class Database:
+
+    def __init__(self,db):
+        self.conn = sqlite.connect(db)
+        self.cursor = self.conn.cursor()
+
+    def tables(self):
+        tables = []
+        self.cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
+        for table_info in self.cursor.fetchall():
+            if table_info[0] != 'sqlite_sequence':
+                tables.append(Table(table_info[0],self.conn))
+        return tables
+
+class Table:
 
     def __init__(self,table_name,db):
         """basename = name of the PyDbLite database = a MySQL table
@@ -108,12 +165,17 @@ class Table:
         self._iterating = False
 
     def create(self,*fields,**kw):
-        """Create a new base with specified field names
+        """Create a new base with specified fields
+        Each field is a tuple with 2 or 3 elements
+        - 1st : field name
+        - 2nd : field type
+        - optional 3rd : a dictionary with keys = 'allow_empty' and/or 'default'
         A keyword argument mode can be specified ; it is used if a file
         with the base name already exists
         - if mode = 'open' : open the existing base, ignore the fields
         - if mode = 'override' : erase the existing base and create a
-        new one with the specified fields"""
+        new one with the specified fields
+        """
         mode = kw.get("mode",None)
         if self._table_exists():
             if mode == "override":
@@ -122,26 +184,71 @@ class Table:
                 return self.open()
             else:
                 raise IOError,"Base %s already exists" %self.name
-        self.fields = [ f[0] for f in fields ]
-        self.all_fields = ["__id__","__version__"] #+self.fields
-        _types = ["INTEGER PRIMARY KEY AUTOINCREMENT","INTEGER"] #+ \
-        # [f[1] for f in fields]
+        self.fields = []
+        self.field_info = {}
+        sql = 'CREATE TABLE %s (' %self.name
         for field in fields:
-            if len(field) !=2:
+            name = field[0]
+            self.fields.append(name)
+            if len(field) <2 or len(field)>3:
                 msg = "Error in field definition %s" %field
-                msg += ": should be a 2-element tuple (field_name,field_type)"
+                msg += ": should be a 2- or 3-element tuple"
+                msg += "(field_name,field_type[,info_dict])"
                 raise SQLiteError,msg
-            self.all_fields.append(field[0])
             _type = field[1]
-            if _type.upper() == "DATETIME":
-                _type = "TIMESTAMP"
-            _types.append(_type)
-        f_string = [ "%s %s" %(f,t) for (f,t) in zip(self.all_fields,_types)]
-        self.types = dict([ (f[0],self.conv_func[f[1].upper()]) 
-            for f in fields if f[1].upper() in self.conv_func ])
-        sql = "CREATE TABLE %s (%s)" %(self.name,",".join(f_string))
+            self.field_info[name] = {'type':_type}
+            if not _type in ['NULL','INTEGER','REAL','TEXT','BLOB']:
+                raise SQLiteError,"Unknow type %s" %_type
+            self.field_info['conv'] = conv_func[_type]
+            sql += '%s %s' %(name,_type)
+            if len(field)==3: # default value
+                info = field[2]
+                if info.get('NOT NULL',False) is True:
+                    sql += ' NOT NULL'
+                default = field[2].get('DEFAULT',None)
+                sql += self._validate_default(name,_type,default)
+            sql += ','
+        sql = sql[:-1]+')'
         self.cursor.execute(sql)
         return self
+
+    def _validate_default(self,name,_type,default):
+        if default is None:
+            return ''
+        if _type=='INTEGER':
+            if isinstance(default,int):
+                self.field_info[name]['default'] = default
+                sql = " DEFAULT %s" %default
+            else:
+                raise SQLiteError,'Default value for %s is not %s' \
+                %(name,_type)
+        elif _type=='REAL':
+            if isinstance(default,float):
+                self.field_info[name]['default'] = default
+                sql = " DEFAULT %s" %default
+            else:
+                raise SQLiteError,'Default value for %s is not %s' \
+                %(name,_type)
+        elif _type=='TEXT':
+            if isinstance(default,(str,unicode)):
+                default = default.replace('"','""')
+                self.field_info[name]['default'] = default
+                sql = ' DEFAULT "%s"' %default
+            else:
+                raise SQLiteError,'Default value for %s is not %s' \
+                %(name,_type)
+        elif _type=='BLOB':
+            if isinstance(default,str):
+                self.field_info[name]['default'] = default
+                sql = ' DEFAULT "%s"' %default
+            elif default in [CURRENT_TIME,CURRENT_DATE,
+                CURRENT_TIMESTAMP]:
+                self.field_info[name]['default'] = default
+                sql = ' DEFAULT %s' %default.__name__
+            else:
+                raise SQLiteError,'Default value for %s is not %s' \
+                    %(name,_type)
+        return sql
 
     def open(self):
         """Open an existing database"""
@@ -154,6 +261,12 @@ class Table:
             # table not found
             raise IOError,"Table %s doesn't exist" %self.name
 
+    def drop(self):
+        """Drop the table from the database"""
+        sql = "DROP TABLE %s" %self.name
+        self.cursor.execute(sql)
+        self.commit()
+
     def _table_exists(self):
         self.cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
         for table_info in self.cursor.fetchall():
@@ -163,13 +276,22 @@ class Table:
 
     def _get_table_info(self):
         """Inspect the base to get field names"""
+        self.fields = []
+        self.field_info = {}
         self.cursor.execute('PRAGMA table_info (%s)' %self.name)
-        fields = [ (f[1].encode('utf-8'),f[2].encode('utf-8')) 
-            for f in self.cursor.fetchall() ]
-        self.all_fields = [ f[0] for f in fields ]
-        self.fields = self.all_fields[2:]
-        self.types = dict([ (f[0],self.conv_func[f[1].upper()]) 
-            for f in fields if f[1].upper() in self.conv_func ])
+        for field_info in self.cursor.fetchall():
+            fname = field_info[1].encode('utf-8')
+            self.fields.append(fname)
+            ftype = field_info[2].encode('utf-8')
+            info = {'type':ftype,'conv':conv_func[ftype]}
+            # can be null ?
+            info['NOT NULL'] = field_info[3] != 0
+            # default value
+            default = field_info[4]
+            if isinstance(default,unicode):
+               default = guess_default_fmt(default)
+            info['DEFAULT'] = default
+            self.field_info[fname] = info
 
     def commit(self):
         """Commit changes on disk"""
@@ -183,8 +305,7 @@ class Table:
         Returns the record identifier
         """
         if args:
-            kw = dict([(f,arg) for f,arg in zip(self.all_fields[2:],args)])
-        kw["__version__"] = 0
+            kw = dict([(f,arg) for f,arg in zip(self.fields,args)])
 
         ks = kw.keys()
         vals = [ str(self._conv(kw[k])) for k in kw.keys() ]
@@ -211,17 +332,15 @@ class Table:
             return 0
         _ids = [ r['__id__'] for r in removed ]
         _ids.sort()
-        sql = "DELETE FROM %s WHERE __id__ IN (%s)" %(self.name,
+        sql = "DELETE FROM %s WHERE rowid IN (%s)" %(self.name,
             ",".join([str(_id) for _id in _ids]))
         self.cursor.execute(sql)
         return len(removed)
 
     def update(self,record,**kw):
         """Update the record with new keys and values"""
-        # increment version number
-        kw["__version__"] = record["__version__"] + 1
         vals = self._make_sql_params(kw)
-        sql = "UPDATE %s SET %s WHERE __id__=%s" %(self.name,
+        sql = "UPDATE %s SET %s WHERE rowid=%s" %(self.name,
             ",".join(vals),record["__id__"])
         self.cursor.execute(sql)
 
@@ -235,39 +354,41 @@ class Table:
 
     def _conv(self,v):
         if isinstance(v,str):
-            #v = v.replace("'","''")
             v = v.replace('"','""')
             return '"%s"' %v
         elif isinstance(v,unicode):
             return self._conv(v.encode('utf-8'))
-        elif isinstance(v,datetime.datetime):
-            if v.tzinfo is not None:
-                raise ValueError,\
-                    "datetime instances with tzinfo not supported"
-            return v.strftime("%Y%m%d%H%M%S%Z")
-        elif isinstance(v,datetime.date):
-            return v.strftime("%Y%m%d")
         else:
             return v
 
     def _make_record(self,row):
         """Make a record dictionary from the result of a fetch_"""
-        res = dict(zip(self.all_fields,row))
-        for k in self.types:
-            res[k] = self.types[k](res[k])
+        res = dict(zip(['__id__']+[f for f in self.fields],row))
+        for f in self.fields:
+            if res[f] is not None:
+                res[f] = conv_func[self.field_info[f]['type']](res[f])
         return res
         
-    def add_field(self,field,default=None):
-        fname,ftype = field
-        if fname in self.all_fields:
-            raise ValueError,'Field "%s" already defined' %fname
-        self.all_fields.append(fname)
-        if ftype.upper() in self.conv_func:
-            self.types[fname] = self.conv_func[ftype.upper()]
-        sql = "ALTER TABLE %s ADD %s %s" %(self.name,fname,ftype)
-        if default is not None:
-            sql += " DEFAULT %s" %self._conv(default)
-        self.cursor.execute(sql)
+    def add_field(self,*fields):
+        for field in fields:
+            if len(field)==2:
+                fname,ftype = field
+                default = None
+            elif len(field)==3:
+                fname,ftype,info = field
+                default = info.get('DEFAULT',None)
+            if fname in self.fields:
+                raise ValueError,'Field "%s" already defined' %fname
+            self.fields.append(fname)
+            if ftype.upper() in conv_func:
+                self.field_info[fname] = {'type':ftype.upper(),
+                    'conv':conv_func[ftype.upper()]}
+            else:
+                raise SQLiteError,'Unknown type %s' %ftype
+            sql = "ALTER TABLE %s ADD %s %s" %(self.name,fname,ftype)
+            if default is not None:
+                sql += self._validate_default(fname,ftype,default)
+            self.cursor.execute(sql)
         self.commit()
     
     def drop_field(self,field):
@@ -278,18 +399,18 @@ class Table:
         db(key=value) returns the list of records where r[key] = value"""
         if kw:
             for key in kw:
-                if not key in self.all_fields:
+                if not key in self.fields:
                     raise ValueError,"Field %s not in the database" %key
             vals = self._make_sql_params(kw)
-            sql = "SELECT * FROM %s WHERE %s" %(self.name," AND ".join(vals))
+            sql = "SELECT rowid,* FROM %s WHERE %s" %(self.name," AND ".join(vals))
         else:
-            sql = "SELECT * FROM %s" %self.name
+            sql = "SELECT rowid,* FROM %s" %self.name
         self.cursor.execute(sql)
         return [self._make_record(row) for row in self.cursor.fetchall() ]
     
     def __getitem__(self,record_id):
         """Direct access by record id"""
-        sql = "SELECT * FROM %s WHERE __id__=%s" %(self.name,record_id)
+        sql = "SELECT rowid,* FROM %s WHERE rowid=%s" %(self.name,record_id)
         self.cursor.execute(sql)
         res = self.cursor.fetchone()
         if res is None:
@@ -298,7 +419,7 @@ class Table:
             return self._make_record(res)
     
     def __len__(self):
-        self.cursor.execute("SELECT '__id__' FROM %s" %self.name)
+        self.cursor.execute("SELECT rowid FROM %s" %self.name)
         return len(self.cursor.fetchall())
 
     def __delitem__(self,record_id):
@@ -307,7 +428,7 @@ class Table:
         
     def __iter__(self):
         """Iteration on the records"""
-        self.cursor.execute("SELECT * FROM %s" %self.name)
+        self.cursor.execute("SELECT rowid,* FROM %s" %self.name)
         results = [ self._make_record(r) for r in self.cursor.fetchall() ]
         return iter(results)
 
@@ -316,8 +437,10 @@ Base = Table
 
 if __name__ == '__main__':
 
-    db = Table("pydbsqlite_test","test_sqlite").create(("name","TEXT"),("age","INTEGER"),
-        ("size","REAL"),("birth","TIMESTAMP"),
+    db = Table("pydbsqlite_test","test_sqlite")
+    db.create(("name","TEXT",{'NOT NULL':True}),
+        ("age","INTEGER"),
+        ("size","REAL"),("birth","BLOB"),("date","BLOB",{'DEFAULT':CURRENT_DATE}),
         mode="override")
 
     try:
@@ -337,7 +460,7 @@ if __name__ == '__main__':
     for i in range(1000):
         db.insert(name=random.choice(names),
              age=random.randint(7,47),size=random.uniform(1.10,1.95),
-             birth=datetime.datetime(1990,10,10,20,10,20,2345))
+             birth=datetime.datetime(1990,10,10,20,10,20,2345).strftime('%Y-%m-%d %H:%M:%S'))
     db.commit()
 
     print 'Record #20 :',db[20]
@@ -373,7 +496,12 @@ if __name__ == '__main__':
     print len([r for r in db if r['name'] in ['pierre','Pierre']]),'p/Pierre'
     print 'is unicode :',isinstance(db[20]['name'],unicode)
     db.commit()
+
     db.open()
+
+    for field in db.fields:
+        print field,db.field_info[field]
+
     print '\nSame operation after commit + open'
     print len([r for r in db if r['name']=='Pierre']),'Pierre'
     print len([r for r in db if r['name']=='pierre']),'pierre'
@@ -387,7 +515,8 @@ if __name__ == '__main__':
 
     print db[22]
     print "add field adate"
-    db.add_field(('adate',"DATE"),datetime.date.today())
+    db.add_field(('adate',"BLOB",
+        {'DEFAULT':datetime.date.today().strftime('%Y-%m-%d')}))
     
     print db[22]
     
