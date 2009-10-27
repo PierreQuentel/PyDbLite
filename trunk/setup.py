@@ -3,11 +3,11 @@
 from distutils.core import setup
 
 setup(name='PyDbLite',
-      version='2.4',
+      version='2.5',
       description='PyDbLite, a fast, pure-Python in-memory database',
       author='Pierre Quentel',
-      author_email='quentel.pierre@wanadoo.fr',
-      url='http://pydblite.sourceforge.net/',
+      author_email='pierre.quentel@gmail.com',
+      url='http://www.pydblite.net/',
       packages=['PyDbLite'],
       classifiers=[
           'Development Status :: 5 - Production/Stable',
