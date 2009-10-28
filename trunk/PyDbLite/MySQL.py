@@ -11,45 +11,47 @@ Differences with PyDbLite:
 
 Fields must be declared 
 Syntax :
-    from PyDbLite.MySQL import Base
-    import MySQLdb
-    # connect to a MySQL server and use database "test"
-    connection = MySQLdb.connect("localhost","root","admin")
-    connection.cursor().execute("USE test")
+    from PyDbLite.MySQL import Database,Table
+    db = Database("localhost","root","admin")
     # pass the connection as argument to Base creation
-    db = Base('dummy',connection)
-    # create new base with field names
-    db.create(('name','INTEGER'),('age',"INTEGER'),('size','REAL'))
-    # existing base
-    db.open()
+    table = Table('dummy',db)
+    # create new table with field names
+    table.create(('name','INTEGER PRIMARY KEY AUTO_INCREMENT'),
+        ('age','INTEGER'),('size','REAL'))
+    # open existing base
+    table.open()
     # insert new record
-    db.insert(name='homer',age=23,size=1.84)
-    # records are dictionaries with a unique integer key __id__
+    table.insert(name='homer',age=23,size=1.84)
     # selection by list comprehension
-    res = [ r for r in db if 30 > r['age'] >= 18 and r['size'] < 2 ]
+    res = [ r for r in table if 30 > r['age'] >= 18 and r['size'] < 2 ]
     # or generator expression
-    for r in (r for r in db if r['name'] in ('homer','marge') ):
+    for r in (r for r in table if r['name'] in ('homer','marge') ):
     # simple selection (equality test)
-    res = db(age=30)
+    res = table(age=30)
+
+    # the following methods only work if the table has an
+    # AUTO_INCREMENT
     # delete a record or a list of records
-    db.delete(one_record)
-    db.delete(list_of_records)
+    table.delete(one_record)
+    table.delete(list_of_records)
     # delete a record by its id
-    del db[rec_id]
+    del table[rec_id]
     # direct access by id
-    record = db[rec_id] # the record such that record['__id__'] == rec_id
+    record = table[rec_id] # the record such that record['__id__'] == rec_id
     # update
-    db.update(record,age=24)
+    table.update(record,age=24)
     # add and drop fields
-    db.add_field('new_field')
-    db.drop_field('name')
+    table.add_field('new_field')
+    table.drop_field('name')
     # save changes on disk
-    db.commit()
+    table.commit()
 """
 
 import os
 import cPickle
 import bisect
+
+import datetime
 
 import MySQLdb
 
@@ -58,15 +60,34 @@ try:
     set([])
 except NameError:
     from sets import Set as set
-    
-class Base:
 
-    def __init__(self,basename,connection):
+# built-in MySQL types
+TYPES = ['INTEGER','REAL','TEXT','BLOB']
+
+
+class MySQLError(Exception):
+
+    pass
+
+
+class Database:
+
+    def __init__(self,host,login,password):
+        self.conn = MySQLdb.connect(host,login,password)
+        self.cursor = self.conn.cursor()
+
+    def tables(self):
+        self.cursor.execute("SHOW TABLES")
+        return [ Table(t[0],self.conn) for t in self.cursor.fetchall() ]
+    
+class Table:
+
+    def __init__(self,basename,db):
         """basename = name of the PyDbLite database = a MySQL table
-        connection = a connection to a MySQL database"""
+        db = an instance of Database"""
         self.name = basename
-        self.conn = connection
-        self.cursor = connection.cursor()
+        self.conn = db
+        self.cursor = db.cursor
         self._iterating = False
 
     def create(self,*fields,**kw):
@@ -84,15 +105,52 @@ class Base:
                 return self.open()
             else:
                 raise IOError,"Base %s already exists" %self.name
-        self.fields = [ f[0] for f in fields ]
-        self.all_fields = ["__id__","__version__"]+self.fields
-        _types = ["INTEGER PRIMARY KEY AUTO_INCREMENT","INTEGER"] + \
-            [f[1] for f in fields]
-        f_string = [ "%s %s" %(f,t) for (f,t) in zip(self.all_fields,_types)]
-        sql = "CREATE TABLE %s (%s)" %(self.name,
-            ",".join(f_string))
+        self.fields = []
+        self.field_info = {}
+        sql = "CREATE TABLE %s (" %self.name
+        for field in fields:
+            sql += self._validate_field(field)
+            sql += ','
+        sql = sql[:-1]+')'
         self.cursor.execute(sql)
+        self._get_table_info()
         return self
+
+    def _validate_field(self,field):
+        if len(field) not in [2,3]:
+            msg = "Error in field definition %s" %field
+            msg += ": should be a 2- or 3-element tuple"
+            msg += " (field_name,field_type[,info])"
+            raise MySQLError,msg
+        if field[0] in self.fields:
+            raise MySQLError,'Field %s already defined' %field[0]
+        # no control on types : we leave this to MySQL
+        self.fields.append(field[0])
+        self.field_info[field[0]] = {'type':field[1]}
+        # for SQL, convert types into one of SQLite built-ins
+        sql = '%s %s' %(field[0],field[1])
+        if len(field) == 3:
+            info = field[2]
+            if info.get('NOT NULL',None) is True:
+                sql += ' NOT NULL'
+            default = info.get('DEFAULT',None)
+            if 'DEFAULT' is not None:
+                sql += self._validate_default(field[0],field[1],default)
+        return sql
+
+    def _validate_default(self,name,_type,default):
+        if default is None:
+            return ''
+        if default in (CURRENT_DATE,CURRENT_TIME,CURRENT_TIMESTAMP):
+            if _type == 'BLOB':
+                sql = default.__name__
+            else:
+                raise MySQLError,'Bad field type %s for default %s' \
+                    %(_type,default.__name__)
+        else:
+            sql = to_SQLite[_type](default)
+        self.field_info[name]['DEFAULT'] = default
+        return ' DEFAULT %s' %sql
 
     def open(self):
         """Open an existing database"""
@@ -113,9 +171,17 @@ class Base:
 
     def _get_table_info(self):
         """Database-specific method to get field names"""
+        self.rowid = None
+        self.fields = []
+        self.field_info = {}
         self.cursor.execute('DESCRIBE %s' %self.name)
-        self.all_fields = [ f[0] for f in self.cursor.fetchall() ]
-        self.fields = self.all_fields[2:]
+        for row in self.cursor.fetchall():
+            field,typ,null,key,default,extra = row
+            self.fields.append(field)
+            info = {'type':typ,'NOT NULL':null,'key':key,
+                'DEFAULT':default,'extra':extra}
+            if extra == 'auto_increment':
+                self.rowid = field
 
     def commit(self):
         """No use here ???"""
@@ -129,8 +195,7 @@ class Base:
         Returns the record identifier
         """
         if args:
-            kw = dict([(f,arg) for f,arg in zip(self.all_fields[2:],args)])
-        kw["__version__"] = 0
+            kw = dict([(f,arg) for f,arg in zip(self.fields,args)])
 
         vals = self._make_sql_params(kw)
         sql = "INSERT INTO %s SET %s" %(self.name,",".join(vals))
@@ -145,6 +210,8 @@ class Base:
         and don't have twice the same __id__
         Return the number of deleted items
         """
+        if self.rowid is None:
+            raise MySQLError,"Can't use delete() : missing row id"
         if isinstance(removed,dict):
             # remove a single record
             removed = [removed]
@@ -153,9 +220,9 @@ class Base:
             removed = [ r for r in removed ]
         if not removed:
             return 0
-        _ids = [ r['__id__'] for r in removed ]
+        _ids = [ r[self.rowid] for r in removed ]
         _ids.sort()
-        sql = "DELETE FROM %s WHERE __id__ IN (%s)" %(self.name,
+        sql = "DELETE FROM %s WHERE %s IN (%s)" %(self.name,self.rowid,
             ",".join([str(_id) for _id in _ids]))
         self.cursor.execute(sql)
         return len(removed)
@@ -163,10 +230,11 @@ class Base:
     def update(self,record,**kw):
         """Update the record with new keys and values"""
         # increment version number
-        kw["__version__"] = record["__version__"] + 1
+        if self.rowid is None:
+            raise MySQLError,"Can't use update() : missing row id"
         vals = self._make_sql_params(kw)
-        sql = "UPDATE %s SET %s WHERE __id__=%s" %(self.name,
-            ",".join(vals),record["__id__"])
+        sql = "UPDATE %s SET %s WHERE %s=%s" %(self.name,
+            ",".join(vals),self.rowid,record[self.rowid])
         self.cursor.execute(sql)
 
     def _make_sql_params(self,kw):
@@ -188,11 +256,11 @@ class Base:
 
     def _make_record(self,row):
         """Make a record dictionary from the result of a fetch_"""
-        return dict(zip(self.all_fields,row))
+        return dict(zip(self.fields,row))
         
     def add_field(self,field,default=None):
         fname,ftype = field
-        if fname in self.all_fields:
+        if fname in self.fields:
             raise ValueError,'Field "%s" already defined' %fname
         sql = "ALTER TABLE %s ADD %s %s" %(self.name,fname,ftype)
         if default is not None:
@@ -202,8 +270,6 @@ class Base:
         self._get_table_info()
     
     def drop_field(self,field):
-        if field in ["__id__","__version__"]:
-            raise ValueError,"Can't delete field %s" %field
         if not field in self.fields:
             raise ValueError,"Field %s not found in base" %field
         sql = "ALTER TABLE %s DROP %s" %(self.name,field)
@@ -214,7 +280,7 @@ class Base:
         """Selection by field values
         db(key=value) returns the list of records where r[key] = value"""
         for key in kw:
-            if not key in self.all_fields:
+            if not key in self.fields:
                 raise ValueError,"Field %s not in the database" %key
         vals = self._make_sql_params(kw)
         sql = "SELECT * FROM %s WHERE %s" %(self.name,",".join(vals))
@@ -223,7 +289,9 @@ class Base:
     
     def __getitem__(self,record_id):
         """Direct access by record id"""
-        sql = "SELECT * FROM %s WHERE __id__=%s" %(self.name,record_id)
+        if self.rowid is None:
+            raise MySQLError,"Can't use __getitem__() : missing row id"
+        sql = "SELECT * FROM %s WHERE %s=%s" %(self.name,self.rowid,record_id)
         self.cursor.execute(sql)
         res = self.cursor.fetchone()
         if res is None:
@@ -244,83 +312,9 @@ class Base:
         results = [ self._make_record(r) for r in self.cursor.fetchall() ]
         return iter(results)
 
+Base = Table # compatibility with older versions
+
 if __name__ == '__main__':
-
-    connection = MySQLdb.connect("localhost","root","admin")
-    cursor = connection.cursor()
-    cursor.execute("USE test")
-
-    db = Base("pydbtest",connection).create(("name","TEXT"),("age","INTEGER"),
-        ("size","REAL"),("birth","DATE"),
-        mode="override")
-
-    try:
-        db.add_field(("name","TEXT"))
-    except:
-        pass
-
-    import random
-    import datetime
-
-    names = ['pierre','claire','simon','camille','jean',
-                 'florence','marie-anne']
-    #db = Base('PyDbLite_test')
-    #db.create('name','age','size','birth',mode="override")
-    for i in range(1000):
-        db.insert(name=random.choice(names),
-             age=random.randint(7,47),size=random.uniform(1.10,1.95),
-             birth=datetime.date(1990,10,10))
-    db.commit()
-
-    print 'Record #20 :',db[20]
-    print '\nRecords with age=30 :'
-    for rec in [ r for r in db if r["age"]==30 ]:
-        print '%-10s | %2s | %s' %(rec['name'],rec['age'],round(rec['size'],2))
-
-    print "\nSame with __call__"
-    # same with select
-    for rec in db(age=30):
-        print '%-10s | %2s | %s' %(rec['name'],rec['age'],round(rec['size'],2))
-    print [ r for r in db if r["age"]==30 ] == db(age=30)
-    raw_input()
-
-    db.insert(name=random.choice(names)) # missing fields
-    print '\nNumber of records with 30 <= age < 33 :',
-    print sum([1 for r in db if 33 > r['age'] >= 30])
-    
-    print db.delete([])
-
-    d = db.delete([r for r in db if 32> r['age'] >= 30 and r['name']==u'pierre'])
-    print "\nDeleting %s records with name == 'pierre' and 30 <= age < 32" %d
-    print '\nAfter deleting records '
-    for rec in db(age=30):
-        print '%-10s | %2s | %s' %(rec['name'],rec['age'],round(rec['size'],2))
-    print '\n',sum([1 for r in db]),'records in the database'
-    print '\nMake pierre uppercase for age > 27'
-    for record in ([r for r in db if r['name']=='pierre' and r['age'] >27]) :
-        db.update(record,name="Pierre")
-    print len([r for r in db if r['name']=='Pierre']),'Pierre'
-    print len([r for r in db if r['name']=='pierre']),'pierre'
-    print len([r for r in db if r['name'] in ['pierre','Pierre']]),'p/Pierre'
-    print 'is unicode :',isinstance(db[20]['name'],unicode)
-    db.commit()
-    db.open()
-    print '\nSame operation after commit + open'
-    print len([r for r in db if r['name']=='Pierre']),'Pierre'
-    print len([r for r in db if r['name']=='pierre']),'pierre'
-    print len([r for r in db if r['name'] in ['pierre','Pierre']]),'p/Pierre'
-    print 'is unicode :',isinstance(db[20]['name'],unicode)
-    
-    print "\nDeleting record #21"
-    del db[21]
-    if not 21 in db:
-        print "record 21 removed"
-
-    print db[22]
-    db.drop_field('name')
-    print db[22]
-    db.add_field(('adate',"DATE"),datetime.date.today())
-    print db[22]
-    
-    
+    os.chdir(os.path.join(os.getcwd(),'test'))
+    execfile('MySQL_test.py')
     
