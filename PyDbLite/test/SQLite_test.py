@@ -5,12 +5,18 @@ sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 import SQLite
 
 db = SQLite.Base("test",'test.sqlite')
-db.create(("name","TEXT",{'NOT NULL':True}),
+db.create(("name",'TEXT NOT NULL'),
     ("age","INTEGER"),
     ("size","REAL"),("birth","BLOB"),
-    ("ctime","BLOB",{'DEFAULT':SQLite.CURRENT_TIME}),
-    ("ctimestamp","BLOB",{'DEFAULT':SQLite.CURRENT_TIMESTAMP}),
+    ("ctime","BLOB DEFAULT CURRENT_TIME"),
+    ("ctimestamp","BLOB DEFAULT CURRENT_TIMESTAMP"),
     mode="override")
+
+db.info()
+db.insert(name="a",age=10)
+db.insert(name="b",age='erty')
+
+print [r for r in db]
 
 try:
     db.add_field(("name","TEXT"))
@@ -85,7 +91,7 @@ if not 21 in db:
 
 print db[22]
 print "add field adate"
-db.add_field(('adate',"BLOB",{'DEFAULT':datetime.date.today()}))
+db.add_field(('adate','BLOB DEFAULT "%s"' %datetime.date.today()))
 
 print db[22]
 
