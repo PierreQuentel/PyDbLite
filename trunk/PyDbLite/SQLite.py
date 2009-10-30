@@ -106,10 +106,10 @@ def to_SQLite(value):
         return '"%s"' %value.encode('utf-8').replace('"','""')
     elif isinstance(value,(int,float)):
         return str(value)
-    elif isinstance(value,datetime.date):
-        return '"%s"' %value.strftime('%Y-%m-%d')
     elif isinstance(value,datetime.datetime):
         return '"%s"' %value.strftime('%Y-%m-%d %H:%M:%S')
+    elif isinstance(value,datetime.date):
+        return '"%s"' %value.strftime('%Y-%m-%d')
     elif isinstance(value,datetime.time):
         return '"%s"' %value.strftime('%H:%M:%S')
     else:
@@ -316,15 +316,15 @@ class Table:
             raise NameError,"Unknown field %s" %field_name
         self.conv_func[field_name] = conv_func
 
-    def conv_date(self,field_name):
+    def is_date(self,field_name):
         """Ask conversion of field to an instance of datetime.date"""
         self.conv(field_name,to_date)
 
-    def conv_time(self,field_name):
+    def is_time(self,field_name):
         """Ask conversion of field to an instance of datetime.date"""
         self.conv(field_name,to_time)
 
-    def conv_datetime(self,field_name):
+    def is_datetime(self,field_name):
         """Ask conversion of field to an instance of datetime.date"""
         self.conv(field_name,to_datetime)
 
