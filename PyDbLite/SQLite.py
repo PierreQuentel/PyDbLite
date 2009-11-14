@@ -93,31 +93,15 @@ class CURRENT_TIMESTAMP:
 
 DEFAULT_CLASSES = [CURRENT_DATE,CURRENT_TIME,CURRENT_TIMESTAMP]
 
-# Return the value formatted for inclusion in a
-# INSERT or UPDATE SQL expression
-def to_SQLite(value):
-    if value is None:
-        return 'NULL'
-    elif value in DEFAULT_CLASSES:
-        return value.__class__
-    elif isinstance(value,str):
-        return '"%s"' %value.replace('"','""')
-    elif isinstance(value,unicode):
-        return '"%s"' %value.encode('utf-8').replace('"','""')
-    elif isinstance(value,(int,float)):
-        return str(value)
-    elif isinstance(value,datetime.datetime):
-        return '"%s"' %value.strftime('%Y-%m-%d %H:%M:%S')
-    elif isinstance(value,datetime.date):
-        return '"%s"' %value.strftime('%Y-%m-%d')
-    elif isinstance(value,datetime.time):
-        return '"%s"' %value.strftime('%H:%M:%S')
-    else:
-        raise ValueError,'Wrong value %s : type %s not supported' \
-            %(value,value.__class__)
-
-
 # functions to convert a value returned by a SQLite SELECT
+
+# CURRENT_TIME format is HH:MM:SS
+# CURRENT_DATE : YYYY-MM-DD
+# CURRENT_TIMESTAMP : YYYY-MM-DD HH:MM:SS
+
+c_time_fmt = re.compile('^(\d{2}):(\d{2}):(\d{2})$')
+c_date_fmt = re.compile('^(\d{4})-(\d{2})-(\d{2})$')
+c_tmsp_fmt = re.compile('^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})')
 
 # DATE : convert YYYY-MM-DD to datetime.date instance
 def to_date(date):
@@ -155,14 +139,6 @@ def to_datetime(timestamp):
 # give the information, default is the value of the
 # variable as a string. We have to guess...
 #
-# CURRENT_TIME format is HH:MM:SS
-# CURRENT_DATE : YYYY-MM-DD
-# CURRENT_TIMESTAMP : YYYY-MM-DD HH:MM:SS
-
-c_time_fmt = re.compile('^(\d{2}):(\d{2}):(\d{2})$')
-c_date_fmt = re.compile('^(\d{4})-(\d{2})-(\d{2})$')
-c_tmsp_fmt = re.compile('^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$')
-
 def guess_default_fmt(value):
     mo = c_time_fmt.match(value)
     if mo:
@@ -339,11 +315,10 @@ class Table:
             kw = dict([(f,arg) for f,arg in zip(self.fields,args)])
 
         ks = kw.keys()
-        vals = [ to_SQLite(kw[k]) for k in kw.keys() ]
         s1 = ",".join(ks)
-        s2 = ",".join(vals)
-        sql = "INSERT INTO %s (%s) VALUES (%s)" %(self.name,s1,s2)
-        self.cursor.execute(sql)
+        qm = ','.join(['?']*len(ks))
+        sql = "INSERT INTO %s (%s) VALUES (%s)" %(self.name,s1,qm)
+        self.cursor.execute(sql,kw.values())
         # return last row id
         return self.cursor.lastrowid
 
@@ -353,34 +328,35 @@ class Table:
         and don't have twice the same __id__
         Return the number of deleted items
         """
+        sql = "DELETE FROM %s " %self.name
         if isinstance(removed,dict):
             # remove a single record
-            removed = [removed]
+            _id = removed['__id__']
+            sql += "WHERE rowid = ?"
+            args = (_id,)
         else:
             # convert iterable into a list (to be able to sort it)
             removed = [ r for r in removed ]
-        if not removed:
-            return 0
-        _ids = [ r['__id__'] for r in removed ]
-        _ids.sort()
-        sql = "DELETE FROM %s WHERE rowid IN (%s)" %(self.name,
-            ",".join([str(_id) for _id in _ids]))
-        self.cursor.execute(sql)
+            if not removed:
+                return 0
+            args = [ r['__id__'] for r in removed ]
+            sql += "WHERE rowid IN (%s)" %(','.join(['?']*len(args)))
+        self.cursor.execute(sql,args)
         return len(removed)
 
     def update(self,record,**kw):
         """Update the record with new keys and values"""
         vals = self._make_sql_params(kw)
-        sql = "UPDATE %s SET %s WHERE rowid=%s" %(self.name,
-            ",".join(vals),record["__id__"])
-        self.cursor.execute(sql)
+        sql = "UPDATE %s SET %s WHERE rowid=?" %(self.name,
+            ",".join(vals))
+        self.cursor.execute(sql,kw.values()+[record['__id__']])
 
     def _make_sql_params(self,kw):
         """Make a list of strings to pass to an SQL statement
         from the dictionary kw with Python types"""
-        vals = []
+        return ['%s=?' %k for k in kw.keys() ]
         for k,v in kw.iteritems():
-            vals.append('%s=%s' %(k,to_SQLite(v)))
+            vals.append('%s=?' %k)
         return vals
 
     def _make_record(self,row):
@@ -411,7 +387,7 @@ class Table:
             sql = "SELECT rowid,* FROM %s WHERE %s" %(self.name," AND ".join(vals))
         else:
             sql = "SELECT rowid,* FROM %s" %self.name
-        self.cursor.execute(sql)
+        self.cursor.execute(sql,kw.values())
         return [self._make_record(row) for row in self.cursor.fetchall() ]
     
     def __getitem__(self,record_id):
