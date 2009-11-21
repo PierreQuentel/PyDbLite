@@ -1,0 +1,46 @@
+<html>
+
+<head>
+<title>PyDbLite</title>
+<link rel="stylesheet" href="pydblite.css">
+</head>
+
+<body>
+
+<table width="100%" cellspacing="0" cellpadding="10">
+
+<tr>
+<td class="lnk" ><a href="licence.html">Licence</a>
+</td>
+
+<td class="navigation" align="center">PyDbLite</td>
+<td class="lnk" align="right"><a href="index_fr.html">Français</a></td>
+
+</tr>
+</table>
+
+
+<p><a name="mysql"><h2>MySQL adapter</h2>
+<p>The only difference with the pure-Python module is the syntax to identify a <code>Base</code> and the need to specify field types on base creation
+<ul>
+<li>import the class <code>Base</code> :
+<span class="python">from PyDbLite.MySQL import Base</span>
+<li>connect to the MySQL database :
+<p><span class="python">import MySQLdb<br>
+ connection = MySQLdb.connect("localhost","root","admin")<br>
+ connection.cursor().execute("USE test")
+ </span>
+
+<li>pass the connection as argument to Base creation : <span class="python">db = Base('dummy',connection)</span>
+<li>to create a new base (a table in the MySQL database),specify a valid MySQL field type :
+<span class="python">db.create(('name','INTEGER'),('age','INTEGER'),('size','REAL'))</span>
+</ul>
+
+<p>For record insertion, selection, update and deletion, adding or dropping fields,
+the syntax is the same as above
+<p>The <code>Base</code> instance has an attribute <code>cursor</code>, so you can also execute
+SQL expressions by <span class="python">db.cursor.execute(some_sql)</span> and get the result
+by <span class="python">results = db.cursor.fetchall()</span>
+
+</body>
+</html>

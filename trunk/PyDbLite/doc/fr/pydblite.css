@@ -11,9 +11,17 @@ pre {
 li { padding-bottom:10;
 	}
 
-.python {
+span.python {
 	color:330099;
 	font-family: "Courier New";
+	}
+
+div.python {
+	color:330099;
+	font-family: "Courier New";
+	margin-left:40px;
+	margin-top: 5px;
+	margin-bottom: 5px;
 	}
 
 .console {
@@ -35,7 +43,8 @@ td.lnk { background-color: #99ccff;
     }
 
 td.menu
-{ background-color: #99ccff;
+{ vertical-align:top;
+  background-color: #99ccff;
   font-size: 80%;
     }
 
@@ -47,3 +56,7 @@ td.content
 ol { margin-left : 20px;
 	}
 
+div.bsd
+{ margin-left:20px;
+  font-family: courier
+ }
