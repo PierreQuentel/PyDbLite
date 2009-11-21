@@ -1,0 +1,118 @@
+<html>
+
+<head>
+<title>PyDbLite</title>
+<link rel="stylesheet" href="pydblite.css">
+</head>
+
+<body>
+
+<table width="100%" cellspacing="0" cellpadding="10">
+
+<tr>
+<td class="lnk" >&nbsp;</td>
+<td class="navigation" align="center">PyDbLite</td>
+<td class="lnk" align="right"><a href="../fr/SQLite.html">Français</a></td>
+</tr>
+
+</table>
+<table width="100%" cellspacing="0" cellpadding="10">
+
+<tr>
+<td class="menu">
+<b>Documentation</b>
+<a href="index.html">Home</a>
+<br><a href="PyDbLite.html">Pure-Python engine</a>
+<br><a href="SQLite.html">SQLite adapter</a>
+<br><a href="MySQL.html">MySQL adapter</a>
+<br><a href="conversions.html">Conversions</a>
+<hr>
+<b>Contacts</b>
+<br><a href="http://groups.google.com/group/pydblite">Community</a>
+<br><a href="contact.html">Contact</a>
+<hr>
+<b>Code</b>
+<br><a href="http://sourceforge.net/project/platformdownload.php?group_id=210258">Download</a>
+<br><a href="http://pydblite.svn.sourceforge.net/viewvc/pydblite">Browse SVN</a>
+<hr>
+<a href="bench.html">Benchmarks</a>
+<hr>
+<a href="licence.html">Licence</a>
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+</td>
+<td class="content">
+
+<h2>SQLite adapter</h2>
+<p>The main difference with the pure-Python module is the syntax to identify a database and a table, and the need to specify field types on base creation
+<p>For compliance with SQLite vocabulary, the module defines two classes, <code>Database</code> and <code>Table</code>
+<p>The <code>Database</code> instances are built with the database path as argument : <span class="python">db = Database('some/path/test.sqlite')</span>
+<p>Instances of <code>Database</code> support a method <code>tables()</code>, returning the list of the table names in the database
+<p>Manipulating a table uses the same syntax as in PyDbLite :
+<ul>
+<li>import the class <code>Table</code> :
+<div class="python">from PyDbLite.SQLite import Table</div>
+<li>to create a <code>Table</code> instance (a table in the SQLite database) you pass 2 arguments : the table name, and the path to the database in the file system :
+<br><div class="python">table = Table('dummy','test')</div>
+<br>You can also pass the instance of the <code>Database</code> class :
+<div class="python">db = Database('test.sqlite')
+<br>table = Table('dummy',db)
+</div>
+<li>to create the table you must specify an SQLite field type : <code>INTEGER, REAL, TEXT</code>
+or <code>BLOB</code> :<br>
+<div class="python">db.create(('name','TEXT'),('age','INTEGER'),('size','REAL'))</div>
+<br>If other information needs to be provided, put it in the second argument, using the SQL syntax for SQLite :
+<div class="python">db.create(('recid','INTEGER PRIMARY KEY AUTOINCREMENT'),
+<br>&nbsp;&nbsp;&nbsp;&nbsp;    ('date','BLOB DEFAULT CURRENT_DATE'))</div>
+
+</ul>
+<p>For record insertion, updating, deletion and selection the syntax is the same as for the pure-Python module. The SQLite primary key <code>rowid</code> is used like the key <code>__id__</code> to identify records
+
+<p>Note that you can't use the <code>drop_field()</code> method, since dropping fields is not supported by SQLite
+
+<p>Conversions between Python types and SQLite field types use the behaviour of the Python SQLite module : <code>datetime.date</code> and <code>datetime.datetime</code> instances are stored as ISO dates/datetimes
+
+<p>Selection methods return dictionaries, with SQLite types converted to Python types like this :
+<p>
+<table border="1">
+<tr><th>SQLite type</th><th>Python type</th></tr>
+<tr><td>NULL</td><td>None</td></tr>
+<tr><td>TEXT</td><td>unicode</td></tr>
+<tr><td>BLOB</td><td>str</td></tr>
+<tr><td>INTEGER</td><td>int</td></tr>
+<tr><td>REAL</td><td>float</td></tr>
+</table>
+
+<p>If you want fields to be returned as instances of <code>datetime.date</code>, <code>datetime.time</code> or <code>datetime.datetime</code> instances, you can specify it when creating or opening the table, using methods <CODE>is_date(<i>field_name</i>)</CODE>, <CODE>is_time(<i>field_name</i>)</CODE> or <CODE>is_datetime(<i>field_name</i>)</CODE> :
+
+<div class="python">db = Database('test.sqlite')
+<br>table = Table('dummy',db)
+<br>table.is_date('birthday')
+</div>
+
+
+<p>The <code>Table</code> instance has an attribute <code>cursor</code>, so you can also execute
+SQL expressions by <span class="python">db.cursor.execute(some_sql)</span> and get the result
+by <span class="python">results = db.cursor.fetchall()</span>
+
+
+</td>
+</tr>
+</table>
+
+</body>
+</html>
