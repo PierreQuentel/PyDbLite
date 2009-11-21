@@ -16,6 +16,10 @@ print dest_dir
 shutil.rmtree('gendoc',ignore_errors=True)
 os.mkdir('gendoc')
 
+out = open(os.path.join('gendoc','index.html'),'w')
+out.write(open('index.html').read())
+out.close()
+
 for lang in ('en','fr'):
     os.mkdir(os.path.join('gendoc',lang))
 
