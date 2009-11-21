@@ -1,0 +1,20 @@
+<h2>Adaptateur MySQL</h2>
+<p>La seule différence avec le module en pur Python est la syntaxe pour identifier une <code>Base</code> et la nécessité de spécifier le type des champs quand on crée une base
+<ul>
+<li>importer la classe <code>Base</code> :
+<span class="python">from PyDbLite.MySQL import Base</span>
+<li>se connecter à la base de données MySQL :
+<p><span class="python">import MySQLdb<br>
+ connection = MySQLdb.connect("localhost","root","admin")<br>
+ connection.cursor().execute("USE test")
+ </span>
+
+<li>passer la connection en argument de la création de Base : <span class="python">db = Base('machpro',connection)</span>
+<li>pour créer une nouvelle base (une table dans la base MySQL), il faut spécifier des types de champs MySQL :
+<span class="python">db.create(('nom','INTEGER'),('age','INTEGER'),('taille','REAL'))</span>
+</ul>
+
+<p>Pour l'insertion, la sélection, la mise à jour et la suppression, la syntaxe est la même que ci-dessus
+
+<p>L'instance de <code>Base</code> a un attribute <code>cursor</code>, ce qui permet d'exécuter des commandes SQL par <span class="python">db.cursor.execute(expression_sql)</span> et récupérer le résultat par <span class="python">results = db.cursor.fetchall()</span>
+

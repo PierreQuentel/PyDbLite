@@ -1,0 +1,14 @@
+<h2>Adaptateur SQLite</h2>
+<p>La seule différence avec le module en pur Python est la syntaxe pour identifier une table et la nécessité de spécifier le type des champs quand on crée une base
+<p>Pour rester cohérent avec le vocabulaire de SQLite, on utilise plutôt le nom <code>Table</code> que <code>Base</code>
+<ul>
+<li>importer la classe <code>Table</code> :
+<span class="python">from PyDbLite.SQLite import Table</span>
+<li>pour créer une instance de <code>Base</code> (une table dans la base de données SQLite) il faut passer 2 argument : le nom de la table, et le chemin de la base dans le système de fichiers : <span class="python">db = Base('machpro','test')</span>
+<li>pour créer une table il faut spécifier un type de champ SQLite : NULL, INTEGER, REAL, TEXT
+ou BLOB : <span class="python">db.create(('nom','TEXT'),('age','INTEGER'),('taille','REAL'))</span>
+<p>Pour simplifier, vous pouvez aussi utiliser les types DATE et DATETIME (ou TIMESTAMP), le programme fera lui-même les conversions entre les instances de <code>datetime.date</code> et
+<code>datetime.datetime</code> et le type TEXT
+</ul>
+<p>Pour l'insertion, la sélection, la mise à jour et la suppression, la syntaxe est la même que ci-dessus. La seule différence est qu'on ne peut pas utiliser la méthode <code>drop_field()</code>, parce que la suppression de champs n'est pas supportée par SQLite
+<p>L'instance de <code>Table</code> a un attribut <code>cursor</code>, ce qui permet d'exécuter des commandes SQL par <span class="python">db.cursor.execute(expression_sql)</span> et récupérer le résultat par <span class="python">results = db.cursor.fetchall()</span>
