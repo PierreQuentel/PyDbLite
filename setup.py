@@ -1,6 +1,21 @@
 #!/usr/bin/env python
-
+import os
 from distutils.core import setup
+
+import sys
+
+package_dir = {
+    'PyDbLite': 'lib',
+    'PyDbLite.test': 'test',
+    'PyDbLite.doc':'doc'
+    }
+
+package_data = {
+    'PyDbLite.test':['*.py'],
+    'PyDbLite.doc':['*.html','*.css','fr/*.html','fr/*.css',
+        'en/*.html','en/*.css']
+    }
+
 
 setup(name='PyDbLite',
       version='2.5',
@@ -8,7 +23,9 @@ setup(name='PyDbLite',
       author='Pierre Quentel',
       author_email='pierre.quentel@gmail.com',
       url='http://www.pydblite.net/',
-      packages=['PyDbLite'],
+      packages=['PyDbLite','PyDbLite.test','PyDbLite.doc'],
+      package_dir=package_dir,
+      package_data=package_data,
       classifiers=[
           'Development Status :: 5 - Production/Stable',
           'Intended Audience :: Developers',
