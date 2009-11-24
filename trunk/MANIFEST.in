@@ -1,2 +1,3 @@
+include LICENCE.txt
 recursive-include doc *.html *.css
-recursive-include test *.py
+

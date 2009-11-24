@@ -5,17 +5,13 @@ from distutils.core import setup
 import sys
 
 package_dir = {
-    'PyDbLite': 'lib',
-    'PyDbLite.test': 'test',
-    'PyDbLite.doc':'doc'
+    'PyDbLite.test':'test'
     }
 
 package_data = {
-    'PyDbLite.test':['*.py'],
-    'PyDbLite.doc':['*.html','*.css','fr/*.html','fr/*.css',
+    'doc':['*.html','*.css','fr/*.html','fr/*.css',
         'en/*.html','en/*.css']
     }
-
 
 setup(name='PyDbLite',
       version='2.5',
@@ -23,7 +19,7 @@ setup(name='PyDbLite',
       author='Pierre Quentel',
       author_email='pierre.quentel@gmail.com',
       url='http://www.pydblite.net/',
-      packages=['PyDbLite','PyDbLite.test','PyDbLite.doc'],
+      packages=['PyDbLite','PyDbLite.test'],
       package_dir=package_dir,
       package_data=package_data,
       classifiers=[
