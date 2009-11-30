@@ -78,7 +78,7 @@ class Database:
 
     def tables(self):
         self.cursor.execute("SHOW TABLES")
-        return [ Table(t[0],self.conn) for t in self.cursor.fetchall() ]
+        return [ t[0] for t in self.cursor.fetchall() ]
     
 class Table:
 
