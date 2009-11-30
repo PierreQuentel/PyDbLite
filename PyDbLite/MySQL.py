@@ -12,7 +12,7 @@ Differences with PyDbLite:
 Fields must be declared 
 Syntax :
     from PyDbLite.MySQL import Database,Table
-    db = Database("localhost","root","admin")
+    db = Database("localhost","root","admin","test")
     # pass the connection as argument to Base creation
     table = Table('dummy',db)
     # create new table with field names
@@ -61,20 +61,16 @@ try:
 except NameError:
     from sets import Set as set
 
-# built-in MySQL types
-TYPES = ['INTEGER','REAL','TEXT','BLOB']
-
-
 class MySQLError(Exception):
 
     pass
 
-
 class Database:
 
-    def __init__(self,host,login,password):
+    def __init__(self,host,login,password,db_name):
         self.conn = MySQLdb.connect(host,login,password)
         self.cursor = self.conn.cursor()
+        self.cursor.execute('USE %s' %db_name)
 
     def tables(self):
         self.cursor.execute("SHOW TABLES")
@@ -88,7 +84,6 @@ class Table:
         self.name = basename
         self.conn = db
         self.cursor = db.cursor
-        self._iterating = False
 
     def create(self,*fields,**kw):
         """Create a new base with specified field names
