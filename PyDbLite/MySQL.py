@@ -82,11 +82,17 @@ class Table:
         """basename = name of the PyDbLite database = a MySQL table
         db = an instance of Database"""
         self.name = basename
-        self.conn = db
+        self.db = db
         self.cursor = db.cursor
 
     def create(self,*fields,**kw):
-        """Create a new base with specified field names
+        """Create a new table
+        For each field, a 2-element tuple is provided :
+        - the field name
+        - a string with additional information : field type +
+          other information using the MySQL syntax
+          eg : ('name','TEXT NOT NULL')
+               ('date','TIMESTAMP DEFAULT CURRENT_TIMESTAMP')
         A keyword argument mode can be specified ; it is used if a file
         with the base name already exists
         - if mode = 'open' : open the existing base, ignore the fields
@@ -112,40 +118,11 @@ class Table:
         return self
 
     def _validate_field(self,field):
-        if len(field) not in [2,3]:
+        if len(field)!= 2:
             msg = "Error in field definition %s" %field
-            msg += ": should be a 2- or 3-element tuple"
-            msg += " (field_name,field_type[,info])"
-            raise MySQLError,msg
-        if field[0] in self.fields:
-            raise MySQLError,'Field %s already defined' %field[0]
-        # no control on types : we leave this to MySQL
-        self.fields.append(field[0])
-        self.field_info[field[0]] = {'type':field[1]}
-        # for SQL, convert types into one of SQLite built-ins
-        sql = '%s %s' %(field[0],field[1])
-        if len(field) == 3:
-            info = field[2]
-            if info.get('NOT NULL',None) is True:
-                sql += ' NOT NULL'
-            default = info.get('DEFAULT',None)
-            if 'DEFAULT' is not None:
-                sql += self._validate_default(field[0],field[1],default)
-        return sql
-
-    def _validate_default(self,name,_type,default):
-        if default is None:
-            return ''
-        if default in (CURRENT_DATE,CURRENT_TIME,CURRENT_TIMESTAMP):
-            if _type == 'BLOB':
-                sql = default.__name__
-            else:
-                raise MySQLError,'Bad field type %s for default %s' \
-                    %(_type,default.__name__)
-        else:
-            sql = to_SQLite[_type](default)
-        self.field_info[name]['DEFAULT'] = default
-        return ' DEFAULT %s' %sql
+            msg += ": should be a 2- tuple (field_name,field_info)"
+            raise SQLiteError,msg
+        return '%s %s' %(field[0],field[1])
 
     def open(self):
         """Open an existing database"""
@@ -173,14 +150,13 @@ class Table:
         for row in self.cursor.fetchall():
             field,typ,null,key,default,extra = row
             self.fields.append(field)
-            info = {'type':typ,'NOT NULL':null,'key':key,
+            self.field_info[field] = {'type':typ,'NOT NULL':null,'key':key,
                 'DEFAULT':default,'extra':extra}
             if extra == 'auto_increment':
                 self.rowid = field
 
     def commit(self):
-        """No use here ???"""
-        pass
+        self.db.conn.commit()
 
     def insert(self,*args,**kw):
         """Insert a record in the database
