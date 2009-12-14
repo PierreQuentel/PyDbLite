@@ -65,11 +65,21 @@ class MySQLError(Exception):
 
     pass
 
-class Database:
+class Connection:
 
-    def __init__(self,host,login,password,db_name):
+    def __init__(self,host,login,password):
         self.conn = MySQLdb.connect(host,login,password)
         self.cursor = self.conn.cursor()
+
+    def databases(self):
+        self.cursor.execute('SHOW DATABASES')
+        print self.cursor.fetchall()
+
+class Database:
+
+    def __init__(self,connection,db_name):
+        self.conn = connection
+        self.cursor = connection.cursor
         self.cursor.execute('USE %s' %db_name)
 
     def tables(self):
@@ -78,11 +88,11 @@ class Database:
     
 class Table:
 
-    def __init__(self,basename,db):
-        """basename = name of the PyDbLite database = a MySQL table
-        db = an instance of Database"""
-        self.name = basename
+    def __init__(self,db,table_name):
+        """db = an instance of Database"""
+        self.name = table_name
         self.db = db
+        self.conn = self.db.conn.conn
         self.cursor = db.cursor
 
     def create(self,*fields,**kw):
@@ -156,7 +166,7 @@ class Table:
                 self.rowid = field
 
     def commit(self):
-        self.db.conn.commit()
+        self.conn.commit()
 
     def insert(self,*args,**kw):
         """Insert a record in the database
@@ -170,6 +180,7 @@ class Table:
 
         vals = self._make_sql_params(kw)
         sql = "INSERT INTO %s SET %s" %(self.name,",".join(vals))
+        print sql
         res = self.cursor.execute(sql)
         self.cursor.execute("SELECT LAST_INSERT_ID()")
         __id__ = self.cursor.fetchone()[0]
@@ -220,8 +231,10 @@ class Table:
         if isinstance(v,str):
             v = v.replace('"','""')
             return '"%s"' %v
+        elif isinstance(v,datetime.datetime):
+            return '"%s"' %v.strftime("%Y-%m-%d %H:%M:%S")
         elif isinstance(v,datetime.date):
-            return v.strftime("%Y%m%d")
+            return v.strftime("%Y-%m-%d")
         else:
             return v
 
