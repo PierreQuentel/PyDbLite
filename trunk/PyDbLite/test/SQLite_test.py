@@ -37,6 +37,8 @@ for i in range(1000):
 db.commit()
 
 print 'Record #20 :',db[20]
+print len(db),'records'
+print len(db())
 raw_input()
 print '\nRecords with age=30 :'
 for rec in [ r for r in db if r["age"]==30 ]:
