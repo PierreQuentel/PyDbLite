@@ -169,8 +169,8 @@ class SQLiteError(Exception):
 
 class Database:
 
-    def __init__(self,db):
-        self.conn = sqlite.connect(db)
+    def __init__(self,db,**kw):
+        self.conn = sqlite.connect(db,**kw)
         self.cursor = self.conn.cursor()
 
     def tables(self):
