@@ -1,13 +1,14 @@
 import os
 import sys
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+sys.path.insert(0,os.path.dirname(os.path.dirname(__file__)))
 
 import MySQL
 
-db = MySQL.Database("localhost",'root','admin','test')
+conn = MySQL.Connection("localhost",'root','admin')
+db = MySQL.Database(conn,'test')
 print db.tables()
 
-table = MySQL.Table('essai',db)
+table = MySQL.Table(db,'essai')
 table.create(("rowid",'INTEGER PRIMARY KEY AUTO_INCREMENT'),
     ("name",'TEXT NOT NULL'),
     ("age","INTEGER"),
@@ -17,7 +18,11 @@ table.create(("rowid",'INTEGER PRIMARY KEY AUTO_INCREMENT'),
     mode="override")
 
 table.insert(name="a",age=10)
-table.insert(name="b",age='erty')
+try:
+    table.insert(name="b",age='erty')
+    raise ValueError,'this record should not be accepted - age is not an int'
+except:
+    pass
 
 print [r for r in table]
 
@@ -40,6 +45,8 @@ for i in range(1000):
 table.commit()
 
 print 'Record #20 :',table[20]
+print len(table),'records'
+print len(table())
 raw_input()
 print '\nRecords with age=30 :'
 for rec in [ r for r in table if r["age"]==30 ]:

@@ -180,7 +180,6 @@ class Table:
 
         vals = self._make_sql_params(kw)
         sql = "INSERT INTO %s SET %s" %(self.name,",".join(vals))
-        print sql
         res = self.cursor.execute(sql)
         self.cursor.execute("SELECT LAST_INSERT_ID()")
         __id__ = self.cursor.fetchone()[0]
@@ -284,7 +283,8 @@ class Table:
             return self._make_record(res)
     
     def __len__(self):
-        return len(self.records)
+        self.cursor.execute("SELECT COUNT(*) FROM %s" %self.name)
+        return int(self.cursor.fetchone()[0])
 
     def __delitem__(self,record_id):
         """Delete by record id"""
