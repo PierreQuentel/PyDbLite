@@ -266,7 +266,10 @@ class Table:
             if not key in self.fields:
                 raise ValueError,"Field %s not in the database" %key
         vals = self._make_sql_params(kw)
-        sql = "SELECT * FROM %s WHERE %s" %(self.name,",".join(vals))
+        if vals:
+            sql = "SELECT * FROM %s WHERE %s" %(self.name,",".join(vals))
+        else: # all records
+            sql = "SELECT * FROM %s" %self.name
         self.cursor.execute(sql)
         return [self._make_record(row) for row in self.cursor.fetchall() ]
     
