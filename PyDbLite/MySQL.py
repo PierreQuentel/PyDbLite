@@ -73,11 +73,21 @@ class Connection:
 
     def databases(self):
         self.cursor.execute('SHOW DATABASES')
-        print self.cursor.fetchall()
+        return [db[0] for db in self.cursor.fetchall()]
+
+    def create(self,db_name,mode=None):
+        if mode=="open":
+            if not db_name in self.databases():
+                self.cursor.execute('CREATE DATABASE %s' %db_name)
+            else:
+                self.cursor.execute('USE %s' %db_name)
+        else:
+            self.cursor.execute('CREATE DATABASE %s' %db_name)
+        return Database(db_name,self)
 
 class Database:
 
-    def __init__(self,connection,db_name):
+    def __init__(self,db_name,connection):
         self.conn = connection
         self.cursor = connection.cursor
         self.cursor.execute('USE %s' %db_name)
@@ -85,10 +95,18 @@ class Database:
     def tables(self):
         self.cursor.execute("SHOW TABLES")
         return [ t[0] for t in self.cursor.fetchall() ]
+
+    def drop(self):
+        # drop database
+        self.cursor.execute('USE %s' %db)
+        self.cursor.execute('SHOW TABLES')
+        if len(self.cursor.fetchall()):
+            raise MySQLError,\
+              "Can't drop database %s ; all tables must be dropped first" %db
     
 class Table:
 
-    def __init__(self,db,table_name):
+    def __init__(self,table_name,db):
         """db = an instance of Database"""
         self.name = table_name
         self.db = db
@@ -182,7 +200,7 @@ class Table:
 
         vals = self._make_sql_params(kw)
         sql = "INSERT INTO %s SET %s" %(self.name,",".join(vals))
-        res = self.cursor.execute(sql)
+        res = self.cursor.execute(sql,kw.values())
         self.cursor.execute("SELECT LAST_INSERT_ID()")
         __id__ = self.cursor.fetchone()[0]
         return __id__
@@ -218,15 +236,12 @@ class Table:
         vals = self._make_sql_params(kw)
         sql = "UPDATE %s SET %s WHERE %s=%s" %(self.name,
             ",".join(vals),self.rowid,record[self.rowid])
-        self.cursor.execute(sql)
+        self.cursor.execute(sql,kw.values())
 
     def _make_sql_params(self,kw):
         """Make a list of strings to pass to an SQL statement
         from the dictionary kw with Python types"""
-        vals = []
-        for k,v in kw.iteritems():
-            vals.append('%s=%s' %(k,self._conv(v)))
-        return vals
+        return ['%s=%%s' %k for k in kw.keys() ]
 
     def _conv(self,v):
         if isinstance(v,str):
@@ -269,10 +284,10 @@ class Table:
                 raise ValueError,"Field %s not in the database" %key
         vals = self._make_sql_params(kw)
         if vals:
-            sql = "SELECT * FROM %s WHERE %s" %(self.name,",".join(vals))
+            sql = "SELECT * FROM %s WHERE %s" %(self.name," AND ".join(vals))
         else: # all records
             sql = "SELECT * FROM %s" %self.name
-        self.cursor.execute(sql)
+        self.cursor.execute(sql,kw.values())            
         return [self._make_record(row) for row in self.cursor.fetchall() ]
     
     def __getitem__(self,record_id):
