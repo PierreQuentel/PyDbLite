@@ -175,8 +175,10 @@ class Table:
         If some of the fields are missing the value is set to None
         Returns the record identifier
         """
+        fields = [ f for f in self.fields
+            if not self.field_info[f]['extra']=="auto_increment"]
         if args:
-            kw = dict([(f,arg) for f,arg in zip(self.fields,args)])
+            kw = dict([(f,arg) for f,arg in zip(fields,args)])
 
         vals = self._make_sql_params(kw)
         sql = "INSERT INTO %s SET %s" %(self.name,",".join(vals))
