@@ -5,10 +5,10 @@ sys.path.insert(0,os.path.dirname(os.path.dirname(__file__)))
 import MySQL
 
 conn = MySQL.Connection("localhost",'root','admin')
-db = MySQL.Database(conn,'test')
+db = MySQL.Database('test',conn)
 print db.tables()
 
-table = MySQL.Table(db,'essai')
+table = MySQL.Table('essai',db)
 table.create(("rowid",'INTEGER PRIMARY KEY AUTO_INCREMENT'),
     ("name",'TEXT NOT NULL'),
     ("age","INTEGER"),
