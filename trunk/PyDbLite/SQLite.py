@@ -11,37 +11,37 @@ Differences with PyDbLite:
     result = db.cursor.fetchall()
 
 Syntax :
-    from PyDbLite.SQLite import Table
+    from PyDbLite.SQLite import Database,Table
     # connect to SQLite database "test"
-    connection = sqlite.connect("test")
+    db = Database("test")
     # pass the table name and database path as arguments to Table creation
-    db = Table('dummy','test')
+    table = Table('dummy','test')
     # create new base with field names
-    db.create(('name','TEXT'),('age','INTEGER'),('size','REAL'))
+    table.create(('name','TEXT'),('age','INTEGER'),('size','REAL'))
     # existing base
-    db.open()
+    table.open()
     # insert new record
-    db.insert(name='homer',age=23,size=1.84)
+    table.insert(name='homer',age=23,size=1.84)
     # records are dictionaries with a unique integer key __id__
     # selection by list comprehension
-    res = [ r for r in db if 30 > r['age'] >= 18 and r['size'] < 2 ]
+    res = [ r for r in table if 30 > r['age'] >= 18 and r['size'] < 2 ]
     # or generator expression
-    for r in (r for r in db if r['name'] in ('homer','marge') ):
+    for r in (r for r in table if r['name'] in ('homer','marge') ):
     # simple selection (equality test)
-    res = db(age=30)
+    res = table(age=30)
     # delete a record or a list of records
-    db.delete(one_record)
-    db.delete(list_of_records)
+    table.delete(one_record)
+    table.delete(list_of_records)
     # delete a record by its id
-    del db[rec_id]
+    del table[rec_id]
     # direct access by id
-    record = db[rec_id] # the record such that record['__id__'] == rec_id
+    record = table[rec_id] # the record such that record['__id__'] == rec_id
     # update
-    db.update(record,age=24)
+    table.update(record,age=24)
     # add a field
-    db.add_field('new_field')
+    table.add_field('new_field')
     # save changes on disk
-    db.commit()
+    table.commit()
 
 Changes in version 2.5 :
 - many changes to support "legacy" SQLite databases :
@@ -188,7 +188,7 @@ class Database:
 class Table:
 
     def __init__(self,basename,db):
-        """basename = name of the PyDbLite database = a MySQL table
+        """basename = name of the SQLite table
         db = a connection to a SQLite database, a Database instance
         or the database path"""
         self.name = basename

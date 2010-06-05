@@ -11,8 +11,9 @@ Differences with PyDbLite:
 
 Fields must be declared 
 Syntax :
-    from PyDbLite.MySQL import Database,Table
-    db = Database("localhost","root","admin","test")
+    from PyDbLite.MySQL import Connection,Database,Table
+    conn = Connection("localhost","root","admin")
+    db = Database("test",conn)
     # pass the connection as argument to Base creation
     table = Table('dummy',db)
     # create new table with field names
