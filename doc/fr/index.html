@@ -2,7 +2,7 @@
 
 <head>
 <title>PyDbLite</title>
-<link rel="stylesheet" href="pydblite.css">
+<link rel="stylesheet" href="../pydblite.css">
 </head>
 
 <body>
@@ -10,56 +10,55 @@
 <table width="100%" cellspacing="0" cellpadding="10">
 
 <tr>
-<td class="lnk" >&nbsp;</td>
-<td class="navigation" align="center">PyDbLite</td>
-<td class="lnk" align="right"><a href="../en/index.html">English</a></td>
+	<td class="navigation" align="center"><img src="../img/banniere.jpg"></td>
+	<td class="lnk" align="right"><a class="langue" href="../en/index.html">English</a></td>
 </tr>
 
 </table>
-<table width="100%" cellspacing="0" cellpadding="10">
 
+<table width="100%" cellspacing="0" cellpadding="0">
 <tr>
-<td class="menu">
-<b>Documentation</b>
-<a href="index.html">Accueil</a>
-<br><a href="PyDbLite.html">Moteur Pur-Python</a>
-<br><a href="SQLite.html">Adapteur SQLite</a>
-<br><a href="MySQL.html">Adapteur MySQL</a>
-<hr>
-<b>Contacts</b>
-<br><a href="http://groups.google.com/group/pydblite">Communauté</a>
-<br><a href="contact.html">Mail</a>
-<hr>
-<b>Code</b>
-<br><a href="http://sourceforge.net/project/platformdownload.php?group_id=210258">Téléchargement</a>
-<br><a href="http://pydblite.svn.sourceforge.net/viewvc/pydblite">Parcourir SVN</a>
-<hr>
-<a href="bench.html">Comparaisons</a>
-<hr>
-<a href="licence.html">Licence</a>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-</td>
-<td class="content">
-PyDbLite est un moteur de base de données en mémoire, en pur Python, qui utilise les "list comprehensions" de Python comme langage de requêtes au lieu de SQL. Il consiste en un petit module, <code>PyDbLite.py</code>
+	<td class="menu">
+	<div id="niveau1">Documentation</div>
+		<div id="niveau2">
+		<a href="index.html">Accueil</a>
+		<br><a href="PyDbLite.html">Moteur pur-Python</a>
+		<br><a href="SQLite.html">Adapteur SQLite </a>
+		<br><a href="MySQL.html">Adapteur MySQL</a>
+		</div>
 
-<p>Le paquetage fournit également deux modules<code>SQLite.py</code> et <code>MySQL.py</code>. Ils permettent de manipuler des bases de données SQLite et MySQL avec la même syntaxe pythonique que le moteur PyDbLite en pur Python
+	<div id="niveau1">Contacts</div>
+		<div id="niveau2">
+		<a href="http://groups.google.com/group/pydblite">Communauté</a>
+		<br><a href="contact.html">Mail</a>
+		</div>
+
+	<div id="niveau1">Code</div>
+		<div id="niveau2">
+		<a href="http://sourceforge.net/project/platformdownload.php?group_id=210258">Téléchargement</a>
+		<br><a href="http://pydblite.svn.sourceforge.net/viewvc/pydblite">Parcourir SVN</a>
+		</div>
+	<div id="niveau1">
+		<a href="bench.html">Comparaisons</a>
+		</div>
+	<div id="niveau1">
+		<a href="licence.html">Licence</a>
+		</div>
+	<div id="fill">&nbsp;<br>&nbsp;<br>&nbsp;<br>
+		&nbsp;<br>&nbsp;<br>&nbsp;<br>
+		&nbsp;<br>&nbsp;<br>&nbsp;<br>
+		&nbsp;<br>&nbsp;<br>&nbsp;<br>
+	</div>
+	</td>
+<td class="content">
+PyDbLite est :
+<ul>
+<li>un moteur de base de données en mémoire, rapide, non typée, en pur Python, compatible avec Python 2.3 et au-dessus, qui utilise la syntaxe de Python pour toutes les opérations de gestion de la base au lieu de SQL. Il consiste en un petit module, <code>PyDbLite.py</code>
+<li>une interface pythonique à SQLite et à MySQL, avec la même syntaxe que le moteur en pur Python pour la plupart des opérations (à l'exception de la connection à la base et de la création de tables, à cause des spécificités de ces bases de données)
+</ul>
 
 <p>Pour l'installer, il suffit de le <a href="http://sourceforge.net/project/platformdownload.php?group_id=210258">télécharger</a> et de l'installer par la commande <span class="console">>python setup.py install</span>
+
 </td>
 </tr>
 </table>

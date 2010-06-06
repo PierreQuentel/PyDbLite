@@ -1,49 +1,138 @@
-body, td {
+body
+	{
 	color: #000000;
-	background-color: #ffffff;
-	font-family: sans-serif;
+	background-image:url(img/bg.jpg);
+	background-repeat:repeat-x;
+	background-attachment:fixed;
 	font-size: 13;
+	font-family:Trebuchet-MS;
 	}
 
-pre {
-	font-family: arial }
-
-li { padding-bottom:10;
+td.navigation
+	{ 
+	background-color: #17171b;
+	font-weight: bold;
+	font-size: 150%;
+	width: 90%;
 	}
 
-.python {
+td.lnk 
+	{ 
+	background-color: #17171b;
+	font-size: 100%;
+    }
+
+pre 
+	{
+	font-family: arial 
+	}
+
+li 
+	{ 
+	padding-bottom:10;
+	}
+
+span.python 
+	{
 	color:330099;
 	font-family: "Courier New";
 	}
 
-.console {
+div.python 
+	{
+	color:330099;
+	font-family: "Courier New";
+	margin-left:40px;
+	margin-top: 5px;
+	margin-bottom: 5px;
+	}
+
+.console 
+	{
 	color:white;
 	background-color:black;
 	font-family: "Courier New";
 	padding : 3;
 	}
 
-td.navigation
-{ background-color: #99ccff;
-  font-weight: bold;
-  font-family: avantgarde, sans-serif;
-  font-size: 150%;
-  width: 90%}
-
-td.lnk { background-color: #99ccff;
-  font-size: 100%;
-    }
 
 td.menu
-{ background-color: #99ccff;
-  font-size: 80%;
+	{ 
+	vertical-align:top;
+	background-color: #E3E3E3;
+	font-size: 80%;
     }
+#niveau1
+	{
+	margin-top:0px;
+	padding-bottom:5px;
+	font-size:17px;
+	background-color:#9ac1c4;
+	padding-left:5px;
+	border:1px solid black;
+	}
+#niveau2
 
-td.content
-{ width: 85%;
-  vertical-align:top;
-}
+	{
+	padding-top:5px;
+	padding-bottom:5px;
+	padding-right:5px;
+	font-size:14px;
+	padding-left:15px;
+	background-color:#E6F3F4;
+	border:1px solid black;
 
-ol { margin-left : 20px;
+	}
+a
+	{
+	text-decoration:none;
+	color:#28282b;
+	}
+a:visited
+	{
+	color:#28282b;	
+	}
+	
+a:hover
+	{
+	color:#7f9e7b;
+	}
+a.langue, a.langue:visited
+	{
+	color:#b2dbdf;
 	}
 
+td.content
+	{ 
+	width: 85%;
+	vertical-align:top;
+	background-color:#E3E3E3;
+	font-size:14px;
+	padding:10px 10px 10px 10px;
+	}
+
+div.fill
+	{ 
+	background-color:#E3E3E3;
+	}
+
+
+ol 
+	{ 
+	margin-left : 20px;
+	}
+
+div.bsd
+	{ 
+	margin-left:20px;
+	font-family: courier
+	}
+h2,h3,h5
+	{
+	color:#313134;
+	border-bottom:1px solid black
+	}
+li 
+	{ 
+	list-style-type: circle ; 
+	}

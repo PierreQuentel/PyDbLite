@@ -2,7 +2,7 @@
 
 <head>
 <title>PyDbLite</title>
-<link rel="stylesheet" href="pydblite.css">
+<link rel="stylesheet" href="../pydblite.css">
 </head>
 
 <body>
@@ -10,52 +10,47 @@
 <table width="100%" cellspacing="0" cellpadding="10">
 
 <tr>
-<td class="lnk" >&nbsp;</td>
-<td class="navigation" align="center">PyDbLite</td>
-<td class="lnk" align="right"><a href="../en/bench.html">English</a></td>
+	<td class="navigation" align="center"><img src="../img/banniere.jpg"></td>
+	<td class="lnk" align="right"><a class="langue" href="../en/bench.html">English</a></td>
 </tr>
 
 </table>
-<table width="100%" cellspacing="0" cellpadding="10">
 
+<table width="100%" cellspacing="0" cellpadding="0">
 <tr>
-<td class="menu">
-<b>Documentation</b>
-<a href="index.html">Accueil</a>
-<br><a href="PyDbLite.html">Moteur Pur-Python</a>
-<br><a href="SQLite.html">Adapteur SQLite</a>
-<br><a href="MySQL.html">Adapteur MySQL</a>
-<hr>
-<b>Contacts</b>
-<br><a href="http://groups.google.com/group/pydblite">Communauté</a>
-<br><a href="contact.html">Mail</a>
-<hr>
-<b>Code</b>
-<br><a href="http://sourceforge.net/project/platformdownload.php?group_id=210258">Téléchargement</a>
-<br><a href="http://pydblite.svn.sourceforge.net/viewvc/pydblite">Parcourir SVN</a>
-<hr>
-<a href="bench.html">Comparaisons</a>
-<hr>
-<a href="licence.html">Licence</a>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-</td>
-<td class="content">
+	<td class="menu">
+	<div id="niveau1">Documentation</div>
+		<div id="niveau2">
+		<a href="index.html">Accueil</a>
+		<br><a href="PyDbLite.html">Moteur pur-Python</a>
+		<br><a href="SQLite.html">Adapteur SQLite </a>
+		<br><a href="MySQL.html">Adapteur MySQL</a>
+		</div>
 
+	<div id="niveau1">Contacts</div>
+		<div id="niveau2">
+		<a href="http://groups.google.com/group/pydblite">Communauté</a>
+		<br><a href="contact.html">Mail</a>
+		</div>
+
+	<div id="niveau1">Code</div>
+		<div id="niveau2">
+		<a href="http://sourceforge.net/project/platformdownload.php?group_id=210258">Téléchargement</a>
+		<br><a href="http://pydblite.svn.sourceforge.net/viewvc/pydblite">Parcourir SVN</a>
+		</div>
+	<div id="niveau1">
+		<a href="bench.html">Comparaisons</a>
+		</div>
+	<div id="niveau1">
+		<a href="licence.html">Licence</a>
+		</div>
+	<div id="fill">&nbsp;<br>&nbsp;<br>&nbsp;<br>
+		&nbsp;<br>&nbsp;<br>&nbsp;<br>
+		&nbsp;<br>&nbsp;<br>&nbsp;<br>
+		&nbsp;<br>&nbsp;<br>&nbsp;<br>
+	</div>
+	</td>
+<td class="content">
 <p>I have measured the time taken by various operations for 3 pure-Python database modules (PyDbLite, buzhug and Gadfly) and compared them with SQLite
 <p>The tests are those described on the <a class="normal" href="http://www.sqlite.org/speed.html" target="_blank">SQLite comparisons pages</a>, which compares performance of SQLite to that of MySQL and PostGreSQL
 <h3><a name="tests"></a>The tests</h3>
@@ -65,7 +60,7 @@
 <p>The database has 3 fields : a (integer, from 1 to n),b (random integer between 1 and 100000),c (a string, value = 'fifty nine' if b=59)
 <br>For PyDbLite, gadfly and SQLite two options are possible : with an index on field a, or without index
 <p>The values of a,b,c are stored in a list recs
-<p><blockquote>
+<p>
 
 <table border="1">
 <tr>
@@ -117,10 +112,10 @@ conn.commit()
 
 
 </table>
-</blockquote>
+
 
 <li>select1 : 100 selections to count the number of records and the average of field b for values of b between 10*n and 10*n + 1000 for n = 1 to 100
-<blockquote>
+
 <table border="1">
 <tr>
 <td>
@@ -138,10 +133,10 @@ SQL statements
     if nb:
         avg = sum([r.b for r in recs])/nb
 </tt></pre></td></tr></table>
-</blockquote>
+
 <p>
 <li>select2 : 100 selections to count the number of records and the average of field b for values of c with the string 'one', 'two', ...,'ninety nine' inside. It uses the keyword LIKE for SQL database (I couldn't do the test for Gadfly which doesn't support LIKE) ; for Kirbybase and buzhug I use regular expressions
-<blockquote>
+
 The strings for each number between 0 and 99 are stored in the list num_strings<p>
 <table border="1">
 <tr>
@@ -160,10 +155,10 @@ SQL statements
     nb = len(recs)
     if nb:
         avg = sum([r.b for r in recs])/nb</tt></pre></td></tr></table>
-</blockquote>
+
 <p>
 <li>delete1 : delete all the records where the field c contains the string 'fifty'. There again I couldn't do the test for gadfly
-<blockquote>
+
 <table border="1">
 <tr>
 <td>
@@ -177,9 +172,9 @@ conn.commit()
 <tr><td>buzhug code</td>
 <td><pre><tt>db.delete(db.select(['__id__'],'p.match(c)',p=re.compile('.*fifty.*')))</tt></pre>
 </td></tr></table>
-</blockquote>
+
 <li>delete2 : delete all the records for which the field a is >10 and < 20000
-<blockquote>
+
 <table border="1">
 <tr>
 <td>
@@ -193,9 +188,9 @@ conn.commit()
 <tr><td>buzhug code</td>
 <td><pre><tt>db.delete(db.select(['__id__'],'x < a < y',x=10,y=20000))</tt></pre>
 </td></tr></table>
-</blockquote>
+
 <li>update1 : 1000 updates, multiply b by 2 for records where 10*n <= a < 10*(n+1) for n = 0 to 999
-<blockquote>
+
 <table border="1">
 <tr>
 <td>
@@ -213,10 +208,10 @@ conn.commit()
     for r in db.select(a=[10*i,10*i+9]):
         db.update(r,b = r.b*2)</tt></pre>
 </td></tr></table>
-</blockquote>
+
 
 <li>update2 : 1000 updates to set c to a random value where a = 1 to 1000
-<blockquote>
+
 New values of field c are stored in a list new_c<p>
 <table border="1">
 <tr>
@@ -233,7 +228,7 @@ conn.commit()</tt></pre>
 for r in recs:
 	db.update(r,c = new_c[r.a])</tt></pre>
 </td></tr></table>
-</blockquote>
+
 </ul>
 
 <p>The tests were made on a Windows XP machine, with Python 2.5 (except gadfly : using the compile kjbuckets.pyd requires Python 2.2)
@@ -298,6 +293,7 @@ update2   24.83       5.95       69.61      1.21     0.93
 <h3><a name="conclusions"></a>Conclusions</h3>
 PyDblite is as fast, and even faster than SQLite for small databases. It is faster than gadfly in all cases. buzhug is faster on most operations when size grows
 <p>
+
 
 </td>
 </tr>

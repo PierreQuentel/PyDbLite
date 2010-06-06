@@ -2,7 +2,7 @@
 
 <head>
 <title>PyDbLite</title>
-<link rel="stylesheet" href="pydblite.css">
+<link rel="stylesheet" href="../pydblite.css">
 </head>
 
 <body>
@@ -10,61 +10,57 @@
 <table width="100%" cellspacing="0" cellpadding="10">
 
 <tr>
-<td class="lnk" >&nbsp;</td>
-<td class="navigation" align="center">PyDbLite</td>
-<td class="lnk" align="right"><a href="../en/PyDbLite.html">English</a></td>
+	<td class="navigation" align="center"><img src="../img/banniere.jpg"></td>
+	<td class="lnk" align="right"><a class="langue" href="../en/PyDbLite.html">English</a></td>
 </tr>
 
 </table>
-<table width="100%" cellspacing="0" cellpadding="10">
 
+<table width="100%" cellspacing="0" cellpadding="0">
 <tr>
-<td class="menu">
-<b>Documentation</b>
-<a href="index.html">Accueil</a>
-<br><a href="PyDbLite.html">Moteur Pur-Python</a>
-<br><a href="SQLite.html">Adapteur SQLite</a>
-<br><a href="MySQL.html">Adapteur MySQL</a>
-<hr>
-<b>Contacts</b>
-<br><a href="http://groups.google.com/group/pydblite">Communauté</a>
-<br><a href="contact.html">Mail</a>
-<hr>
-<b>Code</b>
-<br><a href="http://sourceforge.net/project/platformdownload.php?group_id=210258">Téléchargement</a>
-<br><a href="http://pydblite.svn.sourceforge.net/viewvc/pydblite">Parcourir SVN</a>
-<hr>
-<a href="bench.html">Comparaisons</a>
-<hr>
-<a href="licence.html">Licence</a>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-</td>
+	<td class="menu">
+	<div id="niveau1">Documentation</div>
+		<div id="niveau2">
+		<a href="index.html">Accueil</a>
+		<br><a href="PyDbLite.html">Moteur pur-Python</a>
+		<br><a href="SQLite.html">Adapteur SQLite </a>
+		<br><a href="MySQL.html">Adapteur MySQL</a>
+		</div>
+
+	<div id="niveau1">Contacts</div>
+		<div id="niveau2">
+		<a href="http://groups.google.com/group/pydblite">Communauté</a>
+		<br><a href="contact.html">Mail</a>
+		</div>
+
+	<div id="niveau1">Code</div>
+		<div id="niveau2">
+		<a href="http://sourceforge.net/project/platformdownload.php?group_id=210258">Téléchargement</a>
+		<br><a href="http://pydblite.svn.sourceforge.net/viewvc/pydblite">Parcourir SVN</a>
+		</div>
+	<div id="niveau1">
+		<a href="bench.html">Comparaisons</a>
+		</div>
+	<div id="niveau1">
+		<a href="licence.html">Licence</a>
+		</div>
+	<div id="fill">&nbsp;<br>&nbsp;<br>&nbsp;<br>
+		&nbsp;<br>&nbsp;<br>&nbsp;<br>
+		&nbsp;<br>&nbsp;<br>&nbsp;<br>
+		&nbsp;<br>&nbsp;<br>&nbsp;<br>
+	</div>
+	</td>
 <td class="content">
 <p><h2>Moteur pur Python</h2>
 
-<ul>
-<li>importer la classe <CODE>Base</CODE> du module PyDbLite : <span class="python">from PyDbLite import Base</span>
-</ul>
+Le moteur pur-Python consiste en un module unique, <code>PyDbLite.py</code>. Pour l'utiliser, importer la classe <code>Base</code> depuis ce module :
+<p>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="python">from PyDbLite import Base</span>
 
 <h3>Créer ou ouvrir une base de données</h3>
 
 <ul>
-<li>créer une instance de base de données,en passant un nom de fichier : <span class="python">db = Base('test.pdl')</span>
+<li>créer une instance de base de données, en donnant un nom de fichier comme argument : <span class="python">db = Base('test.pdl')</span>
 
 <li>pour une nouvelle base, définissez les noms des champs : <span class="python">db.create('nom','age','taille')</span>
 
@@ -173,6 +169,7 @@ retourne l'enregistrement tel que record['__id__'] == rec_id
 <li>pour supprimer un champ existant : <span class="python">db.drop_field('nom')</span>
 
 <li>pour connaître la liste des champs : <span class="python">db.fields</span>
+
 
 
 </td>

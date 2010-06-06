@@ -2,7 +2,7 @@
 
 <head>
 <title>PyDbLite</title>
-<link rel="stylesheet" href="pydblite.css">
+<link rel="stylesheet" href="../pydblite.css">
 </head>
 
 <body>
@@ -10,72 +10,81 @@
 <table width="100%" cellspacing="0" cellpadding="10">
 
 <tr>
-<td class="lnk" >&nbsp;</td>
-<td class="navigation" align="center">PyDbLite</td>
-<td class="lnk" align="right"><a href="../fr/MySQL.html">Français</a></td>
+	<td class="navigation" align="center"><img src="../img/banniere.jpg"></td>
+	<td class="lnk" align="right"><a class="langue" href="../fr/MySQL.html">Français</a></td>
 </tr>
 
 </table>
-<table width="100%" cellspacing="0" cellpadding="10">
 
+<table width="100%" cellspacing="0" cellpadding="0">
 <tr>
-<td class="menu">
-<b>Documentation</b>
-<a href="index.html">Home</a>
-<br><a href="PyDbLite.html">Pure-Python engine</a>
-<br><a href="SQLite.html">SQLite adapter</a>
-<br><a href="MySQL.html">MySQL adapter</a>
-<hr>
-<b>Contacts</b>
-<br><a href="http://groups.google.com/group/pydblite">Community</a>
-<br><a href="contact.html">Contact</a>
-<hr>
-<b>Code</b>
-<br><a href="http://sourceforge.net/project/platformdownload.php?group_id=210258">Download</a>
-<br><a href="http://pydblite.svn.sourceforge.net/viewvc/pydblite">Browse SVN</a>
-<hr>
-<a href="bench.html">Benchmarks</a>
-<hr>
-<a href="licence.html">Licence</a>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-</td>
-<td class="content">
-<h2>MySQL adapter</h2>
-<p>The only difference with the pure-Python module is the syntax to identify a <code>Base</code> and the need to specify field types on base creation
-<ul>
-<li>import the class <code>Base</code> :
-<span class="python">from PyDbLite.MySQL import Base</span>
-<li>connect to the MySQL database :
-<p><span class="python">import MySQLdb<br>
- connection = MySQLdb.connect("localhost","root","admin")<br>
- connection.cursor().execute("USE test")
- </span>
+	<td class="menu">
+	<div id="niveau1">Documentation</div>
+		<div id="niveau2">
+		<a href="index.html">Home</a>
+		<br><a href="PyDbLite.html">Pure-Python engine</a>
+		<br><a href="SQLite.html">SQLite adapter</a>
+		<br><a href="MySQL.html">MySQL adapter</a>
+		</div>
 
-<li>pass the connection as argument to Base creation : <span class="python">db = Base('dummy',connection)</span>
-<li>to create a new base (a table in the MySQL database),specify a valid MySQL field type :
-<span class="python">db.create(('name','INTEGER'),('age','INTEGER'),('size','REAL'))</span>
+	<div id="niveau1">Contacts</div>
+		<div id="niveau2">
+		<a href="http://groups.google.com/group/pydblite">Community</a>
+		<br><a href="contact.html">Contact</a>
+		</div>
+
+	<div id="niveau1">Code</div>
+		<div id="niveau2">
+		<a href="http://sourceforge.net/project/platformdownload.php?group_id=210258">Download</a>
+		<br><a href="http://pydblite.svn.sourceforge.net/viewvc/pydblite">Browse SVN</a>
+		</div>
+	<div id="niveau1">
+		<a href="bench.html">Benchmarks</a>
+		</div>
+	<div id="niveau1">
+		<a href="licence.html">Licence</a>
+		</div>
+	<div id="fill">&nbsp;<br>&nbsp;<br>&nbsp;<br>
+		&nbsp;<br>&nbsp;<br>&nbsp;<br>
+		&nbsp;<br>&nbsp;<br>&nbsp;<br>
+		&nbsp;<br>&nbsp;<br>&nbsp;<br>
+	</div>
+	</td>
+<td class="content">
+
+<h2>MySQL adapter</h2>
+<p>The main difference with the pure-Python module is the syntax to identify a database and a table, and the need to specify field types on base creation
+<p>For compliance with MySQL vocabulary, the module defines three classes, <code>Connection, Database</code> and <code>Table</code>
+<p><code><b>Connection</b>(<i>host,login,password</i>)</code> : returns a connection to the MySQL server
+<p>Instances of <code>Connection</code> support 2 methods :
+<ul>
+<li><code>databases()</code> : returns the list of the databases names
+<li><code>create(<i>db_name</i>)</code> : creates a database named <i>db_name</i> and returns the instance of the <code>Database</code> class
+</ul>
+<p><code><b>Database</b>(<i>db_name, connection</i>)</code> : returns the database <i>db_name</i> for the specified <i>connection</i>
+<p>Instances of <code>Database</code> support 2 methods:
+<ul>
+<li><code>tables()</code> : returns the list of the table names in the database
+<li><code>drop()</code> : drop the database
+</ul>
+<p><code><b>Table</b>(<i>table_name,db</i>)</code> : <i>table_name</i> is the table name, <i>db</i> is the instance of <code>Database</code>
+
+<p>Manipulating a table uses the same syntax as in PyDbLite :
+<ul>
+<li>to create the table you must specify a MySQL field type : <code>INTEGER, REAL, DATETIME, CHAR, BLOB,</code>etc. :<br>
+<div class="python">table.create(('name','CHAR(20)'),('age','INTEGER'),('size','REAL'))</div>
+<li>if other information needs to be provided, put it in the second argument, using the SQL syntax for MySQL :
+<div class="python">table.create(('recid','INTEGER PRIMARY KEY AUTO_INCREMENT'),
+<br>&nbsp;&nbsp;&nbsp;&nbsp;    ('date','TIMESTAMP DEFAULT CURRENT_TIMESTAMP'))</div>
+
 </ul>
 
 <p>For record insertion, selection, update and deletion, adding or dropping fields,
-the syntax is the same as above
-<p>The <code>Base</code> instance has an attribute <code>cursor</code>, so you can also execute
-SQL expressions by <span class="python">db.cursor.execute(some_sql)</span> and get the result
-by <span class="python">results = db.cursor.fetchall()</span>
+the syntax is the same as with the pure-Python module
+<p>Selection by record id only works if a field <code>INTEGER PRIMARY KEY AUTO_INCREMENT</code> is present in the table ; the functions <code>delete()</code> and <code>update()</code> also require this record id
+<p>The <code>Table</code> instance has an attribute <code>cursor</code>, so you can also execute
+SQL expressions by <span class="python">table.cursor.execute(some_sql)</span> and get the result
+by <span class="python">results = table.cursor.fetchall()</span>
 
 
 </td>
