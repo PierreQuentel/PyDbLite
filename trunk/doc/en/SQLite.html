@@ -2,7 +2,7 @@
 
 <head>
 <title>PyDbLite</title>
-<link rel="stylesheet" href="pydblite.css">
+<link rel="stylesheet" href="../pydblite.css">
 </head>
 
 <body>
@@ -10,71 +10,66 @@
 <table width="100%" cellspacing="0" cellpadding="10">
 
 <tr>
-<td class="lnk" >&nbsp;</td>
-<td class="navigation" align="center">PyDbLite</td>
-<td class="lnk" align="right"><a href="../fr/SQLite.html">Français</a></td>
+	<td class="navigation" align="center"><img src="../img/banniere.jpg"></td>
+	<td class="lnk" align="right"><a class="langue" href="../fr/SQLite.html">Français</a></td>
 </tr>
 
 </table>
-<table width="100%" cellspacing="0" cellpadding="10">
 
+<table width="100%" cellspacing="0" cellpadding="0">
 <tr>
-<td class="menu">
-<b>Documentation</b>
-<a href="index.html">Home</a>
-<br><a href="PyDbLite.html">Pure-Python engine</a>
-<br><a href="SQLite.html">SQLite adapter</a>
-<br><a href="MySQL.html">MySQL adapter</a>
-<hr>
-<b>Contacts</b>
-<br><a href="http://groups.google.com/group/pydblite">Community</a>
-<br><a href="contact.html">Contact</a>
-<hr>
-<b>Code</b>
-<br><a href="http://sourceforge.net/project/platformdownload.php?group_id=210258">Download</a>
-<br><a href="http://pydblite.svn.sourceforge.net/viewvc/pydblite">Browse SVN</a>
-<hr>
-<a href="bench.html">Benchmarks</a>
-<hr>
-<a href="licence.html">Licence</a>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-</td>
+	<td class="menu">
+	<div id="niveau1">Documentation</div>
+		<div id="niveau2">
+		<a href="index.html">Home</a>
+		<br><a href="PyDbLite.html">Pure-Python engine</a>
+		<br><a href="SQLite.html">SQLite adapter</a>
+		<br><a href="MySQL.html">MySQL adapter</a>
+		</div>
+
+	<div id="niveau1">Contacts</div>
+		<div id="niveau2">
+		<a href="http://groups.google.com/group/pydblite">Community</a>
+		<br><a href="contact.html">Contact</a>
+		</div>
+
+	<div id="niveau1">Code</div>
+		<div id="niveau2">
+		<a href="http://sourceforge.net/project/platformdownload.php?group_id=210258">Download</a>
+		<br><a href="http://pydblite.svn.sourceforge.net/viewvc/pydblite">Browse SVN</a>
+		</div>
+	<div id="niveau1">
+		<a href="bench.html">Benchmarks</a>
+		</div>
+	<div id="niveau1">
+		<a href="licence.html">Licence</a>
+		</div>
+	<div id="fill">&nbsp;<br>&nbsp;<br>&nbsp;<br>
+		&nbsp;<br>&nbsp;<br>&nbsp;<br>
+		&nbsp;<br>&nbsp;<br>&nbsp;<br>
+		&nbsp;<br>&nbsp;<br>&nbsp;<br>
+	</div>
+	</td>
 <td class="content">
+
 
 <h2>SQLite adapter</h2>
 <p>The main difference with the pure-Python module is the syntax to identify a database and a table, and the need to specify field types on base creation
 <p>For compliance with SQLite vocabulary, the module defines two classes, <code>Database</code> and <code>Table</code>
-<p>The <code>Database</code> instances are built with the database path as argument : <span class="python">db = Database('some/path/test.sqlite')</span>
-<p>Instances of <code>Database</code> support a method <code>tables()</code>, returning the list of the table names in the database
+<p><b><code>Database(<i>db_path</i>)</code></b> : <i>db_path</i> is the database path in the file system
+<p>Instances of <code>Database</code> support 2 methods :
+<ul>
+<li><code>tables()</code> : returns the list of the table names in the database
+<li><code>has_table(<i>table_name</i>)</code> : returns a boolean indicating if there is a table named <i>table_name</i> in the database
+</ul>
+<p><b><code>Table(<i>table_name,db</i>)</code></b> : <i>table_name</i> is the table name, <i>db</i> is either the database path in the file system, or the matching instance of <code>Database</i>
+
 <p>Manipulating a table uses the same syntax as in PyDbLite :
 <ul>
-<li>import the class <code>Table</code> :
-<div class="python">from PyDbLite.SQLite import Table</div>
-<li>to create a <code>Table</code> instance (a table in the SQLite database) you pass 2 arguments : the table name, and the path to the database in the file system :
-<br><div class="python">table = Table('dummy','test')</div>
-<br>You can also pass the instance of the <code>Database</code> class :
-<div class="python">db = Database('test.sqlite')
-<br>table = Table('dummy',db)
-</div>
 <li>to create the table you must specify an SQLite field type : <code>INTEGER, REAL, TEXT</code>
 or <code>BLOB</code> :<br>
 <div class="python">db.create(('name','TEXT'),('age','INTEGER'),('size','REAL'))</div>
-<br>If other information needs to be provided, put it in the second argument, using the SQL syntax for SQLite :
+<li>if other information needs to be provided, put it in the second argument, using the SQL syntax for SQLite :
 <div class="python">db.create(('recid','INTEGER PRIMARY KEY AUTOINCREMENT'),
 <br>&nbsp;&nbsp;&nbsp;&nbsp;    ('date','BLOB DEFAULT CURRENT_DATE'))</div>
 

@@ -2,7 +2,7 @@
 
 <head>
 <title>PyDbLite</title>
-<link rel="stylesheet" href="pydblite.css">
+<link rel="stylesheet" href="../pydblite.css">
 </head>
 
 <body>
@@ -10,65 +10,93 @@
 <table width="100%" cellspacing="0" cellpadding="10">
 
 <tr>
-<td class="lnk" >&nbsp;</td>
-<td class="navigation" align="center">PyDbLite</td>
-<td class="lnk" align="right"><a href="../en/SQLite.html">English</a></td>
+	<td class="navigation" align="center"><img src="../img/banniere.jpg"></td>
+	<td class="lnk" align="right"><a class="langue" href="../en/SQLite.html">English</a></td>
 </tr>
 
 </table>
-<table width="100%" cellspacing="0" cellpadding="10">
 
+<table width="100%" cellspacing="0" cellpadding="0">
 <tr>
-<td class="menu">
-<b>Documentation</b>
-<a href="index.html">Accueil</a>
-<br><a href="PyDbLite.html">Moteur Pur-Python</a>
-<br><a href="SQLite.html">Adapteur SQLite</a>
-<br><a href="MySQL.html">Adapteur MySQL</a>
-<hr>
-<b>Contacts</b>
-<br><a href="http://groups.google.com/group/pydblite">Communauté</a>
-<br><a href="contact.html">Mail</a>
-<hr>
-<b>Code</b>
-<br><a href="http://sourceforge.net/project/platformdownload.php?group_id=210258">Téléchargement</a>
-<br><a href="http://pydblite.svn.sourceforge.net/viewvc/pydblite">Parcourir SVN</a>
-<hr>
-<a href="bench.html">Comparaisons</a>
-<hr>
-<a href="licence.html">Licence</a>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-&nbsp;<br>
-</td>
+	<td class="menu">
+	<div id="niveau1">Documentation</div>
+		<div id="niveau2">
+		<a href="index.html">Accueil</a>
+		<br><a href="PyDbLite.html">Moteur pur-Python</a>
+		<br><a href="SQLite.html">Adapteur SQLite </a>
+		<br><a href="MySQL.html">Adapteur MySQL</a>
+		</div>
+
+	<div id="niveau1">Contacts</div>
+		<div id="niveau2">
+		<a href="http://groups.google.com/group/pydblite">Communauté</a>
+		<br><a href="contact.html">Mail</a>
+		</div>
+
+	<div id="niveau1">Code</div>
+		<div id="niveau2">
+		<a href="http://sourceforge.net/project/platformdownload.php?group_id=210258">Téléchargement</a>
+		<br><a href="http://pydblite.svn.sourceforge.net/viewvc/pydblite">Parcourir SVN</a>
+		</div>
+	<div id="niveau1">
+		<a href="bench.html">Comparaisons</a>
+		</div>
+	<div id="niveau1">
+		<a href="licence.html">Licence</a>
+		</div>
+	<div id="fill">&nbsp;<br>&nbsp;<br>&nbsp;<br>
+		&nbsp;<br>&nbsp;<br>&nbsp;<br>
+		&nbsp;<br>&nbsp;<br>&nbsp;<br>
+		&nbsp;<br>&nbsp;<br>&nbsp;<br>
+	</div>
+	</td>
 <td class="content">
 <h2>Adaptateur SQLite</h2>
 <p>La seule différence avec le module en pur Python est la syntaxe pour identifier une table et la nécessité de spécifier le type des champs quand on crée une base
-<p>Pour rester cohérent avec le vocabulaire de SQLite, on utilise plutôt le nom <code>Table</code> que <code>Base</code>
+
+<p>Pour rester cohérent avec le vocabulaire SQLite, le module définit deux classes, <code>Database</code> et <code>Table</code>
+<p><b><code>Database(<i>chemin_bdd</i>)</code></b> : <i>chemin_bdd</i> est le chemin de la base de données dans le système de fichiers
+<p>Les instances de <code>Database</code> supportent 2 méthodes :
 <ul>
-<li>importer la classe <code>Table</code> :
-<span class="python">from PyDbLite.SQLite import Table</span>
-<li>pour créer une instance de <code>Base</code> (une table dans la base de données SQLite) il faut passer 2 argument : le nom de la table, et le chemin de la base dans le système de fichiers : <span class="python">db = Base('machpro','test')</span>
-<li>pour créer une table il faut spécifier un type de champ SQLite : NULL, INTEGER, REAL, TEXT
-ou BLOB : <span class="python">db.create(('nom','TEXT'),('age','INTEGER'),('taille','REAL'))</span>
-<p>Pour simplifier, vous pouvez aussi utiliser les types DATE et DATETIME (ou TIMESTAMP), le programme fera lui-même les conversions entre les instances de <code>datetime.date</code> et
-<code>datetime.datetime</code> et le type TEXT
+<li><code>tables()</code> : renvoie la liste des noms de tables dans la base de données
+<li><code>has_table(<i>nom_table</i>)</code> : renvoie un booléen qui indique s'il existe une table <i>nom_table</i> dans la base de données
 </ul>
+<p><b><code>Table(<i>nom_table,bdd</i>)</code></b> : <i>nom_table</i> est le nom de la table, <i>bdd</i> est soit le chemin de la base de données dans le système de fichiers, soit l'instance correspondante de <code>Database</i>
+
+<p>La manipulation d'une table utilise la même syntaxe que PyDbLite :
+<ul>
+<li>pour créer une table vous devez spécifier les types de champ SQLite : <code>INTEGER, REAL, TEXT</code> ou <code>BLOB</code> :<br>
+<div class="python">db.create(('nom','TEXT'),('age','INTEGER'),('taille','REAL'))</div>
+<li>s'il faut fournir d'autres informations, passez-les comme second argument en respectant la syntaxe SQL propre à SQLite :
+<div class="python">db.create(('recid','INTEGER PRIMARY KEY AUTOINCREMENT'),
+<br>&nbsp;&nbsp;&nbsp;&nbsp;    ('date','BLOB DEFAULT CURRENT_DATE'))</div>
+</ul>
+
 <p>Pour l'insertion, la sélection, la mise à jour et la suppression, la syntaxe est la même que ci-dessus. La seule différence est qu'on ne peut pas utiliser la méthode <code>drop_field()</code>, parce que la suppression de champs n'est pas supportée par SQLite
+
+<p>La conversion entre les types Python et les types de champs SQLite reproduit le comportement du module Python pour SQLite : les instances de <code>datetime.date</code> et de <code>datetime.datetime</code> sont stockées comme des dates ou des dates-heures au format ISO
+
+<p>Les méthodes de sélection renvoient des dictionnaires, dans lesquels les types SQLite sont convertis en types Python de cette façon :
+<p>
+<table border="1">
+<tr><th>Type SQLite</th><th>Type Python</th></tr>
+<tr><td>NULL</td><td>None</td></tr>
+<tr><td>TEXT</td><td>unicode</td></tr>
+<tr><td>BLOB</td><td>str</td></tr>
+<tr><td>INTEGER</td><td>int</td></tr>
+<tr><td>REAL</td><td>float</td></tr>
+</table>
+
+<p>Si vous voulez que des champs soient renvoyés comme instances de <code>datetime.date</code>, <code>datetime.time</code> ou <code>datetime.datetime</code>, vous devez le spécifier quand vous créez ou ouvrez la table, en utilisant les méthodes <CODE>is_date(<i>nom_champ</i>)</CODE>, <CODE>is_time(<i>nom_champ</i>)</CODE> ou <CODE>is_datetime(<i>nom_champ</i>)</CODE> :
+
+<div class="python">db = Database('test.sqlite')
+<br>table = Table('truc',db)
+<br>table.is_date('anniv')
+</div>
+
+
 <p>L'instance de <code>Table</code> a un attribut <code>cursor</code>, ce qui permet d'exécuter des commandes SQL par <span class="python">db.cursor.execute(expression_sql)</span> et récupérer le résultat par <span class="python">results = db.cursor.fetchall()</span>
+
 </td>
 </tr>
 </table>
