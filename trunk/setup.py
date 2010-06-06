@@ -5,7 +5,7 @@ from distutils.core import setup
 import sys
 
 package_dir = {
-    'PyDbLite.test':'test'
+    'PyDbLite.test':'PyDbLite/test'
     }
 
 package_data = {
