@@ -9,8 +9,8 @@ package_dir = {
     }
 
 package_data = {
-    'doc':['*.html','*.css','fr/*.html','fr/*.css',
-        'en/*.html','en/*.css']
+    'doc':['*.html','*.css','img/*.jpg','fr/*.html','fr/*.css',
+        'en/*.html','en/*.css','en/*.jpg']
     }
 
 setup(name='PyDbLite',
