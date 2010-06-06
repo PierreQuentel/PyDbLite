@@ -187,11 +187,11 @@ class Database:
     
 class Table:
 
-    def __init__(self,basename,db):
-        """basename = name of the SQLite table
+    def __init__(self,table_name,db):
+        """table_name = name of the SQLite table
         db = a connection to a SQLite database, a Database instance
         or the database path"""
-        self.name = basename
+        self.name = table_name
         if isinstance(db,sqlite.Connection):
             self.conn = db
             self.cursor = db.cursor()

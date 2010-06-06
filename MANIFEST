@@ -8,6 +8,10 @@ PyDbLite\PyDbLite_SQL.py
 PyDbLite\PyDbLite_conversions.py
 PyDbLite\SQLite.py
 PyDbLite\__init__.py
+PyDbLite\test\MySQL_test.py
+PyDbLite\test\PyDbLite_test.py
+PyDbLite\test\SQLite_test.py
+PyDbLite\test\__init__.py
 doc\index.html
 doc\pydblite.css
 doc\en\MySQL.html
@@ -26,7 +30,3 @@ doc\fr\contact.html
 doc\fr\index.html
 doc\fr\licence.html
 doc\fr\pydblite.css
-test\MySQL_test.py
-test\PyDbLite_test.py
-test\SQLite_test.py
-test\__init__.py
