@@ -1,3 +1,0 @@
-include LICENCE.txt
-recursive-include doc *.html *.css *.jpg
-

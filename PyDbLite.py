@@ -1,4 +1,4 @@
-"""PyDbLite.py
+"""PyDbLite.py for Python 3
 
 BSD licence
 
@@ -45,29 +45,14 @@ Syntax :
     # save changes on disk
     db.commit()
 
-version 2.2 : add __contains__
-
-version 2.3 : introduce syntax (db('name')>'f') & (db('age') == 30)
-
-version 2.4 : 
-- add BSD Licence
-- raise exception if unknown fields in insert
-
-version 2.5 :
-- test is now in folder test
+version 1.0 : first port from Python2 to Python3
 """
 
-version = "2.5"
+version = "1.0"
 
 import os
-import cPickle
+import pickle
 import bisect
-
-# compatibility with Python 2.3
-try:
-    set([])
-except NameError:
-    from sets import Set as set
     
 class Index:
     """Class used for indexing a base on a field
@@ -78,7 +63,10 @@ class Index:
         self.field = field # field name
 
     def __iter__(self):
-        return iter(self.db.indices[self.field])
+        return self
+    
+    def __next__(self):
+        return iter(self.db.indices[self.field]).__next__()
 
     def keys(self):
         return self.db.indices[self.field].keys()
@@ -88,6 +76,9 @@ class Index:
         field value is equal to this key, or an empty list"""
         ids = self.db.indices[self.field].get(key,[])
         return [ self.db.records[_id] for _id in ids ]
+
+    def __contains__(self,key):
+        return key in self.db.indices[self.field]
 
 class Tester:
 
@@ -109,19 +100,47 @@ class Tester:
         return self
 
     def __lt__(self,other):
-        self.records = [r for r in self.records if r[self.key]<other]
+        recs = []
+        for r in self.records:
+            try:
+                if r[self.key]<other:
+                    recs.append(r)
+            except TypeError:
+                continue
+        self.records = recs
         return self
 
     def __le__(self,other):
-        self.records = [r for r in self.records if r[self.key]<=other]
+        recs = []
+        for r in self.records:
+            try:
+                if r[self.key]<=other:
+                    recs.append(r)
+            except TypeError:
+                continue
+        self.records = recs
         return self
 
     def __gt__(self,other):
-        self.records = [r for r in self.records if r[self.key]>other]
+        recs = []
+        for r in self.records:
+            try:
+                if r[self.key]>other:
+                    recs.append(r)
+            except TypeError:
+                continue
+        self.records = recs
         return self
         
     def __ge__(self,other):
-        self.records = [r for r in self.records if r[self.key]>=other]
+        recs = []
+        for r in self.records:
+            try:
+                if r[self.key]>=other:
+                    recs.append(r)
+            except TypeError:
+                continue
+        self.records = recs
         return self
 
     def __and__(self,other_tester):
@@ -150,8 +169,8 @@ class Tester:
 
 class Base:
 
-    def __init__(self,basename,protocol=cPickle.HIGHEST_PROTOCOL):
-        """protocol as defined in pickle / cPickle
+    def __init__(self,basename,protocol=pickle.HIGHEST_PROTOCOL):
+        """protocol as defined in pickle / pickle
         Defaults to the highest protocol available
         For maximum compatibility use protocol = 0"""
         self.name = basename
@@ -167,9 +186,9 @@ class Base:
         self.mode = mode = kw.get("mode",None)
         if os.path.exists(self.name):
             if not os.path.isfile(self.name):
-                raise IOError,"%s exists and is not a file" %self.name
+                raise IOError("%s exists and is not a file" %self.name)
             elif mode is None:
-                raise IOError,"Base %s already exists" %self.name
+                raise IOError("Base %s already exists" %self.name)
             elif mode == "open":
                 return self.open()
             elif mode == "override":
@@ -195,13 +214,13 @@ class Base:
         reset = False
         for f in fields:
             if not f in self.fields:
-                raise NameError,"%s is not a field name %s" %(f,self.fields)
+                raise NameError("%s is not a field name %s" %(f,self.fields))
             # initialize the indices
             if self.mode == "open" and f in self.indices:
                 continue
             reset = True
             self.indices[f] = {}
-            for _id,record in self.records.iteritems():
+            for _id,record in self.records.items():
                 # use bisect to quickly insert the id in the list
                 bisect.insort(self.indices[f].setdefault(record[f],[]),
                     _id)
@@ -215,7 +234,7 @@ class Base:
         """Delete the index on the specified fields"""
         for f in fields:
             if not f in self.indices:
-                raise ValueError,"No index on field %s" %f
+                raise ValueError("No index on field %s" %f)
         for f in fields:
             del self.indices[f]
         self.commit()
@@ -227,10 +246,10 @@ class Base:
             _in = open(self.name) # don't specify binary mode !
         else:
             _in = open(self.name,'rb')
-        self.fields = cPickle.load(_in)
-        self.next_id = cPickle.load(_in)
-        self.records = cPickle.load(_in)
-        self.indices = cPickle.load(_in)
+        self.fields = pickle.load(_in)
+        self.next_id = pickle.load(_in)
+        self.records = pickle.load(_in)
+        self.indices = pickle.load(_in)
         for f in self.indices.keys():
             setattr(self,'_'+f,Index(self,f))
         _in.close()
@@ -240,10 +259,10 @@ class Base:
     def commit(self):
         """Write the database to a file"""
         out = open(self.name,'wb')
-        cPickle.dump(self.fields,out,self.protocol)
-        cPickle.dump(self.next_id,out,self.protocol)
-        cPickle.dump(self.records,out,self.protocol)
-        cPickle.dump(self.indices,out,self.protocol)
+        pickle.dump(self.fields,out,self.protocol)
+        pickle.dump(self.next_id,out,self.protocol)
+        pickle.dump(self.records,out,self.protocol)
+        pickle.dump(self.indices,out,self.protocol)
         out.close()
 
     def insert(self,*args,**kw):
@@ -260,9 +279,9 @@ class Base:
         # raise exception if unknown field
         for key in kw:
             if not key in self.fields:
-                raise NameError,"Invalid field name : %s" %key
+                raise NameError("Invalid field name : %s" %key)
         # set keys and values
-        for (k,v) in kw.iteritems():
+        for (k,v) in kw.items():
             record[k]=v
         # add the key __id__ : record identifier
         record['__id__'] = self.next_id
@@ -298,12 +317,12 @@ class Base:
         # check if the records are in the base
         if not set(_ids).issubset(keys):
             missing = list(set(_ids).difference(keys))
-            raise IndexError,'Delete aborted. Records with these ids' \
-                ' not found in the base : %s' %str(missing)
+            raise IndexError('Delete aborted. Records with these ids' \
+                ' not found in the base : %s' %str(missing))
         # raise exception if duplicate ids
         for i in range(len(_ids)-1):
             if _ids[i] == _ids[i+1]:
-                raise IndexError,"Delete aborted. Duplicate id : %s" %_ids[i]
+                raise IndexError("Delete aborted. Duplicate id : %s" %_ids[i])
         deleted = len(removed)
         while removed:
             r = removed.pop()
@@ -322,7 +341,7 @@ class Base:
         """Update one record of a list of records 
         with new keys and values and update indices"""
         # ignore unknown fields
-        kw = dict([(k,v) for (k,v) in kw.iteritems() if k in self.fields])
+        kw = dict([(k,v) for (k,v) in kw.items() if k in self.fields])
         if isinstance(records,dict):
             records = [ records ]
         # update indices
@@ -346,7 +365,7 @@ class Base:
 
     def add_field(self,field,default=None):
         if field in self.fields + ["__id__","__version__"]:
-            raise ValueError,"Field %s already defined" %field
+            raise ValueError("Field %s already defined" %field)
         for r in self:
             r[field] = default
         self.fields.append(field)
@@ -354,7 +373,7 @@ class Base:
     
     def drop_field(self,field):
         if field in ["__id__","__version__"]:
-            raise ValueError,"Can't delete field %s" %field
+            raise ValueError("Can't delete field %s" %field)
         self.fields.remove(field)
         for r in self:
             del r[field]
@@ -366,12 +385,12 @@ class Base:
         """Selection by field values
         db(key=value) returns the list of records where r[key] = value"""
         if args and kw:
-            raise SyntaxError,"Can't specify positional AND keyword arguments"
+            raise SyntaxError("Can't specify positional AND keyword arguments")
         if args:
             if len(args)>1:
-                raise SyntaxError,"Only one field can be specified"
+                raise SyntaxError("Only one field can be specified")
             elif args[0] not in self.fields:
-                raise ValueError,"%s is not a field" %args[0]
+                raise ValueError("%s is not a field" %args[0])
             else:
                 return Tester(self,args[0])
         if not kw:
@@ -414,9 +433,9 @@ class Base:
         return record_id in self.records
 
     def __iter__(self):
-        """Iteration on the records"""
-        return self.records.itervalues()
+        """Iteration on records"""
+        return self.records.values().__iter__()
 
 if __name__ == '__main__':
-    os.chdir(os.path.join(os.getcwd(),'test'))
-    execfile('PyDbLite_test.py')
+    with open('PyDbLite_test.py') as fh:
+        exec(fh.read())
