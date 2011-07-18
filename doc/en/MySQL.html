@@ -56,10 +56,9 @@
 <p>The main difference with the pure-Python module is the syntax to identify a database and a table, and the need to specify field types when creating a table
 <p>For compliance with MySQL vocabulary, the module defines three classes, <code>Connection, Database</code> and <code>Table</code>
 
+<h2>Connection</h2>
+<p><code><b>Connection</b>(<i>host,login,password[,charset]</i>)</code> returns a connection to the MySQL server. If the optional parameter <i>charset</i> is provided, the TEXT fields must bet inserted as Unicode strings, or as their encoding with this charset ; the values read from the database will also be Unicode strings
 
-<p><code><b>Connection</b>(<i>host,login,password[,charset]</i>)</code> : returns a connection to the MySQL server. If the optional parameter <i>charset</i> is provided, the TEXT fields must bet inserted as Unicode strings, or as their encoding with this charset ; the values read from the database will also be Unicode strings
-
-<blockquote>
 <p>Instances of <code>Connection</code> are dictionary-like objects : the keys are the database names and values are the matching instances of the Database class
 <p>For instance :
 <ul>
@@ -73,11 +72,8 @@
 <li><code>create(<i>db_name</i>)</code> : creates a database named <i>db_name</i> and returns the instance of the <code>Database</code> class
 </ul>
 
-</blockquote>
+<p><h2>Database</h2>
 
-<p><code><b>Database</b></code>
-
-<blockquote>
 <p>Instances of <code>Database</code> are dictionary-like objects : the keys are the table names and the values are the matching instances of the Table class. For instance :
 <ul>
 <li><code>db.keys()</code> : returns the list of the table names in the database
@@ -101,20 +97,24 @@
 
 </ul>
 
-</blockquote>
+<p><h2>Table</h2>
+For record insertion, selection, update and deletion, adding or dropping fields, the syntax is the same as with the pure-Python module
 
-<p><code><b>Table</b></code>
-<blockquote>
-<p>Manipulating a table uses the same syntax as in PyDbLite
+<p>To insert many records at a time,
 
-<p>For record insertion, selection, update and deletion, adding or dropping fields,
-the syntax is the same as with the pure-Python module
+<p><div class="python">table.insert(list_of_values)</div>
+
+<p>will be much faster than
+
+<p><div class="python">for values in list_of_values:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;table.insert(values)</div>
 
 <p>Selection by record id only works if a field <code>INTEGER PRIMARY KEY</code> is present in the table ; the functions <code>delete()</code> and <code>update()</code> also require this record id
 <p>The <code>Table</code> instance has an attribute <code>cursor</code>, so you can also execute
-SQL expressions by <span class="python">table.cursor.execute(some_sql)</span> and get the result
-by <span class="python">results = table.cursor.fetchall()</span>
-</blockquote>
+SQL expressions by
+<p><div class="python">table.cursor.execute(some_sql)</div>
+<p>and get the result by
+<p><div class="python">results = table.cursor.fetchall()</div>
 
 </td>
 </tr>
