@@ -53,39 +53,68 @@
 <td class="content">
 
 <h2>MySQL adapter</h2>
-<p>The main difference with the pure-Python module is the syntax to identify a database and a table, and the need to specify field types on base creation
+<p>The main difference with the pure-Python module is the syntax to identify a database and a table, and the need to specify field types when creating a table
 <p>For compliance with MySQL vocabulary, the module defines three classes, <code>Connection, Database</code> and <code>Table</code>
-<p><code><b>Connection</b>(<i>host,login,password</i>)</code> : returns a connection to the MySQL server
-<p>Instances of <code>Connection</code> support 2 methods :
+
+
+<p><code><b>Connection</b>(<i>host,login,password[,charset]</i>)</code> : returns a connection to the MySQL server. If the optional parameter <i>charset</i> is provided, the TEXT fields must bet inserted as Unicode strings, or as their encoding with this charset ; the values read from the database will also be Unicode strings
+
+<blockquote>
+<p>Instances of <code>Connection</code> are dictionary-like objects : the keys are the database names and values are the matching instances of the Database class
+<p>For instance :
 <ul>
-<li><code>databases()</code> : returns the list of the databases names
+<li><code>conn.keys()</code> returns the list of the database names
+<li><code>conn[db_name]</code> returns the instance of the Database class called <i>db_name</i>
+<li><code>del conn[<i>db_name</i>]</code> drops the database called <i>db_name</i> (all the tables in this database must have been deleted first)
+</ul>
+
+<p>They support another method :
+<ul>
 <li><code>create(<i>db_name</i>)</code> : creates a database named <i>db_name</i> and returns the instance of the <code>Database</code> class
 </ul>
-<p><code><b>Database</b>(<i>db_name, connection</i>)</code> : returns the database <i>db_name</i> for the specified <i>connection</i>
-<p>Instances of <code>Database</code> support 2 methods:
-<ul>
-<li><code>tables()</code> : returns the list of the table names in the database
-<li><code>drop()</code> : drop the database
-</ul>
-<p><code><b>Table</b>(<i>table_name,db</i>)</code> : <i>table_name</i> is the table name, <i>db</i> is the instance of <code>Database</code>
 
-<p>Manipulating a table uses the same syntax as in PyDbLite :
+</blockquote>
+
+<p><code><b>Database</b></code>
+
+<blockquote>
+<p>Instances of <code>Database</code> are dictionary-like objects : the keys are the table names and the values are the matching instances of the Table class. For instance :
 <ul>
-<li>to create the table you must specify a MySQL field type : <code>INTEGER, REAL, DATETIME, CHAR, BLOB,</code>etc. :<br>
-<div class="python">table.create(('name','CHAR(20)'),('age','INTEGER'),('size','REAL'))</div>
-<li>if other information needs to be provided, put it in the second argument, using the SQL syntax for MySQL :
-<div class="python">table.create(('recid','INTEGER PRIMARY KEY AUTO_INCREMENT'),
+<li><code>db.keys()</code> : returns the list of the table names in the database
+<li><code>db[table_name]</code> returns the instance of the Table class called <i>table_name</i>
+<li><code>del db[table_name]</code> : drops the table called <i>table_name</i>
+</ul>
+<p>They support another method :
+<ul>
+<li><code>create(<i>table_name,*fields[,**mode]</i>)</code> : creates a table named <i>table_name</i> and returns the instance of the <code>Table</code> class
+<p><i>fields</i> are 2-element tuples (<i>field_name,field_type</i>) where <i>field_name</i> is the field name and <i>field_type</i> is a MySQL field type : <code>INTEGER, REAL, DATETIME, CHAR, BLOB,</code>etc. :<br>
+<div class="python">db.create('foo',('name','CHAR(20)'),('age','INTEGER'),('size','REAL'))</div>
+<br>If additional information on the type needs to be provided, put it in the second argument, using the SQL syntax for MySQL :
+<div class="python">db.create('foo',('recid','INTEGER PRIMARY KEY AUTO_INCREMENT'),
 <br>&nbsp;&nbsp;&nbsp;&nbsp;    ('date','TIMESTAMP DEFAULT CURRENT_TIMESTAMP'))</div>
+<p>The optional keyword argument <i>mode</i> specifies what to do if a table names <i>table_name</i> already exists :
+<ul>
+<li><code>mode="open"</code> : returns the instance of Table for this table, ignores field definitions
+<li><code>mode="override"</code> : drops the table and creates a new one with the field definitions
+<li>if mode is not specified, an exception is raised
+</ul>
 
 </ul>
+
+</blockquote>
+
+<p><code><b>Table</b></code>
+<blockquote>
+<p>Manipulating a table uses the same syntax as in PyDbLite
 
 <p>For record insertion, selection, update and deletion, adding or dropping fields,
 the syntax is the same as with the pure-Python module
-<p>Selection by record id only works if a field <code>INTEGER PRIMARY KEY AUTO_INCREMENT</code> is present in the table ; the functions <code>delete()</code> and <code>update()</code> also require this record id
+
+<p>Selection by record id only works if a field <code>INTEGER PRIMARY KEY</code> is present in the table ; the functions <code>delete()</code> and <code>update()</code> also require this record id
 <p>The <code>Table</code> instance has an attribute <code>cursor</code>, so you can also execute
 SQL expressions by <span class="python">table.cursor.execute(some_sql)</span> and get the result
 by <span class="python">results = table.cursor.fetchall()</span>
-
+</blockquote>
 
 </td>
 </tr>
