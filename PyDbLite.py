@@ -242,10 +242,7 @@ class Base:
     def open(self):
         """Open an existing database and load its content into memory"""
         # guess protocol
-        if self.protocol==0:
-            _in = open(self.name) # don't specify binary mode !
-        else:
-            _in = open(self.name,'rb')
+        _in = open(self.name,'rb') # binary mode
         self.fields = pickle.load(_in)
         self.next_id = pickle.load(_in)
         self.records = pickle.load(_in)
@@ -420,6 +417,8 @@ class Base:
     
     def __getitem__(self,key):
         # direct access by record id
+        if key < 0:
+            key = len(self)+key
         return self.records[key]
     
     def __len__(self):
