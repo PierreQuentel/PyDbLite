@@ -57,6 +57,8 @@ Changes in version 2.5 :
 
 import os
 import cPickle
+import cStringIO
+import traceback
 import bisect
 import re
 import time
@@ -167,13 +169,16 @@ class SQLiteError(Exception):
 
     pass
 
-class Database:
+class Database(dict):
 
     def __init__(self,db,**kw):
+        dict.__init__(self)
         self.conn = sqlite.connect(db,**kw)
         self.cursor = self.conn.cursor()
+        for table_name in self._tables():
+            self[table_name] = Table(table_name,self)
 
-    def tables(self):
+    def _tables(self):
         """Return the list of table names in the database"""
         tables = []
         self.cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
@@ -182,8 +187,25 @@ class Database:
                 tables.append(table_info[0])
         return tables
 
-    def has_table(self,table):
-        return table in self.tables()
+    def create(self,table_name,*fields,**kw):
+        table_name = self._norm(table_name)
+        self[table_name] = Table(table_name,self).create(*fields,**kw)
+
+    def __getitem__(self,table_name):
+        try:
+            return dict.__getitem__(self,table_name).open()
+        except KeyError:
+            table = Table(table_name,self)
+            self[table_name] = table
+            return table
+
+    def __delitem__(self,table):
+        # drop table
+        if isinstance(table,Table):
+            table = table.name
+        self.cursor.execute('DROP TABLE %s' %table)
+        dict.__delitem__(self,table)
+
     
 class Table:
 
@@ -193,13 +215,13 @@ class Table:
         or the database path"""
         self.name = table_name
         if isinstance(db,sqlite.Connection):
-            self.conn = db
+            self.db = db
             self.cursor = db.cursor()
         elif isinstance(db,Database):
-            self.conn = db.conn
+            self.db = db
             self.cursor = db.cursor
         else:
-            self.conn = sqlite.connect(db)
+            self.db = sqlite.connect(db)
             self.cursor = self.conn.cursor()
         self.conv_func = {}
 
@@ -312,6 +334,8 @@ class Table:
         Returns the record identifier
         """
         if args:
+            if isinstance(args[0],(list,tuple)):
+                return self._insert_many(args[0])
             kw = dict([(f,arg) for f,arg in zip(self.fields,args)])
 
         ks = kw.keys()
@@ -319,6 +343,24 @@ class Table:
         qm = ','.join(['?']*len(ks))
         sql = "INSERT INTO %s (%s) VALUES (%s)" %(self.name,s1,qm)
         self.cursor.execute(sql,kw.values())
+        # return last row id
+        return self.cursor.lastrowid
+
+    def _insert_many(self,args):
+        """Insert a list or tuple of records"""
+        sql = "INSERT INTO %s" %self.name
+        sql += "(%s) VALUES (%s)"
+        if isinstance(args[0],dict):
+            ks = args[0].keys()
+            sql = sql %(','.join(ks),','.join(['?' for k in ks]))
+            args = [ [arg[k] for k in ks] for arg in args ]
+        else:
+            sql = sql %(','.join(self.fields),
+                ','.join(['?' for f in self.fields]))
+        try:
+            self.cursor.executemany(sql,args)
+        except:
+            raise Exception,self._err_msg(sql,args)
         # return last row id
         return self.cursor.lastrowid
 
@@ -413,6 +455,16 @@ class Table:
         self.cursor.execute("SELECT rowid,* FROM %s" %self.name)
         results = [ self._make_record(r) for r in self.cursor.fetchall() ]
         return iter(results)
+
+    def _err_msg(self,sql,args=None):
+        msg = "Exception for table %s.%s\n" %(self.db,self.name)
+        msg += 'SQL request %s\n' %sql
+        if args:
+            msg += 'Arguments : %s\n' %args
+        out = cStringIO.StringIO()
+        traceback.print_exc(file=out)
+        msg += out.getvalue()
+        return msg
 
 Base = Table # compatibility with previous versions
 
