@@ -157,6 +157,9 @@ class Base:
         self.name = basename
         self.protocol = protocol
 
+    def exists(self):
+        return os.path.exists(self.name)
+
     def create(self,*fields,**kw):
         """Create a new base with specified field names
         A keyword argument mode can be specified ; it is used if a file
