@@ -55,9 +55,13 @@ version 2.4 :
 
 version 2.5 :
 - test is now in folder test
+
+version 2.6
+- if db exists, read field names on instance creation
+- allow add_field on an instance even if it was not open()
 """
 
-version = "2.5"
+version = "2.6"
 
 import os
 import cPickle
@@ -156,6 +160,13 @@ class Base:
         For maximum compatibility use protocol = 0"""
         self.name = basename
         self.protocol = protocol
+        # if base exists, get field names
+        if self.exists():
+            if protocol==0:
+                _in = open(self.name) # don't specify binary mode !
+            else:
+                _in = open(self.name,'rb')
+            self.fields = cPickle.load(_in)
 
     def exists(self):
         return os.path.exists(self.name)
@@ -350,11 +361,13 @@ class Base:
     def add_field(self,field,default=None):
         if field in self.fields + ["__id__","__version__"]:
             raise ValueError,"Field %s already defined" %field
+        if not hasattr(self,'records'): # base not open yet
+            self.open()
         for r in self:
             r[field] = default
         self.fields.append(field)
         self.commit()
-    
+        
     def drop_field(self,field):
         if field in ["__id__","__version__"]:
             raise ValueError,"Can't delete field %s" %field
