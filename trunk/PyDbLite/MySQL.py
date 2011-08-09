@@ -30,8 +30,7 @@ Syntax :
     # simple selection (equality test)
     res = table(age=30)
 
-    # the following methods only work if the table has an
-    # AUTO_INCREMENT
+    # the following methods only work if the table has a PRIMARY KEY
     # delete a record or a list of records
     table.delete(one_record)
     table.delete(list_of_records)
@@ -49,6 +48,8 @@ Syntax :
 """
 
 import os
+import traceback
+import cStringIO
 import cPickle
 import bisect
 
@@ -63,48 +64,95 @@ except NameError:
     from sets import Set as set
 
 class MySQLError(Exception):
-
     pass
 
-class Connection:
+class Connection(dict):
 
-    def __init__(self,host,login,password):
-        self.conn = MySQLdb.connect(host,login,password)
+    def __init__(self,host,login,password,charset=None):
+        dict.__init__(self)
+        self.charset = charset
+        if charset is None:
+            self.conn = MySQLdb.connect(host,login,password)
+        else:
+            self.conn = MySQLdb.connect(host,login,password,unicode=charset)
+            self.conn.character_set_name = lambda charset=charset: charset
         self.cursor = self.conn.cursor()
+        for db_name in self._databases():
+            self[db_name] = Database(db_name,self)
 
-    def databases(self):
+    def _databases(self):
         self.cursor.execute('SHOW DATABASES')
         return [db[0] for db in self.cursor.fetchall()]
 
+    def _norm(self,word):
+        if self.charset and not isinstance(word,unicode):
+            return unicode(word,self.charset)
+        return word
+
     def create(self,db_name,mode=None):
-        if mode=="open":
-            if not db_name in self.databases():
-                self.cursor.execute('CREATE DATABASE %s' %db_name)
-            else:
-                self.cursor.execute('USE %s' %db_name)
-        else:
-            self.cursor.execute('CREATE DATABASE %s' %db_name)
-        return Database(db_name,self)
+        db_name = self._norm(db_name)
+        if mode != "open" and db_name in self._databases():
+            raise MySQLError,"Database %s already exists" %db_name
+        elif mode == "open":
+            return self[db_name]
+        self.cursor.execute('CREATE DATABASE %s' %db_name)
+        self[db_name] = Database(db_name,self)
+        return self[db_name]
 
-class Database:
+    def open(self,db_name):
+        return self[_norm(db_name)]
 
-    def __init__(self,db_name,connection):
-        self.conn = connection
-        self.cursor = connection.cursor
-        self.cursor.execute('USE %s' %db_name)
-
-    def tables(self):
-        self.cursor.execute("SHOW TABLES")
-        return [ t[0] for t in self.cursor.fetchall() ]
-
-    def drop(self):
+    def __delitem__(self,db_name):
+        db_name = self._norm(db_name)
+        dict.__delitem__(self,db_name)
         # drop database
-        self.cursor.execute('USE %s' %db)
-        self.cursor.execute('SHOW TABLES')
+        self.cursor.execute('SHOW TABLES IN %s' %db_name)
         if len(self.cursor.fetchall()):
             raise MySQLError,\
-              "Can't drop database %s ; all tables must be dropped first" %db
-    
+              "Can't drop database %s ; all tables must be dropped first" %db_name
+        self.cursor.execute('DROP DATABASE %s' %db_name)
+
+class Database(dict):
+
+    def __init__(self,db_name,connection):
+        dict.__init__(self)
+        self.name = db_name
+        self.conn = connection
+        self.cursor = connection.cursor
+        for table_name in self._tables():
+            self[table_name] = Table(table_name,self)
+
+    def _norm(self,word):
+        if self.conn.charset and not isinstance(word,unicode):
+            return unicode(word,self.conn.charset)
+        return word
+
+    def _tables(self):
+        self.cursor.execute("SHOW TABLES IN %s" %self.name)
+        return [ t[0] for t in self.cursor.fetchall() ]
+
+    def create(self,table_name,*fields,**kw):
+        table_name = self._norm(table_name)
+        self[table_name] = Table(table_name,self).create(*fields,**kw)
+
+    def __getitem__(self,table_name):
+        table_name = self._norm(table_name)
+        try:
+            return dict.__getitem__(self,table_name).open()
+        except KeyError:
+            table = Table(table_name,self)
+            self[table_name] = table
+            return table
+
+    def __delitem__(self,table):
+        # drop table
+        if isinstance(table,Table):
+            table = table.name
+        else:
+            table = self._norm(table)
+        self.cursor.execute('DROP TABLE %s.%s' %(self.name,table))
+        dict.__delitem__(self,table)
+
 class Table:
 
     def __init__(self,table_name,db):
@@ -113,6 +161,7 @@ class Table:
         self.db = db
         self.conn = self.db.conn.conn
         self.cursor = db.cursor
+        self.dt = '%s.%s' %(db.name,table_name)
 
     def create(self,*fields,**kw):
         """Create a new table
@@ -122,39 +171,41 @@ class Table:
           other information using the MySQL syntax
           eg : ('name','TEXT NOT NULL')
                ('date','TIMESTAMP DEFAULT CURRENT_TIMESTAMP')
-        A keyword argument mode can be specified ; it is used if a file
+        A keyword argument mode can be specified ; it is used if a table
         with the base name already exists
-        - if mode = 'open' : open the existing base, ignore the fields
-        - if mode = 'override' : erase the existing base and create a
+        - if mode = 'open' : use the existing table, ignore the fields
+        - if mode = 'override' : erase the existing table and create a
         new one with the specified fields"""
         self.mode = mode = kw.get("mode",None)
         if self._table_exists():
             if mode == "override":
-                self.cursor.execute("DROP TABLE %s" %self.name)
+                self.execute("DROP TABLE %s" %self.dt)
             elif mode == "open":
                 return self.open()
             else:
-                raise IOError,"Base %s already exists" %self.name
+                raise IOError,"Base %s already exists" %self.dt
         self.fields = []
         self.field_info = {}
-        sql = "CREATE TABLE %s (" %self.name
+        sql = "CREATE TABLE %s (" %(self.dt)
         for field in fields:
             sql += self._validate_field(field)
             sql += ','
         sql = sql[:-1]+')'
-        self.cursor.execute(sql)
+        self.execute(sql)
         self._get_table_info()
+        # update database object
+        self.db[self.name] = self
         return self
 
     def _validate_field(self,field):
         if len(field)!= 2:
             msg = "Error in field definition %s" %field
             msg += ": should be a 2- tuple (field_name,field_info)"
-            raise SQLiteError,msg
+            raise MySQLError,msg
         return '%s %s' %(field[0],field[1])
 
     def open(self):
-        """Open an existing database"""
+        """Open an existing table"""
         if self._table_exists():
             self.mode = "open"
             self._get_table_info()
@@ -164,7 +215,7 @@ class Table:
 
     def _table_exists(self):
         """Database-specific method to see if the table exists"""
-        self.cursor.execute("SHOW TABLES")
+        self.execute("SHOW TABLES IN %s" %self.db.name)
         for table in self.cursor.fetchall():
             if table[0].lower() == self.name.lower():
                 return True
@@ -175,13 +226,13 @@ class Table:
         self.rowid = None
         self.fields = []
         self.field_info = {}
-        self.cursor.execute('DESCRIBE %s' %self.name)
+        self.execute('DESCRIBE %s' %self.dt)
         for row in self.cursor.fetchall():
             field,typ,null,key,default,extra = row
             self.fields.append(field)
             self.field_info[field] = {'type':typ,'NOT NULL':null,'key':key,
                 'DEFAULT':default,'extra':extra}
-            if extra == 'auto_increment':
+            if extra == 'auto_increment' or key.upper()=='PRI':
                 self.rowid = field
 
     def commit(self):
@@ -197,12 +248,37 @@ class Table:
         fields = [ f for f in self.fields
             if not self.field_info[f]['extra']=="auto_increment"]
         if args:
+            if isinstance(args[0],(list,tuple)):
+                return self._insert_many(args[0])
             kw = dict([(f,arg) for f,arg in zip(fields,args)])
 
         vals = self._make_sql_params(kw)
-        sql = "INSERT INTO %s SET %s" %(self.name,",".join(vals))
-        res = self.cursor.execute(sql,kw.values())
-        self.cursor.execute("SELECT LAST_INSERT_ID()")
+        sql = "INSERT INTO %s SET %s" %(self.dt,",".join(vals))
+        sql = self.db._norm(sql)
+        self.execute(sql,kw.values())
+        self.execute("SELECT LAST_INSERT_ID()")
+        __id__ = self.cursor.fetchone()[0]
+        return __id__
+
+    def _insert_many(self,args):
+        """Insert a list or tuple of records"""
+        sql = "INSERT INTO %s" %self.dt
+        sql += "(%s) VALUES (%s)"
+        if isinstance(args[0],dict):
+            ks = args[0].keys()
+            sql = sql %(','.join(ks),','.join(['%s' for k in ks]))
+            args = [ [arg[k] for k in ks] for arg in args ]
+        else:
+            fields = [ f for f in self.fields
+                if not self.field_info[f]['extra']=="auto_increment"]
+            sql = sql %(','.join(fields),','.join(['%s' for f in fields]))
+        if self.db.conn.charset:
+            sql = sql.encode(self.db.conn.charset)
+        try:
+            self.cursor.executemany(sql,args)
+        except:
+            raise Exception,self._err_msg(sql,args)
+        self.execute("SELECT LAST_INSERT_ID()")
         __id__ = self.cursor.fetchone()[0]
         return __id__
 
@@ -224,9 +300,9 @@ class Table:
             return 0
         _ids = [ r[self.rowid] for r in removed ]
         _ids.sort()
-        sql = "DELETE FROM %s WHERE %s IN (%s)" %(self.name,self.rowid,
-            ",".join([str(_id) for _id in _ids]))
-        self.cursor.execute(sql)
+        sql = "DELETE FROM %s WHERE %s IN (%s)" %(self.dt,
+            self.rowid,",".join([str(_id) for _id in _ids]))
+        self.execute(sql)
         return len(removed)
 
     def update(self,record,**kw):
@@ -235,9 +311,9 @@ class Table:
         if self.rowid is None:
             raise MySQLError,"Can't use update() : missing row id"
         vals = self._make_sql_params(kw)
-        sql = "UPDATE %s SET %s WHERE %s=%s" %(self.name,
+        sql = "UPDATE %s SET %s WHERE %s=%s" %(self.dt,
             ",".join(vals),self.rowid,record[self.rowid])
-        self.cursor.execute(sql,kw.values())
+        self.execute(sql,kw.values())
 
     def _make_sql_params(self,kw):
         """Make a list of strings to pass to an SQL statement
@@ -263,18 +339,18 @@ class Table:
         fname,ftype = field
         if fname in self.fields:
             raise ValueError,'Field "%s" already defined' %fname
-        sql = "ALTER TABLE %s ADD %s %s" %(self.name,fname,ftype)
+        sql = "ALTER TABLE %s ADD %s %s" %(self.dt,fname,ftype)
         if default is not None:
             sql += " DEFAULT %s" %self._conv(default)
-        self.cursor.execute(sql)
+        self.execute(sql)
         self.commit()
         self._get_table_info()
     
     def drop_field(self,field):
         if not field in self.fields:
             raise ValueError,"Field %s not found in base" %field
-        sql = "ALTER TABLE %s DROP %s" %(self.name,field)
-        self.cursor.execute(sql)
+        sql = "ALTER TABLE %s DROP %s" %(self.dt,field)
+        self.execute(sql)
         self._get_table_info()
 
     def __call__(self,**kw):
@@ -285,26 +361,33 @@ class Table:
                 raise ValueError,"Field %s not in the database" %key
         vals = self._make_sql_params(kw)
         if vals:
-            sql = "SELECT * FROM %s WHERE %s" %(self.name," AND ".join(vals))
+            sql = "SELECT * FROM %s WHERE %s" %(self.dt," AND ".join(vals))
         else: # all records
-            sql = "SELECT * FROM %s" %self.name
-        self.cursor.execute(sql,kw.values())            
+            sql = "SELECT * FROM %s" %self.dt
+        self.execute(sql,kw.values())            
         return [self._make_record(row) for row in self.cursor.fetchall() ]
     
     def __getitem__(self,record_id):
         """Direct access by record id"""
         if self.rowid is None:
             raise MySQLError,"Can't use __getitem__() : missing row id"
-        sql = "SELECT * FROM %s WHERE %s=%s" %(self.name,self.rowid,record_id)
-        self.cursor.execute(sql)
+        sql = "SELECT * FROM %s WHERE %s=%s" %(self.dt,self.rowid,record_id)
+        self.execute(sql)
         res = self.cursor.fetchone()
         if res is None:
             raise IndexError,"No record at index %s" %record_id
         else:
             return self._make_record(res)
+
+    def __contains__(self,record_id):
+        try:
+            self[record_id]
+            return True
+        except:
+            return False
     
     def __len__(self):
-        self.cursor.execute("SELECT COUNT(*) FROM %s" %self.name)
+        self.execute("SELECT COUNT(*) FROM %s" %self.dt)
         return int(self.cursor.fetchone()[0])
 
     def __delitem__(self,record_id):
@@ -313,9 +396,30 @@ class Table:
         
     def __iter__(self):
         """Iteration on the records"""
-        self.cursor.execute("SELECT * FROM %s" %self.name)
+        self.execute("SELECT * FROM %s" %self.dt)
         results = [ self._make_record(r) for r in self.cursor.fetchall() ]
         return iter(results)
+
+    def execute(self,sql,*args):
+        try:
+            self.cursor.execute(sql,*args)
+        except:
+            raise MySQLError,self._err_msg(sql)
+
+    def _err_msg(self,sql,args=None):
+        msg = "Exception for table %s.%s\n" %(self.db.name,self.name)
+        msg += 'SQL request %s\n' %sql
+        if args:
+            msg += 'Arguments : %s\n' %args
+        out = cStringIO.StringIO()
+        traceback.print_exc(file=out)
+        msg += out.getvalue()
+        self.cursor.execute('SHOW WARNINGS')
+        warnings = self.cursor.fetchall()
+        if warnings:
+            msg += "WARNINGS\n" + str(warnings)
+        return msg
+
 
 Base = Table # compatibility with older versions
 
