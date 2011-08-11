@@ -14,7 +14,7 @@ package_data = {
     }
 
 setup(name='PyDbLite',
-      version='2.5',
+      version='2.6',
       description='PyDbLite, a fast, pure-Python in-memory database',
       author='Pierre Quentel',
       author_email='pierre.quentel@gmail.com',
