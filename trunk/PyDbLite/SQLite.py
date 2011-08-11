@@ -175,6 +175,7 @@ class Database(dict):
         dict.__init__(self)
         self.conn = sqlite.connect(db,**kw)
         self.cursor = self.conn.cursor()
+        self.commit = self.conn.commit
         for table_name in self._tables():
             self[table_name] = Table(table_name,self)
 
@@ -188,16 +189,8 @@ class Database(dict):
         return tables
 
     def create(self,table_name,*fields,**kw):
-        table_name = self._norm(table_name)
         self[table_name] = Table(table_name,self).create(*fields,**kw)
-
-    def __getitem__(self,table_name):
-        try:
-            return dict.__getitem__(self,table_name).open()
-        except KeyError:
-            table = Table(table_name,self)
-            self[table_name] = table
-            return table
+        return self[table_name]
 
     def __delitem__(self,table):
         # drop table
@@ -206,24 +199,17 @@ class Database(dict):
         self.cursor.execute('DROP TABLE %s' %table)
         dict.__delitem__(self,table)
 
-    
 class Table:
 
     def __init__(self,table_name,db):
-        """table_name = name of the SQLite table
-        db = a connection to a SQLite database, a Database instance
-        or the database path"""
+        """table_name = name of the SQLite table. db is a Database instance"""
         self.name = table_name
-        if isinstance(db,sqlite.Connection):
-            self.db = db
-            self.cursor = db.cursor()
-        elif isinstance(db,Database):
-            self.db = db
-            self.cursor = db.cursor
-        else:
-            self.db = sqlite.connect(db)
-            self.cursor = self.conn.cursor()
+        self.db = db
+        self.cursor = db.cursor
+        self.commit = self.db.commit
         self.conv_func = {}
+        self.mode = "open"
+        self._get_table_info()
 
     def create(self,*fields,**kw):
         """Create a new table
@@ -257,21 +243,10 @@ class Table:
 
     def open(self):
         """Open an existing database"""
-        if self._table_exists():
-            self.mode = "open"
-            # get table info
-            self._get_table_info()
-            return self
-        else:
-            # table not found
-            raise IOError,"Table %s doesn't exist" %self.name
+        return self
 
     def _table_exists(self):
-        self.cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
-        for table_info in self.cursor.fetchall():
-            if table_info[0] == self.name:
-                return True
-        return False
+        return self.name in self.db
 
     def _get_table_info(self):
         """Inspect the base to get field names"""
@@ -295,10 +270,6 @@ class Table:
     def info(self):
         # returns information about the table
         return [(field,self.field_info[field]) for field in self.fields]
-
-    def commit(self):
-        """Commit changes on disk"""
-        self.conn.commit()
 
     def _validate_field(self,field):
         if len(field)!= 2:
@@ -377,7 +348,7 @@ class Table:
             sql += "WHERE rowid = ?"
             args = (_id,)
         else:
-            # convert iterable into a list (to be able to sort it)
+            # convert iterable into a list
             removed = [ r for r in removed ]
             if not removed:
                 return 0
@@ -397,9 +368,6 @@ class Table:
         """Make a list of strings to pass to an SQL statement
         from the dictionary kw with Python types"""
         return ['%s=?' %k for k in kw.keys() ]
-        for k,v in kw.iteritems():
-            vals.append('%s=?' %k)
-        return vals
 
     def _make_record(self,row):
         """Make a record dictionary from the result of a fetch_"""
@@ -467,7 +435,3 @@ class Table:
         return msg
 
 Base = Table # compatibility with previous versions
-
-if __name__ == '__main__':
-    os.chdir(os.path.join(os.getcwd(),'test'))
-    execfile('SQLite_test.py')
