@@ -154,22 +154,23 @@ class Tester:
 
 class Base:
 
-    def __init__(self,basename,protocol=cPickle.HIGHEST_PROTOCOL):
+    def __init__(self,path,protocol=cPickle.HIGHEST_PROTOCOL):
         """protocol as defined in pickle / cPickle
         Defaults to the highest protocol available
         For maximum compatibility use protocol = 0"""
-        self.name = basename
+        self.path = path
+        self.name = os.path.splitext(os.path.basename(path))[0]
         self.protocol = protocol
         # if base exists, get field names
         if self.exists():
             if protocol==0:
-                _in = open(self.name) # don't specify binary mode !
+                _in = open(self.path) # don't specify binary mode !
             else:
-                _in = open(self.name,'rb')
+                _in = open(self.path,'rb')
             self.fields = cPickle.load(_in)
 
     def exists(self):
-        return os.path.exists(self.name)
+        return os.path.exists(self.path)
 
     def create(self,*fields,**kw):
         """Create a new base with specified field names
@@ -179,15 +180,15 @@ class Base:
         - if mode = 'override' : erase the existing base and create a
         new one with the specified fields"""
         self.mode = mode = kw.get("mode",None)
-        if os.path.exists(self.name):
-            if not os.path.isfile(self.name):
-                raise IOError,"%s exists and is not a file" %self.name
+        if os.path.exists(self.path):
+            if not os.path.isfile(self.path):
+                raise IOError,"%s exists and is not a file" %self.path
             elif mode is None:
-                raise IOError,"Base %s already exists" %self.name
+                raise IOError,"Base %s already exists" %self.path
             elif mode == "open":
                 return self.open()
             elif mode == "override":
-                os.remove(self.name)
+                os.remove(self.path)
         self.fields = list(fields)
         self.records = {}
         self.next_id = 0
@@ -238,9 +239,9 @@ class Base:
         """Open an existing database and load its content into memory"""
         # guess protocol
         if self.protocol==0:
-            _in = open(self.name) # don't specify binary mode !
+            _in = open(self.path) # don't specify binary mode !
         else:
-            _in = open(self.name,'rb')
+            _in = open(self.path,'rb')
         self.fields = cPickle.load(_in)
         self.next_id = cPickle.load(_in)
         self.records = cPickle.load(_in)
@@ -253,7 +254,7 @@ class Base:
 
     def commit(self):
         """Write the database to a file"""
-        out = open(self.name,'wb')
+        out = open(self.path,'wb')
         cPickle.dump(self.fields,out,self.protocol)
         cPickle.dump(self.next_id,out,self.protocol)
         cPickle.dump(self.records,out,self.protocol)
@@ -432,7 +433,3 @@ class Base:
     def __iter__(self):
         """Iteration on the records"""
         return self.records.itervalues()
-
-if __name__ == '__main__':
-    os.chdir(os.path.join(os.getcwd(),'test'))
-    execfile('PyDbLite_test.py')
