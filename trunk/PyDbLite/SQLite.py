@@ -56,8 +56,17 @@ Changes in version 2.5 :
 """
 
 import os
-import cPickle
-import cStringIO
+try:
+    import cPickle as pickle # Python 2
+    import cStringIO as io
+    def to_str(val,encoding="utf-8"): # encode a Unicode string to a Python 2 str
+        return val.encode(encoding)
+except ImportError:
+    import pickle # Python 3
+    import io
+    unicode = str # used in tests
+    def to_str(val): # leaves a Unicode unchanged
+        return val
 import traceback
 import bisect
 import re
@@ -71,7 +80,7 @@ except ImportError:
     try:
         from pysqlite2 import dbapi2 as sqlite
     except ImportError:
-        print "SQLite is not installed"
+        print("SQLite is not installed")
         raise
 
 # compatibility with Python 2.3
@@ -111,7 +120,7 @@ def to_date(date):
         return None
     mo = c_date_fmt.match(date)
     if not mo:
-        raise ValueError,"Bad value %s for DATE format" %date
+        raise ValueError("Bad value %s for DATE format" %date)
     year,month,day = [int(x) for x in mo.groups()]
     return datetime.date(year,month,day)
 
@@ -121,7 +130,7 @@ def to_time(_time):
         return None
     mo = c_time_fmt.match(_time)
     if not mo:
-        raise ValueError,"Bad value %s for TIME format" %_time
+        raise ValueError("Bad value %s for TIME format" %_time)
     hour,minute,second = [int(x) for x in mo.groups()]
     return datetime.time(hour,minute,second)
 
@@ -131,10 +140,10 @@ def to_datetime(timestamp):
     if timestamp is None:
         return None
     if not isinstance(timestamp,unicode):
-        raise ValueError,"Bad value %s for TIMESTAMP format" %timestamp
+        raise ValueError("Bad value %s for TIMESTAMP format" %timestamp)
     mo = c_tmsp_fmt.match(timestamp)
     if not mo:
-        raise ValueError,"Bad value %s for TIMESTAMP format" %timestamp
+        raise ValueError("Bad value %s for TIMESTAMP format" %timestamp)
     return datetime.datetime(*[int(x) for x in mo.groups()])
 
 # if default value is CURRENT_DATE etc. SQLite doesn't
@@ -231,7 +240,7 @@ class Table:
             elif mode == "open":
                 return self.open()
             else:
-                raise IOError,"Base %s already exists" %self.name
+                raise IOError("Base %s already exists" %self.name)
         sql = "CREATE TABLE %s (" %self.name
         for field in fields:
             sql += self._validate_field(field)
@@ -254,9 +263,9 @@ class Table:
         self.field_info = {}
         self.cursor.execute('PRAGMA table_info (%s)' %self.name)
         for field_info in self.cursor.fetchall():
-            fname = field_info[1].encode('utf-8')
+            fname = to_str(field_info[1])
             self.fields.append(fname)
-            ftype = field_info[2].encode('utf-8')
+            ftype = to_str(field_info[2])
             info = {'type':ftype}
             # can be null ?
             info['NOT NULL'] = field_info[3] != 0
@@ -275,14 +284,14 @@ class Table:
         if len(field)!= 2:
             msg = "Error in field definition %s" %field
             msg += ": should be a 2- tuple (field_name,field_info)"
-            raise SQLiteError,msg
+            raise SQLiteError(msg)
         return '%s %s' %(field[0],field[1])
 
     def conv(self,field_name,conv_func):
         """When a record is returned by a SELECT, ask conversion of
         specified field value with the specified function"""
         if field_name not in self.fields:
-            raise NameError,"Unknown field %s" %field_name
+            raise NameError("Unknown field %s" %field_name)
         self.conv_func[field_name] = conv_func
 
     def is_date(self,field_name):
@@ -313,7 +322,7 @@ class Table:
         s1 = ",".join(ks)
         qm = ','.join(['?']*len(ks))
         sql = "INSERT INTO %s (%s) VALUES (%s)" %(self.name,s1,qm)
-        self.cursor.execute(sql,kw.values())
+        self.cursor.execute(sql,list(kw.values()))
         # return last row id
         return self.cursor.lastrowid
 
@@ -331,7 +340,7 @@ class Table:
         try:
             self.cursor.executemany(sql,args)
         except:
-            raise Exception,self._err_msg(sql,args)
+            raise Exception(self._err_msg(sql,args))
         # return last row id
         return self.cursor.lastrowid
 
@@ -362,7 +371,7 @@ class Table:
         vals = self._make_sql_params(kw)
         sql = "UPDATE %s SET %s WHERE rowid=?" %(self.name,
             ",".join(vals))
-        self.cursor.execute(sql,kw.values()+[record['__id__']])
+        self.cursor.execute(sql,list(kw.values())+[record['__id__']])
 
     def _make_sql_params(self,kw):
         """Make a list of strings to pass to an SQL statement
@@ -384,7 +393,7 @@ class Table:
         self._get_table_info()
     
     def drop_field(self,field):
-        raise SQLiteError,"Dropping fields is not supported by SQLite"
+        raise SQLiteError("Dropping fields is not supported by SQLite")
 
     def __call__(self,**kw):
         """Selection by field values
@@ -392,7 +401,7 @@ class Table:
         if kw:
             for key in kw:
                 if not key in self.fields:
-                    raise ValueError,"Field %s not in the database" %key
+                    raise ValueError("Field %s not in the database" %key)
             vals = self._make_sql_params(kw)
             sql = "SELECT rowid,* FROM %s WHERE %s" %(self.name," AND ".join(vals))
         else:
@@ -406,7 +415,7 @@ class Table:
         self.cursor.execute(sql)
         res = self.cursor.fetchone()
         if res is None:
-            raise IndexError,"No record at index %s" %record_id
+            raise IndexError("No record at index %s" %record_id)
         else:
             return self._make_record(res)
     
@@ -429,7 +438,7 @@ class Table:
         msg += 'SQL request %s\n' %sql
         if args:
             msg += 'Arguments : %s\n' %args
-        out = cStringIO.StringIO()
+        out = io.StringIO()
         traceback.print_exc(file=out)
         msg += out.getvalue()
         return msg
