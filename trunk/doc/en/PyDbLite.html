@@ -165,15 +165,20 @@ To speed up selections, an index can be created on a field : <span class="python
     <p>The index supports iteration on the field values, and the <CODE>keys()</CODE> method
     returns all existing values for the field
 
-<h3>Other functions</h3>
+<h3>Other attributes and methods</h3>
 
-<li>number of records in the base : <span class="python">len(db)</span>
+<ul>
+<li><span class="python">db.add_field('new_field'[,default=v])</span> : adds a new field to an existing base. <i>default</i> is an optional default value ; set to <code>None</code> if not specified
 
-<li>to add a new field to an existing base and specify a default value : <span class="python">db.add_field('new_field'[,default=v])</span>. If no default is provided, the field value is <CODE>None</CODE>
+<li><span class="python">db.drop_field('name')</span> : drops an existing field
 
-<li>to drop an existing field : <span class="python">db.drop_field('name')</span>
+<li><span class="python">db.path</span> : the path of the database in the file system
 
-<li>to get the list of fields : <span class="python">db.fields</span>
+<li><span class="python">db.name</span> : the database name : the basename of the path, stripped of its extension
+
+<li><span class="python">len(db)</span> : number of records in the base
+
+<li><span class="python">db.fields</span> : the list of the fields (does not include the internal fields <code>__id__</code> and <code>__version__</code>)
 
 </ul>
 
