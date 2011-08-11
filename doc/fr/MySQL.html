@@ -52,38 +52,84 @@
 	</td>
 <td class="content">
 <h2>Adaptateur MySQL</h2>
-<p>La seule différence avec le module en pur Python est la syntaxe pour identifier une <code>Base</code> et la nécessité de spécifier le type des champs quand on crée une base
+<p>La principale différence avec le module en pur Python est la syntaxe pour identifier une base de donnéese t une table, et la nécessité de spécifier le type des champs quand on crée une base
 
 <p>Pour rester compatible avec le vocabulaire de MySQL, le module définit trois classes, <code>Connection, Database</code> et <code>Table</code>
-<p><code><b>Connection</b>(<i>hote,identifiant,mot_de_passe</i>)</code> : renvoie une connectin au serveur MySQL
-<p>Les instances de <code>Connection</code> supportent 2 méthodes :
-<ul>
-<li><code>databases()</code> : renvoie la liste des noms de bases de données
-<li><code>create(<i>nom_bdd</i>)</code> : crée une base de données appelée <i>nom_bdd</i> et renvoie l'instance de la classe <code>Database</code>
-</ul>
-<p><code><b>Database</b>(<i>nom_bdd, connection</i>)</code> : renvoie la base de données <i>nom_bdd</i> pour la <i>connection</i> spécifiée
-<p>Les instances de <code>Database</code> supportent 2 méthodes:
-<ul>
-<li><code>tables()</code> : renvoie la liste des noms de tables dans la base de données
-<li><code>drop()</code> : efface la base de données
-</ul>
-<p><code><b>Table</b>(<i>nom_table,bdd</i>)</code> : <i>nom_table</i> est le nom de la table, <i>bdd</i> est l'instance de <code>Database</code>
+<h2>Connection</h2>
+<p><code><b>Connection</b>(<i>hote,identifiant,mot_de_passe[,charset]</i>)</code> : renvoie une connection au serveur MySQL. Si le paramètre optionnel <i>charset</i> est fourni, les champs TEXT doivent être insérés comme chaînes Unicode, ou comme leur encodage dans ce charset ; les valeurs lues depuis la base de données seront aussi des chaînes Unicode
 
-<p>Pour manipuler une table, on utilise la même syntaxe que dans PyDbLite :
+<p>Les instances de <code>Connection</code> sont des objets similaires à des dictionaires : les clés sont les noms des bases de données et les valeurs sont les instances correspondantes de la classe <CODE>Database</CODE>
+<p>Par exemple :
 <ul>
-<li>pour créer une tables il faut spécifier un type de champ de MySQL : <code>INTEGER, REAL, DATETIME, CHAR, BLOB,</code>etc. :<br>
-<div class="python">table.create(('nom','CHAR(20)'),('age','INTEGER'),('taille','REAL'))</div>
-<li>s'il faut fournir d'autres informations, les mettre dans un second argument, en utilisant la syntaxe SQL propre à MySQL :
-<div class="python">table.create(('recid','INTEGER PRIMARY KEY AUTO_INCREMENT'),
+<li><code>conn.keys()</code> renvoie la liste des noms de bases de données
+<li><code>conn[nom_bdd]</code> renvoie l'instance de <CODE>Database</CODE> pour la base de données <i>nom_bdd</i>
+<li><code>del conn[<i>nom_bdd</i>]</code> supprime la base de données <i>nom_bdd</i> (toutes les tables de cette base de données doivent avoir été supprimées précédemment)
+</ul>
+
+
+<p>Elles possèdent une autre méthode :
+<ul>
+<li><code>create(<i>nom_bdd</i>)</code> : crée une base de données appelée <i>nom_bdd</i> et renvoie l'instance correspondante de la classe <code>Database</code>
+</ul>
+
+
+<p><h2>Database</h2>
+
+<p>Les instances de <code>Database</code> sont des objets similaires à des dictionnaires : les clés sont les noms de tables et les valeurs sont les instances correspondantes de la classe <CODE>Table</CODE> class. Par exemple :
+<ul>
+<li><code>db.keys()</code> renvoie la liste des noms de tables dans la base de données
+<li><code>db[nom_table]</code> renvoie l'instance de <CODE>Table</CODE> appelée <i>nom_table</i>
+<li><code>del db[nom_table]</code> : supprime la table appelée <i>nom_table</i>
+</ul>
+
+<p>Elles possèdent une autre méthode :
+
+<ul>
+<li><code>create(<i>nom_table,*champs[,**mode]</i>)</code> : crée une table appelée <i>nom_table</i> et renvoie l'instance de la classe <code>Table</code>
+<p><i>champs</i> sont des tuples à 2 éléments (<i>nom_champ,type_champ</i>) où <i>nom_champ</i> est le nom du champ et <i>type_champ</i> est un type de champ MySQL : <code>INTEGER, REAL, DATETIME, CHAR, BLOB,</code>etc. :<br>
+<div class="python">db.create('test',('nom','CHAR(20)'),('age','INTEGER'),('taille','REAL'))</div>
+
+<br>S'il faut fournir des informations supplémentaires sur les types, les mettre dans le deuxième argument, en se servant de la syntaxe SQL propre à MySQL :
+<div class="python">db.create('test',('recid','INTEGER PRIMARY KEY AUTO_INCREMENT'),
 <br>&nbsp;&nbsp;&nbsp;&nbsp;    ('date','TIMESTAMP DEFAULT CURRENT_TIMESTAMP'))</div>
 
+
+<p>Le mot-clé optionnel <i>mode</i> spécifie ce qu'il faut faire si une table du même nom existe déjà
+<ul>
+<li><span class="python">mode="open"</span> ouvre la table et ignore les définitions de champs
+
+<li><span class="python">mode="override"</span> efface la table existante et en crée une nouvelle avec les définitions de champs
+
+<li>si <i>mode</i> n'est pas spécifié et que la table existe déjà, une exception <CODE>IOError</CODE> est déclenchée
+
 </ul>
 
+</ul>
 
-<p>Pour l'insertion, la sélection, la mise à jour et la suppression, la syntaxe est la même que ci-dessus
-<p>La sélection par identifiant d'enregistrement ne fonctionne que si un champ <code>INTEGER PRIMARY KEY AUTO_INCREMENT</code> est présent dans la table ; les fonctions <code>delete()</code> et <code>update()</code> requièrent aussi ce champ
+<h2>Table</h2>
 
-<p>L'instance de <code>Base</code> a un attribute <code>cursor</code>, ce qui permet d'exécuter des commandes SQL par <span class="python">db.cursor.execute(expression_sql)</span> et récupérer le résultat par <span class="python">results = db.cursor.fetchall()</span>
+<p>Pour l'insertion, la sélection, la mise à jour et la suppression, la syntaxe est la même que pour le module en pur Python
+
+<p>La sélection par identifiant d'enregistrement ne fonctionne que si un champ a été défini comme clé primaire ou avec le mode AUTO_INCREMENT ; les fonctions <code>delete()</code> et <code>update()</code> requièrent aussi ce champ
+
+<p>Pour insérer de nombreux enregistrements en une seule fois,
+
+<p><div class="python">table.insert(liste_de_valeurs)</div>
+
+<p>sera beaucoup plus rapide que
+
+<p><div class="python">for valeurs in liste_de_valeurs:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;table.insert(valeurs)</div>
+
+
+<h2><code>cursor</code> et <code>commit</code></h2>
+
+Les intances de <code>Database</code> et <code>Table</code> ont toutes :
+<ul>
+<li>l'attribut <code>cursor</code>, le curseur de la connection MySQL. On peut donc exécuter des expressions SQL par <div class="python">db.cursor.execute(expr_sql)</div> et récupérer les résultats par <div class="python">resultats = db.cursor.fetchall()</div>
+
+<li>la méthode <code>commit()</code> pour confirmer les changements à la base de données en fin de transaction
+</ul>
 
 
 </td>

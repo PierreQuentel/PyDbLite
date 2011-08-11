@@ -1,9 +1,6 @@
 body
     {
     color: #000000;
-    background-image:url(img/bg.jpg);
-    background-repeat:repeat-x;
-    background-attachment:fixed;
     font-size: 13;
     font-family:Trebuchet-MS;
     }
@@ -34,6 +31,11 @@ li
 
 span.python 
     {
+    color:330099;
+    font-family: "Courier New";
+    }
+
+code    {
     color:330099;
     font-family: "Courier New";
     }
@@ -106,7 +108,6 @@ td.content
     { 
     width: 85%;
     vertical-align:top;
-    background-color:#E3E3E3;
     font-size:14px;
     padding:10px 10px 10px 10px;
     }
