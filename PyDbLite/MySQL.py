@@ -74,7 +74,11 @@ class Connection(dict):
         if charset is None:
             self.conn = MySQLdb.connect(host,login,password)
         else:
-            self.conn = MySQLdb.connect(host,login,password,unicode=charset)
+            # syntax for charset changes between versions of MySQLdb
+            try:
+                self.conn = MySQLdb.connect(host,login,password,unicode=charset)
+            except TypeError:
+                self.conn = MySQLdb.connect(host,login,password,charset=charset)
             self.conn.character_set_name = lambda charset=charset: charset
         self.cursor = self.conn.cursor()
         for db_name in self._databases():
@@ -161,6 +165,7 @@ class Table:
         self.db = db
         self.conn = self.db.conn.conn
         self.cursor = db.cursor
+        self.commit = self.conn.commit
         self.dt = '%s.%s' %(db.name,table_name)
 
     def create(self,*fields,**kw):
@@ -234,9 +239,6 @@ class Table:
                 'DEFAULT':default,'extra':extra}
             if extra == 'auto_increment' or key.upper()=='PRI':
                 self.rowid = field
-
-    def commit(self):
-        self.conn.commit()
 
     def insert(self,*args,**kw):
         """Insert a record in the database
