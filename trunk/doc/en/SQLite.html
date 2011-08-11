@@ -56,32 +56,55 @@
 <h2>SQLite adapter</h2>
 <p>The main difference with the pure-Python module is the syntax to identify a database and a table, and the need to specify field types on base creation
 <p>For compliance with SQLite vocabulary, the module defines two classes, <code>Database</code> and <code>Table</code>
-<p><b><code>Database(<i>db_path</i>)</code></b> : <i>db_path</i> is the database path in the file system
-<p>Instances of <code>Database</code> support 2 methods :
-<ul>
-<li><code>tables()</code> : returns the list of the table names in the database
-<li><code>has_table(<i>table_name</i>)</code> : returns a boolean indicating if there is a table named <i>table_name</i> in the database
-</ul>
-<p><b><code>Table(<i>table_name,db</i>)</code></b> : <i>table_name</i> is the table name, <i>db</i> is either the database path in the file system, or the matching instance of <code>Database</i>
 
-<p>Manipulating a table uses the same syntax as in PyDbLite :
+<h3>Database</h3>
+
+<p><b><code>Database(<i>db_path[,**kw]</i>)</code></b> : <i>db_path</i> is the database path in the file system. The keyword arguments are the same as for the method <code>connect()</code> of the Python built-in module sqlite3
+<p>Instances of <code>Database</code> are dictionary-like objects, where keys are the table names and values are instances of the <code>Table</code> class
 <ul>
-<li>to create the table you must specify an SQLite field type : <code>INTEGER, REAL, TEXT</code>
-or <code>BLOB</code> :<br>
-<div class="python">db.create(('name','TEXT'),('age','INTEGER'),('size','REAL'))</div>
-<li>if other information needs to be provided, put it in the second argument, using the SQL syntax for SQLite :
-<div class="python">db.create(('recid','INTEGER PRIMARY KEY AUTOINCREMENT'),
-<br>&nbsp;&nbsp;&nbsp;&nbsp;    ('date','BLOB DEFAULT CURRENT_DATE'))</div>
+<li><span class="python">db["foo"]</span> returns the instance of the <code>Table</code> class for table "foo"
+<li><span class="python">db.keys()</span> returns the table names
+<li><span class="python">if "foo" in db</span> tests if table "foo" exists in the database
+<li><span class="python">del db["foo"]</span> drops the table "foo"
+</ul>
+<p>To create a new table :
+<div class="python">table = db.create(<i>table_name,*fields[,mode]</i>)</div>
+<p>The <i>fields</i> must be 2-element tuples <i>(field_name,field_type)</i> where <i>field_type</i> is an SQLite field type : <code>INTEGER, REAL, TEXT</code> or <code>BLOB</code> :
+<div class="python">db.create('test',('name','TEXT'),('age','INTEGER'),('size','REAL'))</div>
+
+<p>If other information needs to be provided, put it in the second argument, using the SQL syntax for SQLite :
+<div class="python">db.create('test',('date','BLOB DEFAULT CURRENT_DATE'))</div>
+
+<p>The optional keyword argument <i>mode</i> specifies what you want to do if a table of the same name already exists in the file system
+<ul>
+<li><span class="python">mode="open"</span> opens the table and ignores the field definition
+
+<li><span class="python">mode="override"</span> erases the existing table and creates a new one with the field definition
+
+<li>if <i>mode</i> is not specified and the table already exists, an <CODE>IOError</CODE> is raised
 
 </ul>
+
+
+<h3>Table</h3>
+
 <p>For record insertion, updating, deletion and selection the syntax is the same as for the pure-Python module. The SQLite primary key <code>rowid</code> is used like the key <code>__id__</code> to identify records
+
+<p>To insert many records at a time,
+
+<p><div class="python">table.insert(list_of_values)</div>
+
+<p>will be much faster than
+
+<p><div class="python">for values in list_of_values:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;table.insert(values)</div>
 
 <p>Note that you can't use the <code>drop_field()</code> method, since dropping fields is not supported by SQLite
 
 <p>Conversions between Python types and SQLite field types use the behaviour of the Python SQLite module : <code>datetime.date</code> and <code>datetime.datetime</code> instances are stored as ISO dates/datetimes
 
 <p>Selection methods return dictionaries, with SQLite types converted to Python types like this :
-<p>
+<blockquote>
 <table border="1">
 <tr><th>SQLite type</th><th>Python type</th></tr>
 <tr><td>NULL</td><td>None</td></tr>
@@ -90,19 +113,22 @@ or <code>BLOB</code> :<br>
 <tr><td>INTEGER</td><td>int</td></tr>
 <tr><td>REAL</td><td>float</td></tr>
 </table>
+</blockquote>
 
 <p>If you want fields to be returned as instances of <code>datetime.date</code>, <code>datetime.time</code> or <code>datetime.datetime</code> instances, you can specify it when creating or opening the table, using methods <CODE>is_date(<i>field_name</i>)</CODE>, <CODE>is_time(<i>field_name</i>)</CODE> or <CODE>is_datetime(<i>field_name</i>)</CODE> :
 
 <div class="python">db = Database('test.sqlite')
-<br>table = Table('dummy',db)
+<br>table = db['dummy']
 <br>table.is_date('birthday')
 </div>
 
+<h3><code>cursor</code> and <code>commit</code></h3>
 
-<p>The <code>Table</code> instance has an attribute <code>cursor</code>, so you can also execute
-SQL expressions by <span class="python">db.cursor.execute(some_sql)</span> and get the result
-by <span class="python">results = db.cursor.fetchall()</span>
-
+Intances of <code>Database</code> and <code>Table</code> all have :
+<ul>
+<li>the attribute <code>cursor</code>, the SQLite connections cursor, so you can also execute SQL expressions by <div class="python">db.cursor.execute(some_sql)</div> and get the result by <div class="python">results = db.cursor.fetchall()</div>
+<li>the method <code>commit()</code> to commit changes to a database after a transaction
+</ul>
 
 </td>
 </tr>

@@ -52,11 +52,11 @@
 	</td>
 <td class="content">
 
-<h2>MySQL adapter</h2>
+<h3>MySQL adapter</h3>
 <p>The main difference with the pure-Python module is the syntax to identify a database and a table, and the need to specify field types when creating a table
 <p>For compliance with MySQL vocabulary, the module defines three classes, <code>Connection, Database</code> and <code>Table</code>
 
-<h2>Connection</h2>
+<h3>Connection</h3>
 <p><code><b>Connection</b>(<i>host,login,password[,charset]</i>)</code> returns a connection to the MySQL server. If the optional parameter <i>charset</i> is provided, the TEXT fields must bet inserted as Unicode strings, or as their encoding with this charset ; the values read from the database will also be Unicode strings
 
 <p>Instances of <code>Connection</code> are dictionary-like objects : the keys are the database names and values are the matching instances of the Database class
@@ -72,11 +72,11 @@
 <li><code>create(<i>db_name</i>)</code> : creates a database named <i>db_name</i> and returns the instance of the <code>Database</code> class
 </ul>
 
-<p><h2>Database</h2>
+<p><h3>Database</h3>
 
 <p>Instances of <code>Database</code> are dictionary-like objects : the keys are the table names and the values are the matching instances of the Table class. For instance :
 <ul>
-<li><code>db.keys()</code> : returns the list of the table names in the database
+<li><code>db.keys()</code> returns the list of the table names in the database
 <li><code>db[table_name]</code> returns the instance of the Table class called <i>table_name</i>
 <li><code>del db[table_name]</code> : drops the table called <i>table_name</i>
 </ul>
@@ -97,8 +97,10 @@
 
 </ul>
 
-<p><h2>Table</h2>
+<p><h3>Table</h3>
 For record insertion, selection, update and deletion, adding or dropping fields, the syntax is the same as with the pure-Python module
+
+<p>Direct access by record identifier is only possible si a field has been defined as a primary key or has the mode AUTO_INCREMENT ; functions <code>delete()</code> and <code>update()</code> alos require a such field
 
 <p>To insert many records at a time,
 
@@ -110,11 +112,14 @@ For record insertion, selection, update and deletion, adding or dropping fields,
 &nbsp;&nbsp;&nbsp;&nbsp;table.insert(values)</div>
 
 <p>Selection by record id only works if a field <code>INTEGER PRIMARY KEY</code> is present in the table ; the functions <code>delete()</code> and <code>update()</code> also require this record id
-<p>The <code>Table</code> instance has an attribute <code>cursor</code>, so you can also execute
-SQL expressions by
-<p><div class="python">table.cursor.execute(some_sql)</div>
-<p>and get the result by
-<p><div class="python">results = table.cursor.fetchall()</div>
+
+<h3><code>cursor</code> and <code>commit</code></h3>
+
+Intances of <code>Database</code> and <code>Table</code> all have :
+<ul>
+<li>the attribute <code>cursor</code>, the MySQL connections cursor, so you can also execute SQL expressions by <div class="python">db.cursor.execute(some_sql)</div> and get the result by <div class="python">results = db.cursor.fetchall()</div>
+<li>the method <code>commit()</code> to commit changes to a database after a transaction
+</ul>
 
 </td>
 </tr>

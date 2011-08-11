@@ -1,6 +1,7 @@
 <html>
 
 <head>
+<meta http-equiv="Content-type" content="text/html;charset=iso-8859-1">
 <title>PyDbLite</title>
 <link rel="stylesheet" href="../pydblite.css">
 </head>
@@ -66,6 +67,8 @@ Le moteur pur-Python consiste en un module unique, <code>PyDbLite.py</code>. Pou
 
 <br>Vous n'avez pas à définir le type des champs. PyDbLite accepte toute valeur qui peut être sérialisée par le module <CODE>cPickle</CODE> : des chaînes de caractères, des chaînes Unicode, des entiers, réels, dates et dates-heures (instances des classes <CODE>date</CODE> et <CODE>datetime</CODE> dans le module <CODE>datetime</CODE>), des instances de classes définies par l'utilisateur, etc
 
+<li><span class="python">db.exists()</span> indique si la base existe
+
 <li>si la base existe déjà, pour l'ouvrir : <span class="python">db.open()</span>
 
 <li>on peut passer un paramètre "mode" à la méthode <CODE>create()</CODE>, pour indiquer ce qu'il faut faire si la base existe déjà sur le disque
@@ -114,16 +117,26 @@ efface la base existante et en crée une nouvelle avec les définitions de champs
 
 <h3>Sélection</h3>
 
-<ul><h5>Accès direct</h5>
+L'instance de <CODE>Base</CODE> est un itérateur sur les enregistrements. Pour itérer sur tous les enregistrements :
+<BLOCKQUOTE>
+<span class="python">for r in db:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;fais_qqch_avec(r)</span>
 
-<li>on peut accéder directement à un enregistrement par son identifiant : <span class="python">record = db[rec_id]</span>
+</BLOCKQUOTE>
 
-retourne l'enregistrement tel que record['__id__'] == rec_id
+<h4>Accès direct</h4>
 
-<li>pour les sélections simples :
-<span class="python">db(cle1=val1,cle2=val2)</span> renvoie la liste des enregistrements dont les clés prennent les valeurs données
+On peut accéder directement à un enregistrement par son identifiant : <div class="python">record = db[rec_id]</div>
 
-<li><span class="python">db(cle1) >= val1</span> retourne un itérateur sur tous les enregistrements pour lesquels la valeur du champ cle1 est supérieur ou égal à val1. Exemple :
+retourne l'enregistrement tel que <code>record['__id__'] == rec_id</code>
+
+<h4>Sélection simples</h4>
+
+<ul>
+<li>
+<span class="python">db(cle1=val1,cle2=val2)</span> renvoie la liste des enregistrements dont les clés ont les valeurs données
+
+<li><span class="python">db(cle) >= valeur</span> retourne un itérateur sur tous les enregistrements pour lesquels la valeur du champ <CODE>cle</CODE> est supérieure ou égale à <CODE>valeur</CODE>. Exemple :
 <blockquote><span class="python">for rec in (db("age")>30):<br>
 &nbsp;&nbsp;&nbsp;&nbsp;	print rec["nom"]	</span></blockquote>
 <li>ces "comparaisons riches" peuvent être combinées avec des & (et) et des | (ou) :<br>
@@ -131,11 +144,8 @@ retourne l'enregistrement tel que record['__id__'] == rec_id
 &nbsp;&nbsp;&nbsp;&nbsp;print rec["nom"]</span></blockquote>
 </ul>
 
-<ul><h5>Listes en intension</h5>
-
-<li>L'instance de Base est un itérateur sur les enregistrements. Pour itérer sur tous les enregistrements :
-<br><span class="python">for r in db:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;fais_qqch_avec(r)</span>
+<h4>Listes en intension</h4>
+<ul>
 <li>la sélection d'enregistrements peut utiliser la syntaxe des listes en intension ("list comprehensions") de Python :
 <br><span class="python">recs = [ r for r in db if 30 > r['age'] >= 18 and r['taille'] < 2 ]</span>
 
@@ -148,19 +158,19 @@ retourne l'enregistrement tel que record['__id__'] == rec_id
 <br>itère sur les enregistrements dont le nom est 'homer' ou 'marge'
 </ul>
 
-<ul><h5>Index</h5>
-<li>pour accélérer les sélections, un index peut être créé sur un champ : <span class="python">db.create_index('age')</span>
+<h4>Index</h4>
+<ul>Pour accélérer les sélections, un index peut être créé sur un champ : <span class="python">db.create_index('age')</span>
 
-<br>Quand un index est créé, l'instance de la base de données a un attribut (ici <CODE>_age</CODE> : noter le signe de soulignement initial, pour éviter les conflits de noms avec des noms internes). Cet attribut est un objet de type dictionnaire, où les clés sont les valeurs prises par le champ, et les valeurs sont les enregistrements dont le champ a la même valeur que la clé :
-<br><span class="python">records = db._age[23]</span> retourne la liste des enregistrements avec age == 23
+<p>Quand un index est créé, l'instance de la base de données a un attribut (ici <CODE>_age</CODE> : noter le signe de soulignement initial, pour éviter les conflits de noms avec des noms internes). Cet attribut est un objet de type dictionnaire, où les clés sont les valeurs prises par le champ, et les valeurs sont les enregistrements dont le champ a la même valeur que la clé :
+<p><span class="python">records = db._age[23]</span> retourne la liste des enregistrements avec age == 23
 
-<br>Si aucun enregistrement n'a cette valeur, la recherche par cette valeur retourne une liste vide
+<p>Si aucun enregistrement n'a cette valeur, la recherche par cette valeur retourne une liste vide
 
-<br>L'index supporte l'itération sur les valeurs du champ, et la méthode <CODE>keys()</CODE> retourne toutes les valeurs existantes pour le champ
+<p>L'index supporte l'itération sur les valeurs du champ, et la méthode <CODE>keys()</CODE> retourne toutes les valeurs existantes pour le champ
 
 </ul>
 
-<h3>Autres fonctions</h3>
+<h3>Autres méthodes</h3>
 <ul>
 <li>nombre d'enregistrements dans la base : <span class="python">len(db)</span>
 
