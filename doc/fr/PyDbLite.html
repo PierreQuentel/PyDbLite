@@ -170,16 +170,19 @@ retourne l'enregistrement tel que <code>record['__id__'] == rec_id</code>
 
 </ul>
 
-<h3>Autres méthodes</h3>
+<h3>Autres attributs et méthodes</h3>
 <ul>
-<li>nombre d'enregistrements dans la base : <span class="python">len(db)</span>
+<li><span class="python">db.add_field('nouveau_champ'[,default=v])</span> : ajoute un nouveau champ à la base de données. <i>default</i> est une valeur par défaut ; elle vaut <code>None</code> si elle n'est pas précisée
 
-<li>pour ajouter un nouveau champ à une base existante et spécifier une valeur par défaut : <span class="python">db.add_field('nouveau_champ'[,default=v])</span>. Si le défaut n'est pas fourni, la valeur du champ est <CODE>None</CODE>
+<li><span class="python">db.drop_field('nom')</span> : supprime un champ existant
 
-<li>pour supprimer un champ existant : <span class="python">db.drop_field('nom')</span>
+<li><span class="python">db.path</span> : the chemin de la base de données dans le système de fichiers
 
-<li>pour connaître la liste des champs : <span class="python">db.fields</span>
+<li><span class="python">db.name</span> : le nom de la base de données : le nom de base du chemin (sans le répertoire), auquel on a enlevé l'extension
 
+<li><span class="python">len(db)</span> : nombre d'enregistrements dans la base
+
+<li><span class="python">db.fields</span> : la liste des champs (n'inclut pas les champs internes <code>__id__</code> et <code>__version__</code>)
 
 
 </td>
