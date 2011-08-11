@@ -8,7 +8,11 @@ import os
 import sys
 sys.path.insert(0,os.path.dirname(os.getcwd()))
 import SQLite
-print SQLite.__file__
+
+if sys.version_info[0]==3:
+    def unicode(s,en):
+        return s
+
 if os.path.exists("test.sqlite"):
     os.remove("test.sqlite")
 
@@ -78,6 +82,7 @@ if __name__=="__main__":
     vals2 = [('camille',datetime.date(1986,12,12),24),
         ('jean',datetime.date(1989,6,12),21),('florence',datetime.date(1994,1,14),17),
         ('marie-anne',datetime.date(1999,1,28),12)]
+    
     rec3 = {'name':unicode('éçùï','iso-8859-1'),'age':55}
     
     suite = unittest.TestSuite()
