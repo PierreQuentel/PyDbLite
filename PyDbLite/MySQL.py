@@ -264,6 +264,8 @@ class Table:
 
     def _insert_many(self,args):
         """Insert a list or tuple of records"""
+        if not args:
+            return
         sql = "INSERT INTO %s" %self.dt
         sql += "(%s) VALUES (%s)"
         if isinstance(args[0],dict):
