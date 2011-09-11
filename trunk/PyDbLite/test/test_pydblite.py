@@ -6,8 +6,13 @@ import random
 
 import os
 import sys
-#sys.path.insert(0,os.path.dirname(os.getcwd()))
+sys.path.insert(0,os.path.dirname(os.getcwd()))
 import PyDbLite
+print(PyDbLite.__file__)
+print(dir(PyDbLite))
+
+if os.path.exists('test.pdl'):
+    os.remove('test.pdl')
 
 db = None
 vals1 = [('simon',datetime.date(1984,8,17),26)]

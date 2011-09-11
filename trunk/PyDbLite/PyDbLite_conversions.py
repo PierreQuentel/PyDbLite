@@ -69,7 +69,7 @@ def fromCSV(csvfile,out=None,fieldnames=None,fmtparams=None,conv_func={},
     
     kw = {"mode":"override"}
     db.create(*fieldnames,**kw)
-    print db.fields
+    print(db.fields)
     
     next_id = 0
     records = {}
@@ -102,7 +102,7 @@ def fromCSV(csvfile,out=None,fieldnames=None,fmtparams=None,conv_func={},
         records[record["__id__"]] = record
     db.records = records
     db.commit()
-    print len(db)
+    print(len(db))
     return db
 
 if __name__ == "__main__":
@@ -119,6 +119,6 @@ if __name__ == "__main__":
             ok += 1
         except:
             nok += 1
-    print ok,nok
-    print r1,r2
+    print(ok,nok)
+    print(r1,r2)
     

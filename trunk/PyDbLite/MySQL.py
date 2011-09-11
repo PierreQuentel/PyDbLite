@@ -49,11 +49,13 @@ Syntax :
 
 import os
 import traceback
-import cStringIO
-import cPickle
 import bisect
-
 import datetime
+
+try:
+    import cStringIO as io
+except:
+    import io
 
 import MySQLdb
 
@@ -96,7 +98,7 @@ class Connection(dict):
     def create(self,db_name,mode=None):
         db_name = self._norm(db_name)
         if mode != "open" and db_name in self._databases():
-            raise MySQLError,"Database %s already exists" %db_name
+            raise MySQLError("Database %s already exists" %db_name)
         elif mode == "open":
             return self[db_name]
         self.cursor.execute('CREATE DATABASE %s' %db_name)
@@ -112,8 +114,9 @@ class Connection(dict):
         # drop database
         self.cursor.execute('SHOW TABLES IN %s' %db_name)
         if len(self.cursor.fetchall()):
-            raise MySQLError,\
-              "Can't drop database %s ; all tables must be dropped first" %db_name
+            raise MySQLError(
+              "Can't drop database %s ; all tables must be dropped first" 
+              %db_name)
         self.cursor.execute('DROP DATABASE %s' %db_name)
 
 class Database(dict):
@@ -188,7 +191,7 @@ class Table:
             elif mode == "open":
                 return self.open()
             else:
-                raise IOError,"Base %s already exists" %self.dt
+                raise IOError("Base %s already exists" %self.dt)
         self.fields = []
         self.field_info = {}
         sql = "CREATE TABLE %s (" %(self.dt)
@@ -206,7 +209,7 @@ class Table:
         if len(field)!= 2:
             msg = "Error in field definition %s" %field
             msg += ": should be a 2- tuple (field_name,field_info)"
-            raise MySQLError,msg
+            raise MySQLError(msg)
         return '%s %s' %(field[0],field[1])
 
     def open(self):
@@ -216,7 +219,7 @@ class Table:
             self._get_table_info()
             return self
         # table not found
-        raise IOError,"Table %s doesn't exist" %self.name
+        raise IOError("Table %s doesn't exist" %self.name)
 
     def _table_exists(self):
         """Database-specific method to see if the table exists"""
@@ -281,7 +284,7 @@ class Table:
         try:
             self.cursor.executemany(sql,args)
         except:
-            raise Exception,self._err_msg(sql,args)
+            raise Exception(self._err_msg(sql,args))
         self.execute("SELECT LAST_INSERT_ID()")
         __id__ = self.cursor.fetchone()[0]
         return __id__
@@ -293,7 +296,7 @@ class Table:
         Return the number of deleted items
         """
         if self.rowid is None:
-            raise MySQLError,"Can't use delete() : missing row id"
+            raise MySQLError("Can't use delete() : missing row id")
         if isinstance(removed,dict):
             # remove a single record
             removed = [removed]
@@ -313,7 +316,7 @@ class Table:
         """Update the record with new keys and values"""
         # increment version number
         if self.rowid is None:
-            raise MySQLError,"Can't use update() : missing row id"
+            raise MySQLError("Can't use update() : missing row id")
         vals = self._make_sql_params(kw)
         sql = "UPDATE %s SET %s WHERE %s=%s" %(self.dt,
             ",".join(vals),self.rowid,record[self.rowid])
@@ -342,7 +345,7 @@ class Table:
     def add_field(self,field,default=None):
         fname,ftype = field
         if fname in self.fields:
-            raise ValueError,'Field "%s" already defined' %fname
+            raise ValueError('Field "%s" already defined' %fname)
         sql = "ALTER TABLE %s ADD %s %s" %(self.dt,fname,ftype)
         if default is not None:
             sql += " DEFAULT %s" %self._conv(default)
@@ -352,7 +355,7 @@ class Table:
     
     def drop_field(self,field):
         if not field in self.fields:
-            raise ValueError,"Field %s not found in base" %field
+            raise ValueError("Field %s not found in base" %field)
         sql = "ALTER TABLE %s DROP %s" %(self.dt,field)
         self.execute(sql)
         self._get_table_info()
@@ -362,7 +365,7 @@ class Table:
         db(key=value) returns the list of records where r[key] = value"""
         for key in kw:
             if not key in self.fields:
-                raise ValueError,"Field %s not in the database" %key
+                raise ValueError("Field %s not in the database" %key)
         vals = self._make_sql_params(kw)
         if vals:
             sql = "SELECT * FROM %s WHERE %s" %(self.dt," AND ".join(vals))
@@ -374,12 +377,12 @@ class Table:
     def __getitem__(self,record_id):
         """Direct access by record id"""
         if self.rowid is None:
-            raise MySQLError,"Can't use __getitem__() : missing row id"
+            raise MySQLError("Can't use __getitem__() : missing row id")
         sql = "SELECT * FROM %s WHERE %s=%s" %(self.dt,self.rowid,record_id)
         self.execute(sql)
         res = self.cursor.fetchone()
         if res is None:
-            raise IndexError,"No record at index %s" %record_id
+            raise IndexError("No record at index %s" %record_id)
         else:
             return self._make_record(res)
 
@@ -408,14 +411,14 @@ class Table:
         try:
             self.cursor.execute(sql,*args)
         except:
-            raise MySQLError,self._err_msg(sql)
+            raise MySQLError(self._err_msg(sql))
 
     def _err_msg(self,sql,args=None):
         msg = "Exception for table %s.%s\n" %(self.db.name,self.name)
         msg += 'SQL request %s\n' %sql
         if args:
             msg += 'Arguments : %s\n' %args
-        out = cStringIO.StringIO()
+        out = io.StringIO()
         traceback.print_exc(file=out)
         msg += out.getvalue()
         self.cursor.execute('SHOW WARNINGS')
@@ -426,8 +429,3 @@ class Table:
 
 
 Base = Table # compatibility with older versions
-
-if __name__ == '__main__':
-    os.chdir(os.path.join(os.getcwd(),'test'))
-    execfile('MySQL_test.py')
-    

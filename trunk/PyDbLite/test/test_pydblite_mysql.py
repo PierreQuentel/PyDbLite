@@ -8,12 +8,13 @@ import os
 import sys
 sys.path.insert(0,os.path.dirname(os.getcwd()))
 import MySQL
-print MySQL.__file__
+print(MySQL.__file__)
 
 try:
     host,user,password = open('mysql.txt').read().strip().split(',')
 except IOError:
-    print "Store host,user,password in mysql.txt"
+    print("Store host,user,password in mysql.txt")
+    sys.exit()
 
 class TestOperators(unittest.TestCase):
 
@@ -71,7 +72,6 @@ if __name__=="__main__":
     suite.addTest(unittest.makeSuite(TestMySQLFunctions))
     unittest.TextTestRunner().run(suite)
 
-    print 'test finished'
     del db['table1']
     del conn[db_name]
     assert db_name not in conn
