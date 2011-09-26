@@ -260,7 +260,7 @@ class Table:
         vals = self._make_sql_params(kw)
         sql = "INSERT INTO %s SET %s" %(self.dt,",".join(vals))
         sql = self.db._norm(sql)
-        self.execute(sql,kw.values())
+        self.execute(sql,list(kw.values()))
         self.execute("SELECT LAST_INSERT_ID()")
         __id__ = self.cursor.fetchone()[0]
         return __id__
@@ -320,7 +320,7 @@ class Table:
         vals = self._make_sql_params(kw)
         sql = "UPDATE %s SET %s WHERE %s=%s" %(self.dt,
             ",".join(vals),self.rowid,record[self.rowid])
-        self.execute(sql,kw.values())
+        self.execute(sql,list(kw.values()))
 
     def _make_sql_params(self,kw):
         """Make a list of strings to pass to an SQL statement
@@ -369,9 +369,9 @@ class Table:
         vals = self._make_sql_params(kw)
         if vals:
             sql = "SELECT * FROM %s WHERE %s" %(self.dt," AND ".join(vals))
+            self.execute(sql,list(kw.values()))
         else: # all records
-            sql = "SELECT * FROM %s" %self.dt
-        self.execute(sql,kw.values())            
+            self.execute("SELECT * FROM %s" %self.dt)
         return [self._make_record(row) for row in self.cursor.fetchall() ]
     
     def __getitem__(self,record_id):
