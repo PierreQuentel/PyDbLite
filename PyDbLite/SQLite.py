@@ -404,7 +404,7 @@ class Table:
                     raise ValueError("Field %s not in the database" %key)
             vals = self._make_sql_params(kw)
             sql = "SELECT rowid,* FROM %s WHERE %s" %(self.name," AND ".join(vals))
-            self.cursor.execute(sql,kw.values())
+            self.cursor.execute(sql,list(kw.values()))
         else:
             self.cursor.execute("SELECT rowid,* FROM %s" %self.name)
         return [self._make_record(row) for row in self.cursor.fetchall() ]
