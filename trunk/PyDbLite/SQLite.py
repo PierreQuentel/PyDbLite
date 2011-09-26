@@ -399,9 +399,9 @@ class Table:
         """Selection by field values
         db(key=value) returns the list of records where r[key] = value"""
         if kw:
-            for key in kw:
-                if not key in self.fields:
-                    raise ValueError("Field %s not in the database" %key)
+            undef = set(kw) - set(self.fields)
+            if undef:
+                raise ValueError("Fields %s not in the database" %undef)            
             vals = self._make_sql_params(kw)
             sql = "SELECT rowid,* FROM %s WHERE %s" %(self.name," AND ".join(vals))
             self.cursor.execute(sql,list(kw.values()))
