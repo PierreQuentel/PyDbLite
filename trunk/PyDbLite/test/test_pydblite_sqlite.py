@@ -59,6 +59,11 @@ class TestSQLiteFunctions(unittest.TestCase):
             for j,field in enumerate(table.fields):
                 self.assertEqual(rec[field],v[j])
 
+    def test_21_select(self):
+        table = self.db['table1']
+        recs = table(name='simon')
+        self.assertEqual(len(recs),1)
+
     def test_30_update(self):
         table = self.db['table1']
         table.is_date('birth')
