@@ -259,7 +259,8 @@ class Table:
 
         vals = self._make_sql_params(kw)
         sql = "INSERT INTO %s SET %s" %(self.dt,",".join(vals))
-        sql = self.db._norm(sql)
+        if self.db.conn.charset:
+            sql = sql.encode(self.db.conn.charset)
         self.execute(sql,list(kw.values()))
         self.execute("SELECT LAST_INSERT_ID()")
         __id__ = self.cursor.fetchone()[0]
@@ -320,6 +321,8 @@ class Table:
         vals = self._make_sql_params(kw)
         sql = "UPDATE %s SET %s WHERE %s=%s" %(self.dt,
             ",".join(vals),self.rowid,record[self.rowid])
+        if self.db.conn.charset:
+            sql = sql.encode(self.db.conn.charset)
         self.execute(sql,list(kw.values()))
 
     def _make_sql_params(self,kw):
@@ -418,6 +421,7 @@ class Table:
         msg += 'SQL request %s\n' %sql
         if args:
             msg += 'Arguments : %s\n' %args
+        msg += 'charset : %s\n' %self.db.conn.charset
         out = io.StringIO()
         traceback.print_exc(file=out)
         msg += out.getvalue()
