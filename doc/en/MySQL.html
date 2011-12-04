@@ -69,7 +69,8 @@
 
 <p>They support another method :
 <ul>
-<li><code>create(<i>db_name</i>)</code> : creates a database named <i>db_name</i> and returns the instance of the <code>Database</code> class
+<li><code>create(<i>db_name[,mode]</i>)</code> : creates a database named <i>db_name</i> and returns the instance of the <code>Database</code> class
+<p>The optional keyword argument <i>mode</i> specifies what to do if a database of the same name already exists : if set to "open", it returns the instance of the <code>Database</code> for this database, otherwise an exception is raised
 </ul>
 
 <p><h3>Database</h3>
