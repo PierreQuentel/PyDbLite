@@ -20,7 +20,7 @@ def toCSV(pdl,out=None,write_field_names=True):
     writer = csv.DictWriter(out,fields)
     # write field names
     if write_field_names:
-        writer.writerow(dict([(k,k) for k in fields])) 
+        writer.writerow(dict([(k,k) for k in fields]))
     # write values
     writer.writerows(pdl())
     return file_name
@@ -34,25 +34,25 @@ def fromCSV(csvfile,out=None,fieldnames=None,fmtparams=None,conv_func={},
 
     fieldnames : list of field names. If set to None, the field names must
     be present in the first line of the CSV file
-    
-    fmtparams : the format parameters for the CSV file, as described in 
+
+    fmtparams : the format parameters for the CSV file, as described in
     the csv module of the standard distribution
-    
+
     conv_func is a dictionary mapping a field name to the function used to
     convert the string read in the CSV to the appropriate Python type. For
     instance if field "age" must be converted to an integer :
     conv_func["age"] = int
-    
+
     empty_to_None is a list of the fields such that when the value read in
     the CSV file is the empty string, the field value is set to None
     """
     import csv
     import time
     import datetime
-    
+
     if out is None:
         out = os.path.splitext(csvfile)[0]+".pdl"
-        
+
     if fieldnames is None:
         # read field names in the first line of CSV file
         reader = csv.reader(open(csvfile))
@@ -66,11 +66,11 @@ def fromCSV(csvfile,out=None,fieldnames=None,fmtparams=None,conv_func={},
     conv_func.update({"__id__":int})
     auto_id = not "__id__" in fieldnames
     fieldnames = [ f for f in fieldnames if not f in ("__id__") ]
-    
+
     kw = {"mode":"override"}
     db.create(*fieldnames,**kw)
     print(db.fields)
-    
+
     next_id = 0
     records = {}
     while True:
@@ -111,7 +111,7 @@ if __name__ == "__main__":
     csvfile = toCSV(pdl)
     import datetime
     db = fromCSV(csvfile,out="test_copy.pdl")
-    
+
     ok = nok = 0
     for r1 in pdl:
         try:
@@ -121,4 +121,3 @@ if __name__ == "__main__":
             nok += 1
     print(ok,nok)
     print(r1,r2)
-    

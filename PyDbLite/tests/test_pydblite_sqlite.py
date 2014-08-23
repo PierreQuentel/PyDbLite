@@ -6,6 +6,7 @@ import os
 import sys
 
 from .common_tests import Generic
+from PyDbLite import PyDbLite
 from PyDbLite import SQLite
 
 if sys.version_info[0] == 3:

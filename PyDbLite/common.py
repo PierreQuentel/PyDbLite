@@ -1,13 +1,25 @@
 #
-# common.py
-#
 # BSD licence
+#
 # Author : Bro <bro.development@gmail.com>
 #
+
+import types
+import sys
+
 
 def enum(*sequential, **named):
     enums = dict(zip(sequential, range(len(sequential))), **named)
     return type('Enum', (), enums)
+
+try:
+    strinstance = basestring
+except:
+    strinstance = str
+
+def is_iterable_but_not_str(x):
+    return hasattr(x, '__iter__') and not isinstance(x, strinstance)
+
 
 class Expression(object):
 
@@ -23,9 +35,7 @@ class Expression(object):
             elif self.operator == Filter.operations.ILIKE:
                 self.filter_value = "'*%s*'" % self.value
             elif self.operator == Filter.operations.IN:
-                print("self.value:", self.value)
                 self.filter_value = "('%s')" % "','".join(self.value)
-                print("self.filter_value:", self.filter_value)
             else:
                 if type(self.value) is bool:
                     self.filter_value = 1 if self.value else 0
@@ -44,6 +54,7 @@ class Expression(object):
     def __str__(self):
         return self.filter_string()
 
+
 class ExpressionGroup(object):
 
     def __init__(self):
@@ -55,10 +66,13 @@ class ExpressionGroup(object):
     def is_dummy(self):
         return self.expression is None and self.exp_operator is None
 
+    def is_filtered(self):
+        return not self.is_dummy()
+
     def __or__(self, exp_group):
         if exp_group.is_dummy() or self.is_dummy():
             return exp_group if self.is_dummy() else self
-        new_exp_group = ExpressionGroup()
+        new_exp_group = type(self)()
         new_exp_group.exp_group1 = exp_group
         new_exp_group.exp_group2 = self
         new_exp_group.exp_operator = Filter.operations.OR
@@ -67,7 +81,7 @@ class ExpressionGroup(object):
     def __and__(self, exp_group):
         if exp_group.is_dummy() or self.is_dummy():
             return exp_group if self.is_dummy() else self
-        new_exp_group = ExpressionGroup()
+        new_exp_group = type(self)()
         new_exp_group.exp_group1 = exp_group
         new_exp_group.exp_group2 = self
         new_exp_group.exp_operator = Filter.operations.AND
@@ -98,18 +112,20 @@ class ExpressionGroup(object):
 
 
 class Filter(object):
-    operations = enum(**{'AND':'AND', 'OR':'OR', 'LIKE':'LIKE', 'ILIKE':"GLOB", "IN":"IN", 'EQ':"=", 'NE':"!=", 'LT':"<", 'LE':"<=", 'GT':">", 'GE':">="})
+    operations = enum(**{'AND': 'AND', 'OR': 'OR', 'LIKE': 'LIKE', 'ILIKE': "GLOB", "IN": "IN",
+                         'EQ': "=", 'NE': "!=", 'LT': "<", 'LE': "<=", 'GT': ">", 'GE': ">="})
 
     def __init__(self, db, key):
         self.db = db
         self.key = key
         self.expression_group = ExpressionGroup()
+        self.expression_t = Expression
 
     def is_filtered(self):
         return not self.expression_group.is_dummy()
 
     def _comparison(self, value, operation):
-        self.expression_group.expression = Expression(key=self.key, value=value, operator=operation)
+        self.expression_group.expression = self.expression_t(key=self.key, value=value, operator=operation)
         return self
 
     def like(self, value):
@@ -120,7 +136,7 @@ class Filter(object):
 
     def __eq__(self, value):
         # Iterable, so we use IN (X, X...) instead of =
-        if hasattr(value, '__iter__') and type(value) is not str:
+        if is_iterable_but_not_str(value):
             return self._comparison(value, self.operations.IN)
         else:
             return self._comparison(value, self.operations.EQ)
@@ -144,7 +160,7 @@ class Filter(object):
         """
         Returns a new filter that combines this filter with other_filter with AND.
         """
-        new_filter = Filter(self.db, None)
+        new_filter = type(self)(self.db, None)
         new_filter.expression_group = self.expression_group & other_filter.expression_group
         return new_filter
 
@@ -152,7 +168,7 @@ class Filter(object):
         """
         Returns a new filter that combines this filter with other_filter with OR.
         """
-        new_filter = Filter(self.db, None)
+        new_filter = type(self)(self.db, None)
         new_filter.expression_group = self.expression_group | other_filter.expression_group
         return new_filter
 

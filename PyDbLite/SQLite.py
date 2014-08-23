@@ -1,58 +1,20 @@
+#
+# BSD licence
+#
+# Author : Pierre Quentel (pierre.quentel@gmail.com)
+#
+
 """PyDbLite.py adapted for SQLite backend
 
 Differences with PyDbLite:
 - pass the connection to the SQLite db as argument to Table()
 - in create(), field definitions must specify a type
-- no index
 - no drop_field (not supported by SQLite)
 - the Table() instance has a cursor attribute, so that SQL requests
   can be executed :
     db.cursor.execute(an_sql_request)
     result = db.cursor.fetchall()
 
-Syntax :
-    from PyDbLite.SQLite import Database,Table
-    # connect to SQLite database "test"
-    db = Database("test")
-    # pass the table name and database path as arguments to Table creation
-    table = Table('dummy','test')
-    # create new base with field names
-    table.create(('name','TEXT'),('age','INTEGER'),('size','REAL'))
-    # existing base
-    table.open()
-    # insert new record
-    table.insert(name='homer',age=23,size=1.84)
-    # records are dictionaries with a unique integer key __id__
-    # selection by list comprehension
-    res = [ r for r in table if 30 > r['age'] >= 18 and r['size'] < 2 ]
-    # or generator expression
-    for r in (r for r in table if r['name'] in ('homer','marge') ):
-    # simple selection (equality test)
-    res = table(age=30)
-    # delete a record or a list of records
-    table.delete(one_record)
-    table.delete(list_of_records)
-    # delete a record by its id
-    del table[rec_id]
-    # direct access by id
-    record = table[rec_id] # the record such that record['__id__'] == rec_id
-    # update
-    table.update(record,age=24)
-    # add a field
-    table.add_field('new_field')
-    # save changes on disk
-    table.commit()
-
-Changes in version 2.5 :
-- many changes to support "legacy" SQLite databases :
-    . no control on types declared in CREATE TABLE or ALTER TABLE
-    . no control on value types in INSERT or UPDATE
-    . no version number in records
-- add methods to specify a conversion function for fields after a SELECT
-- change names to be closer to SQLite names :
-    . a class Database to modelise the database
-    . a class Table (not Base) for each table in the database
-- test is now in folder "test"
 """
 
 try:
@@ -66,15 +28,15 @@ except ImportError:
 
     def to_str(val):  # leaves a Unicode unchanged
         return val
+
 import traceback
 import re
 import datetime
 
-from .common import Expression, ExpressionGroup, Filter
+from .common import ExpressionGroup, Filter
 
 # test if sqlite is installed or raise exception
 try:
-    #raise ImportError()
     from sqlite3 import dbapi2 as sqlite
     from sqlite3 import OperationalError
 except ImportError:
@@ -439,9 +401,21 @@ class Table(object):
 
     def __call__(self, *args, **kw):
         """Selection by field values
-        db(key=value) returns the list of records where r[key] = value"""
+
+        db(key=value) returns the list of records where r[key] = value
+
+        Args:
+            args (list): A field to filter on.
+            kw (dict): pairs of field and value to filter on.
+
+        Returns:
+            When args supplied, return a Filter object that filters on the specified field.
+            When kw supplied, return all the records where field values matches the
+            key/values in kw.
+        """
         if args and kw:
             raise SyntaxError("Can't specify positional AND keyword arguments")
+
         use_expression = False
         if args:
             if len(args) > 1:
@@ -452,6 +426,7 @@ class Table(object):
                 raise ValueError("%s is not a field" % args[0])
             else:
                 return self.filter(key=args[0])
+
         if use_expression:
             sql = "SELECT rowid,* FROM %s WHERE %s" % (self.name, args[0])
             self.cursor.execute(sql)

@@ -1,71 +1,10 @@
-"""PyDbLite.py
+#
+# BSD licence
+#
+# Author : Pierre Quentel (pierre.quentel@gmail.com)
+#
 
-BSD licence
-
-Author : Pierre Quentel (pierre.quentel@gmail.com)
-
-In-memory database management, with selection by list comprehension
-or generator expression
-
-Fields are untyped : they can store anything that can be pickled.
-Selected records are returned as dictionaries. Each record is
-identified by a unique id and has a version number incremented
-at every record update, to detect concurrent access
-
-Syntax :
-    from PyDbLite import Base
-    db = Base('dummy')
-    # create new base with field names
-    db.create('name','age','size')
-    # existing base
-    db.open()
-    # insert new record
-    db.insert(name='homer',age=23,size=1.84)
-    # records are dictionaries with a unique integer key __id__
-    # simple selection by field value
-    records = db(name="homer")
-    # complex selection by list comprehension
-    res = [ r for r in db if 30 > r['age'] >= 18 and r['size'] < 2 ]
-    # or generator expression
-    for r in (r for r in db if r['name'] in ('homer','marge') ):
-    # delete a record or a list of records
-    db.delete(one_record)
-    db.delete(list_of_records)
-    # delete a record by its id
-    del db[rec_id]
-    # direct access by id
-    record = db[rec_id] # the record such that record['__id__'] == rec_id
-    # create an index on a field
-    db.create_index('age')
-    # update
-    db.update(record,age=24)
-    # add and drop fields
-    db.add_field('new_field',default=0)
-    db.drop_field('name')
-    # save changes on disk
-    db.commit()
-
-version 2.2 : add __contains__
-
-version 2.3 : introduce syntax (db('name')>'f') & (db('age') == 30)
-
-version 2.4 :'
-- add BSD Licence
-- raise exception if unknown fields in insert
-
-version 2.5 :
-- test is now in folder test
-
-version 2.6
-- if db exists, read field names on instance creation
-- allow add_field on an instance even if it was not open()
-- attribute path is the path of the database in the file system
-  (was called "name" in previous versions)
-- attribute name is the base name of the database, without the extension
-- adapt code to run on Python 2 and Python 3
-"""
-
-version = "2.6"
+version = "3.0"
 
 import os
 import bisect
@@ -82,11 +21,18 @@ try:
 except NameError:
     from sets import Set as set
 
-from . import common
 from .common import Expression, ExpressionGroup, Filter
 
 from itertools import groupby
 import operator
+
+
+def _in(a, b):
+    return operator.contains(b, a)
+
+
+def like(a, b):
+    return operator.contains(a.lower(), b.lower())
 
 
 class PyDbExpression(Expression):
@@ -94,18 +40,15 @@ class PyDbExpression(Expression):
     def __init__(self, **kwargs):
         super(PyDbExpression, self).__init__(**kwargs)
         self.operations = {'AND': 'AND', 'OR': 'OR',
-                           'LIKE': operator.contains,
+                           'LIKE': like,
                            'GLOB': operator.contains,
-                           "IN": operator.contains,
+                           "IN": _in,
                            '=': operator.eq, '!=': operator.ne, '<': operator.lt,
                            '<=': operator.le, '>': operator.gt, '>=': operator.ge}
 
     def apply(self, records):
         operation = self.operations[self.operator]
-        if self.operator == Filter.operations.LIKE:
-            records = [r for r in records if operation(r[self.key].lower(), self.value.lower())]
-        else:
-            records = [r for r in records if operation(r[self.key], self.value)]
+        records = [r for r in records if operation(r[self.key], self.value)]
         return records
 
 
@@ -132,8 +75,16 @@ class PyDbExpressionGroup(ExpressionGroup):
             return records
 
 
-common.ExpressionGroup = PyDbExpressionGroup
-common.Expression = PyDbExpression
+class PyDbFilter(Filter):
+
+    def __init__(self, db, key):
+        self.db = db
+        self.key = key
+        self.expression_group = PyDbExpressionGroup()
+        self.expression_t = PyDbExpression
+
+    def apply_filter(self, records):
+        return self.expression_group.apply_filter(records)
 
 
 class Index(object):
@@ -166,6 +117,8 @@ class _Base(object):
         self.path = path
         self.name = os.path.splitext(os.path.basename(path))[0]
         self.protocol = protocol
+        if path is ":memory:":
+            save_to_file = False
         self.save_to_file = save_to_file
         # if base exists, get field names
         if save_to_file and self.exists():
@@ -238,7 +191,7 @@ class _Base(object):
         """
         reset = False
         for f in fields:
-            if not f in self.fields:
+            if f not in self.fields:
                 raise NameError("%s is not a field name %s" % (f, self.fields))
             # initialize the indices
             if self.mode == "open" and f in self.indices:
@@ -257,7 +210,7 @@ class _Base(object):
     def delete_index(self, *fields):
         """Delete the index on the specified fields"""
         for f in fields:
-            if not f in self.indices:
+            if f not in self.indices:
                 raise ValueError("No index on field %s" % f)
         for f in fields:
             del self.indices[f]
@@ -321,7 +274,7 @@ class _Base(object):
         record = copy.deepcopy(self.field_values)
         # raise exception if unknown field
         for key in kw:
-            if not key in self.fields:
+            if key not in self.fields:
                 raise NameError("Invalid field name : %s" % key)
         # set keys and values
         for (k, v) in kw.items():
@@ -457,12 +410,12 @@ class _Base(object):
         if args:
             if len(args) > 1:
                 raise SyntaxError("Only one field can be specified")
-            elif (type(args[0]) is PyDbExpressionGroup or type(args[0]) is Filter):
+            elif (type(args[0]) is PyDbExpressionGroup or type(args[0]) is PyDbFilter):
                 return args[0].apply_filter(self.records)
             elif args[0] not in self.fields:
                 raise ValueError("%s is not a field" % args[0])
             else:
-                return Filter(self, args[0])
+                return PyDbFilter(self, args[0])
         if not kw:
             return self.records.values()  # db() returns all the values
 
@@ -496,7 +449,8 @@ class _Base(object):
         if db_filter is not None:
             if not type(db_filter) is PyDbExpressionGroup:
                 raise ValueError("Filter argument is not of type 'PyDbExpressionGroup': %s" % type(db_filter))
-            return len(db_filter.apply_filter(self.records))
+            if db_filter.is_filtered():
+                return len(db_filter.apply_filter(self.records))
         return len(self.records)
 
     def __len__(self):
@@ -517,7 +471,7 @@ class _Base(object):
         return [(c, result[c]) for c in result]
 
     def filter(self, key=None):
-        return Filter(self, key)
+        return PyDbFilter(self, key)
 
     def get_group_count(self, group_by_field, db_filter=None):
         if db_filter is None:
@@ -530,7 +484,7 @@ class _Base(object):
         return [(k, groups_dict[k]) for k in groups_dict]
 
     def get_unique_ids(self, unique_id, db_filter=None):
-        if not db_filter is None:
+        if db_filter is not None and db_filter.is_filtered():
             records = self(db_filter)
         else:
             records = self()
@@ -553,59 +507,7 @@ class _Base_Py3(_Base):
         """Iteration on the records"""
         return iter(self.records.values())
 
-import sys
 if sys.version_info[0] == 2:
     Base = _Base_Py2
 else:
     Base = _Base_Py3
-
-
-if __name__ == '__main__':
-    from PyDbLite import Base
-    db = Base('dummy', save_to_file=False)
-    # create new base with field names
-    db.create('name', 'age', 'size')
-    # insert new record
-    db.insert(name='homer', age=23, size=1.84)
-    # records are dictionaries with a unique integer key __id__
-    # simple selection by field value
-    records = db(name="homer")
-    # complex selection by list comprehension
-    res = [ r for r in db if 30 > r['age'] >= 18 and r['size'] < 2 ]
-    # delete a record or a list of records
-    r = records[0]
-    db.delete(r)
-
-    list_of_records = []
-    r = db.insert(name='homer', age=23, size=1.84)
-    list_of_records.append(db[r])
-    r = db.insert(name='marge', age=36, size=1.94)
-    list_of_records.append(db[r])
-
-    # or generator expression
-    for r in (r for r in db if r['name'] in ('homer','marge') ):
-        #print "record:", r
-        pass
-
-    db.delete(list_of_records)
-
-    rec_id = db.insert(name='Bart', age=15, size=1.34)
-    record = db[rec_id] # the record such that record['__id__'] == rec_id
-
-    # delete a record by its id
-    del db[rec_id]
-
-    # create an index on a field
-    db.create_index('age')
-    # update
-    rec_id = db.insert(name='Lisa', age=13, size=1.24)
-
-    # direct access by id
-    record = db[rec_id]
-
-    db.update(record, age=24)
-    # add and drop fields
-    db.add_field('new_field',default=0)
-    db.drop_field('name')
-    # save changes on disk
-    db.commit()

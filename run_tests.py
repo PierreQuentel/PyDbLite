@@ -5,7 +5,7 @@ import unittest
 warnings.filterwarnings("ignore", category=RuntimeWarning)
 warnings.resetwarnings()
 
-if __name__=="__main__":
+if __name__ == "__main__":
     from PyDbLite.tests.test_pydblite import PyDbLiteTestCase
     from PyDbLite.tests.test_pydblite_sqlite import SQLiteTestCase, TestSQLiteFunctions
 
@@ -13,4 +13,4 @@ if __name__=="__main__":
     suite.addTest(unittest.makeSuite(PyDbLiteTestCase))
     suite.addTest(unittest.makeSuite(SQLiteTestCase))
     suite.addTest(unittest.makeSuite(TestSQLiteFunctions))
-    unittest.TextTestRunner().run(suite)
+    unittest.TextTestRunner(verbosity=2).run(suite)

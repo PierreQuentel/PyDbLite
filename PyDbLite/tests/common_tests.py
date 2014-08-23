@@ -5,6 +5,7 @@ import unittest
 warnings.filterwarnings("ignore", category=RuntimeWarning)
 warnings.resetwarnings()
 
+
 class Generic(object):
 
     def test_create_index(self):
@@ -109,7 +110,7 @@ class Generic(object):
     def test_select(self):
         self.setup_db_for_filter()
         record = self.filter_db(unique_id=1)[0]
-        self.assertTrue(record['active'] == 1 or record['active'] == True)
+        self.assertTrue(record['active'] == 1 or record['active'] is True)
         self.assertEqual(record["unique_id"], 1)
         self.assertEqual(record["name"], 'Test0')
 
@@ -124,8 +125,10 @@ class Generic(object):
         self.assertEqual(len([x for x in self.filter_db]), len(self.filter_db))
         records = self.filter_db()
         for r in records:
-            self.assertEqual([x for x in self.filter_db if x['unique_id'] == r['unique_id']], self.filter_db(unique_id=r['unique_id']))
-            self.assertEqual([x for x in self.filter_db if x['name'] == r['name']], self.filter_db(name=r['name']))
+            self.assertEqual([x for x in self.filter_db if x['unique_id'] == r['unique_id']],
+                             self.filter_db(unique_id=r['unique_id']))
+            self.assertEqual([x for x in self.filter_db if x['name'] == r['name']],
+                             self.filter_db(name=r['name']))
 
     def test_fetch(self):
         torrent_count = 10
@@ -188,6 +191,11 @@ class Generic(object):
         self.setup_db_for_filter()
         self.assertEqual(len((self.filter_db("active") != True)), 3)  # noqa
 
+    def test_filter_in(self):
+        ''' Test IN ( == with a list '''
+        self.setup_db_for_filter()
+        self.assertEqual(len(self.filter_db("name") == ["Test4", "Test7"]), 3)
+
     def test_filter_greater(self):
         self.setup_db_for_filter()
         self.assertEqual(len((self.filter_db("unique_id") > 4)), 3)
@@ -217,8 +225,7 @@ class Generic(object):
         self.assertEqual(len(self.filter_db("name").like("Test0")), 3)
 
     def test_filter_and(self):
-        ''' Test text case insensitive '''
-        from PyDbLite.common import Filter
+        ''' Test AND '''
         self.setup_db_for_filter()
         f = (self.filter_db.filter() &
              (self.filter_db.filter(key="name") == "Test4"))
@@ -230,8 +237,7 @@ class Generic(object):
         self.assertEqual(len(f), 1)
 
     def test_filter_or(self):
-        ''' Test text case insensitive '''
-        from PyDbLite.common import Filter
+        ''' Test OR '''
         self.setup_db_for_filter()
         f = (self.filter_db.filter() |
              (self.filter_db.filter(key="name") == "Test4"))
@@ -255,10 +261,3 @@ class Generic(object):
             counts[e["name"]] = counts.get(e["name"], 0) + 1
         for name, count in result:
             self.assertEqual(count, counts[name])
-
-
-if __name__=="__main__":
-    suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(PyDbLiteTestCase))
-    suite.addTest(unittest.makeSuite(SQLiteTestCase))
-    unittest.TextTestRunner().run(suite)

@@ -9,7 +9,7 @@ Differences with PyDbLite:
     db.cursor.execute(an_sql_request)
     result = db.cursor.fetchall()
 
-Fields must be declared 
+Fields must be declared
 Syntax :
     from PyDbLite.MySQL import Connection,Database,Table
     conn = Connection("localhost","root","admin")
@@ -115,7 +115,7 @@ class Connection(dict):
         self.cursor.execute('SHOW TABLES IN %s' %db_name)
         if len(self.cursor.fetchall()):
             raise MySQLError(
-              "Can't drop database %s ; all tables must be dropped first" 
+              "Can't drop database %s ; all tables must be dropped first"
               %db_name)
         self.cursor.execute('DROP DATABASE %s' %db_name)
 
@@ -344,7 +344,7 @@ class Table:
     def _make_record(self,row):
         """Make a record dictionary from the result of a fetch_"""
         return dict(zip(self.fields,row))
-        
+
     def add_field(self,field,default=None):
         fname,ftype = field
         if fname in self.fields:
@@ -355,7 +355,7 @@ class Table:
         self.execute(sql)
         self.commit()
         self._get_table_info()
-    
+
     def drop_field(self,field):
         if not field in self.fields:
             raise ValueError("Field %s not found in base" %field)
@@ -376,7 +376,7 @@ class Table:
         else: # all records
             self.execute("SELECT * FROM %s" %self.dt)
         return [self._make_record(row) for row in self.cursor.fetchall() ]
-    
+
     def __getitem__(self,record_id):
         """Direct access by record id"""
         if self.rowid is None:
@@ -395,7 +395,7 @@ class Table:
             return True
         except:
             return False
-    
+
     def __len__(self):
         self.execute("SELECT COUNT(*) FROM %s" %self.dt)
         return int(self.cursor.fetchone()[0])
@@ -403,7 +403,7 @@ class Table:
     def __delitem__(self,record_id):
         """Delete by record id"""
         self.delete(self[record_id])
-        
+
     def __iter__(self):
         """Iteration on the records"""
         self.execute("SELECT * FROM %s" %self.dt)
