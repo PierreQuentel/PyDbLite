@@ -17,12 +17,12 @@ try:
 except:
     strinstance = str
 
+
 def is_iterable_but_not_str(x):
     return hasattr(x, '__iter__') and not isinstance(x, strinstance)
 
 
 class Expression(object):
-
     def __init__(self, **kwargs):
         self.key = kwargs.get("key", None)
         self.value = kwargs.get("value", None)
@@ -112,8 +112,11 @@ class ExpressionGroup(object):
 
 
 class Filter(object):
-    operations = enum(**{'AND': 'AND', 'OR': 'OR', 'LIKE': 'LIKE', 'ILIKE': "GLOB", "IN": "IN",
-                         'EQ': "=", 'NE': "!=", 'LT': "<", 'LE': "<=", 'GT': ">", 'GE': ">="})
+    """A filter to be used to filter the results from a database query.
+    Users should not have to use this class."""
+    operations = enum(**{'AND': 'AND', 'OR': 'OR', 'LIKE': 'LIKE', 'ILIKE': "GLOB",
+                         "IN": "IN", 'EQ': "=", 'NE': "!=", 'LT': "<", 'LE': "<=",
+                         'GT': ">", 'GE': ">="})
 
     def __init__(self, db, key):
         self.db = db
@@ -122,19 +125,27 @@ class Filter(object):
         self.expression_t = Expression
 
     def is_filtered(self):
+        """If the filter contains any filters"""
         return not self.expression_group.is_dummy()
 
     def _comparison(self, value, operation):
-        self.expression_group.expression = self.expression_t(key=self.key, value=value, operator=operation)
+        self.expression_group.expression = self.expression_t(key=self.key,
+                                                             value=value, operator=operation)
         return self
 
     def like(self, value):
+        """Perform LIKE operation"""
         return self._comparison(value, self.operations.LIKE)
 
     def ilike(self, value):
+        """Perform ILIKE operation"""
         return self._comparison(value, self.operations.ILIKE)
 
     def __eq__(self, value):
+        """Perform EQUALS operation
+        When input value is an iterable, but not a string, it will match for
+        any of the values on the iterable
+        """
         # Iterable, so we use IN (X, X...) instead of =
         if is_iterable_but_not_str(value):
             return self._comparison(value, self.operations.IN)
@@ -142,23 +153,28 @@ class Filter(object):
             return self._comparison(value, self.operations.EQ)
 
     def __ne__(self, value):
+        """Perform NOT EQUALS operation"""
         return self._comparison(value, self.operations.NE)
 
     def __lt__(self, value):
+        """Perform LESS THAN operation"""
         return self._comparison(value, self.operations.LT)
 
     def __le__(self, value):
+        """Perform LESS THAN OR EQUALS operation"""
         return self._comparison(value, self.operations.LE)
 
     def __gt__(self, value):
+        """Perform GREATER THAN operation"""
         return self._comparison(value, self.operations.GT)
 
     def __ge__(self, value):
+        """Perform GREATER THAN OR EQUALS operation"""
         return self._comparison(value, self.operations.GE)
 
     def __and__(self, other_filter):
         """
-        Returns a new filter that combines this filter with other_filter with AND.
+        Returns a new filter that combines this filter with other_filter using AND.
         """
         new_filter = type(self)(self.db, None)
         new_filter.expression_group = self.expression_group & other_filter.expression_group
@@ -166,13 +182,14 @@ class Filter(object):
 
     def __or__(self, other_filter):
         """
-        Returns a new filter that combines this filter with other_filter with OR.
+        Returns a new filter that combines this filter with other_filter using OR.
         """
         new_filter = type(self)(self.db, None)
         new_filter.expression_group = self.expression_group | other_filter.expression_group
         return new_filter
 
     def __len__(self):
+        """Returns the number of records that matches this filter"""
         if self.expression_group.is_dummy():
             count = len(self.db)
         else:
@@ -180,6 +197,7 @@ class Filter(object):
         return count
 
     def __iter__(self):
+        """Returns in iterator over the records for this filter"""
         if self.expression_group.is_dummy():
             res = self.db()
         else:
@@ -187,12 +205,14 @@ class Filter(object):
         return iter(res)
 
     def __str__(self):
+        """Returns a string representation of the filter"""
         if self.expression_group:
             return self.expression_group.filter_string()
         else:
             return ""
 
     def filter(self):
+        """Returns the filter"""
         if self.expression_group:
             return self.expression_group.filter()
         else:

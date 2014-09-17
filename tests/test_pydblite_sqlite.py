@@ -6,8 +6,8 @@ import os
 import sys
 
 from .common_tests import Generic
-from PyDbLite import PyDbLite
-from PyDbLite import SQLite
+from pydblite import pydblite
+from pydblite import sqlite
 
 if sys.version_info[0] == 3:
     def unicode(s, en):
@@ -26,7 +26,7 @@ rec3 = {'name': unicode('éçùï', 'iso-8859-1'), 'age': 55}
 class TestSQLiteFunctions(unittest.TestCase):
 
     def setUp(self):
-        self.db = SQLite.Database(":memory:")
+        self.db = sqlite.Database(":memory:")
         self.db.create('table1',
                        ('name', 'TEXT'),
                        ('birth', 'DATE DEFAULT CURRENT_DATE'),
@@ -38,7 +38,7 @@ class TestSQLiteFunctions(unittest.TestCase):
         t1.insert(vals1)
 
     def test_00_create(self):
-        db = SQLite.Database(":memory:")
+        db = sqlite.Database(":memory:")
         t1 = db.create('table1',
                        ('name', 'TEXT'),
                        ('birth', 'DATE DEFAULT CURRENT_DATE'),
@@ -92,7 +92,7 @@ class SQLiteTestCase(Generic, unittest.TestCase):
 
     def setUp(self):
         self.first_record_id = 1
-        from PyDbLite.SQLite import Table, Database
+        from pydblite.sqlite import Table, Database
         db = Database(":memory:")
         filter_db = Table('test_database', db)
         filter_db.create(('unique_id', 'INTEGER'), ('name', 'TEXT'), ('active', 'INTEGER'))

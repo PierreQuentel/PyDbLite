@@ -1,12 +1,5 @@
-__all__ = ["test_pydblite", "test_pydblite_sqlite", "test_pydblite_mysql"]
+__all__ = ["test_pydblite", "test_pydblite_sqlite"]
 
-import os
-dirname = os.path.dirname
-
-from pkgutil import extend_path
-__path__ = extend_path(__path__, __name__)
-basedir = dirname(dirname(dirname(__file__))) # To get PyDbLite as a module
-__path__ = extend_path(__path__, basedir)
 
 def load_tests(loader, tests, pattern):
     ''' Discover and load all unit tests in all files named ``*_test.py`` in ``./src/``
@@ -25,4 +18,3 @@ def load_tests(loader, tests, pattern):
         else:
             suite.addTests(all_test_suite)
     return suite
-

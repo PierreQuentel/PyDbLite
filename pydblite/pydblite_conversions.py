@@ -2,10 +2,10 @@
 # currently supported : csv
 
 import os
+import pydblite
 
-import PyDbLite
 
-def toCSV(pdl,out=None,write_field_names=True):
+def toCSV(pdl, out=None, write_field_names=True):
     """Conversion from the PyDbLite Base instance pdl to the file object out
     open for writing in binary mode
     If out is not specified, the field name is the same as the PyDbLite
@@ -15,18 +15,18 @@ def toCSV(pdl,out=None,write_field_names=True):
     import csv
     if out is None:
         file_name = os.path.splitext(pdl.name)[0]+".csv"
-        out = open(file_name,"wb")
-    fields = ["__id__","__version__"]+pdl.fields
-    writer = csv.DictWriter(out,fields)
+        out = open(file_name, "wb")
+    fields = ["__id__", "__version__"] + pdl.fields
+    writer = csv.DictWriter(out, fields)
     # write field names
     if write_field_names:
-        writer.writerow(dict([(k,k) for k in fields]))
+        writer.writerow(dict([(k, k) for k in fields]))
     # write values
     writer.writerows(pdl())
     return file_name
 
-def fromCSV(csvfile,out=None,fieldnames=None,fmtparams=None,conv_func={},
-    empty_to_None=[]):
+
+def fromCSV(csvfile, out=None, fieldnames=None, fmtparams=None, conv_func={}, empty_to_None=[]):
     """Conversion from CSV to PyDbLite
     csvfile : name of the CSV file in the file system
 
@@ -51,24 +51,24 @@ def fromCSV(csvfile,out=None,fieldnames=None,fmtparams=None,conv_func={},
     import datetime
 
     if out is None:
-        out = os.path.splitext(csvfile)[0]+".pdl"
+        out = os.path.splitext(csvfile)[0] + ".pdl"
 
     if fieldnames is None:
         # read field names in the first line of CSV file
         reader = csv.reader(open(csvfile))
         fieldnames = reader.next()
 
-    reader = csv.DictReader(open(csvfile),fieldnames,fmtparams)
-    reader.next() # skip first line
+    reader = csv.DictReader(open(csvfile), fieldnames, fmtparams)
+    reader.next()  # skip first line
 
-    db = PyDbLite.Base(out)
+    db = pydblite.Base(out)
 
-    conv_func.update({"__id__":int})
-    auto_id = not "__id__" in fieldnames
-    fieldnames = [ f for f in fieldnames if not f in ("__id__") ]
+    conv_func.update({"__id__": int})
+    auto_id = "__id__" not in fieldnames
+    fieldnames = [f for f in fieldnames if f not in ("__id__")]
 
-    kw = {"mode":"override"}
-    db.create(*fieldnames,**kw)
+    kw = {"mode": "override"}
+    db.create(*fieldnames, **kw)
     print(db.fields)
 
     next_id = 0
@@ -87,15 +87,15 @@ def fromCSV(csvfile,out=None,fieldnames=None,fmtparams=None,conv_func={},
                 record[field] = None
         # type conversion
         for field in conv_func:
-            if not isinstance(conv_func[field],(tuple,list)):
+            if not isinstance(conv_func[field], (tuple, list)):
                 record[field] = conv_func[field](record[field])
             else:
                 # date or datetime
-                date_class,date_fmt = conv_func[field]
+                date_class, date_fmt = conv_func[field]
                 if not record[field]:
                     record[field] = None
                 else:
-                    time_tuple = time.strptime(record[field],date_fmt)
+                    time_tuple = time.strptime(record[field], date_fmt)
                     if date_class is datetime.date:
                         time_tuple = time_tuple[:3]
                     record[field] = date_class(*time_tuple)
@@ -106,11 +106,11 @@ def fromCSV(csvfile,out=None,fieldnames=None,fmtparams=None,conv_func={},
     return db
 
 if __name__ == "__main__":
-    os.chdir(os.path.join(os.getcwd(),'test'))
-    pdl = PyDbLite.Base("test.pdl").open()
+    os.chdir(os.path.join(os.getcwd(), 'test'))
+    pdl = pydblite.Base("test.pdl").open()
     csvfile = toCSV(pdl)
     import datetime
-    db = fromCSV(csvfile,out="test_copy.pdl")
+    db = fromCSV(csvfile, out="test_copy.pdl")
 
     ok = nok = 0
     for r1 in pdl:
@@ -119,5 +119,5 @@ if __name__ == "__main__":
             ok += 1
         except:
             nok += 1
-    print(ok,nok)
-    print(r1,r2)
+    print(ok, nok)
+    print(r1, r2)

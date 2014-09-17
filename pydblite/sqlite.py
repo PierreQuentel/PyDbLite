@@ -4,17 +4,17 @@
 # Author : Pierre Quentel (pierre.quentel@gmail.com)
 #
 
-"""PyDbLite.py adapted for SQLite backend
 
-Differences with PyDbLite:
-- pass the connection to the SQLite db as argument to Table()
-- in create(), field definitions must specify a type
-- no drop_field (not supported by SQLite)
-- the Table() instance has a cursor attribute, so that SQL requests
-  can be executed :
-    db.cursor.execute(an_sql_request)
-    result = db.cursor.fetchall()
+"""
+Main differences from :mod:`pydblite.pydblite`:
 
+- pass the connection to the :class:`SQLite db <pydblite.sqlite.Database>` as argument to
+  :class:`Table <pydblite.sqlite.Table>`
+- in :func:`create() <pydblite.sqlite.Table.create>` field definitions must specify a type.
+- no `drop_field` (not supported by SQLite)
+- the :class:`Table <pydblite.sqlite.Table>` instance has a
+  :attr:`cursor <pydblite.sqlite.Database.cursor>` attribute, so that raw SQL requests can
+  be executed.
 """
 
 try:
@@ -147,7 +147,7 @@ def guess_default_fmt(value):
 
 
 class SQLiteError(Exception):
-
+    """SQLiteError"""
     pass
 
 
@@ -155,16 +155,17 @@ class Database(dict):
 
     def __init__(self, filename, **kw):
         """
-        To create a in-memory database provide ':memory:' as filename:
+        To create an in-memory database provide ':memory:' as filename
 
         Args:
-            filename (str): The name of the database file.
-            kw (dict): Arguments forwarded to sqlite3.connect
+            - filename (str): The name of the database file, or ':memory:'
+            - kw (dict): Arguments forwarded to sqlite3.connect
         """
         dict.__init__(self)
         self.conn = sqlite.connect(filename, **kw)
+        """The SQLite connection"""
         self.cursor = self.conn.cursor()
-        self.commit = self.conn.commit
+        """The SQLite connections cursor"""
         for table_name in self._tables():
             self[table_name] = Table(table_name, self)
 
@@ -181,6 +182,10 @@ class Database(dict):
         self[table_name] = Table(table_name, self).create(*fields, **kw)
         return self[table_name]
 
+    def commit(self):
+        """Save any changes to the database"""
+        self.conn.commit()
+
     def __delitem__(self, table):
         # drop table
         if isinstance(table, Table):
@@ -194,39 +199,41 @@ class Table(object):
     def __init__(self, table_name, db):
         """
         Args:
-            table_name (str): The name of the SQLite table
-            db (Database instance): The database
+
+           - table_name (str): The name of the SQLite table.
+           - db (:class:`Database <pydblite.sqlite.Database>`): The database.
+
         """
         self.name = table_name
         self.db = db
         self.cursor = db.cursor
-        self.commit = self.db.commit
+        """The SQLite connections cursor"""
         self.conv_func = {}
         self.mode = "open"
         self._get_table_info()
 
     def create(self, *fields, **kw):
         """
-        Create a new table
-        For each field, a 2-element tuple is provided :
-        - the field name
-        - a string with additional information : field type +
-          other information using the SQLite syntax
-          eg : ('name','TEXT NOT NULL')
-               ('date','BLOB DEFAULT CURRENT_DATE')
-
-        A keyword argument mode can be specified ; it is used if a file
-        with the base name already exists
-        - if mode = 'open' : open the existing base, ignore the fields
-        - if mode = 'override' : erase the existing base and create a
-        new one with the specified fields
+        Create a new table.
 
         Args:
-            fields (list of tuples): The fields names/types to create.
-            mode (str): the mode used when creating the database.
+           - fields (list of tuples): The fields names/types to create.
+             For each field, a 2-element tuple must be provided:
+
+             - the field name
+             - a string with additional information like field type +
+               other information using the SQLite syntax
+               eg  ('name', 'TEXT NOT NULL'), ('date', 'BLOB DEFAULT CURRENT_DATE')
+
+           - mode (str): The mode used when creating the database.
+                  mode is only used if a database file already exists.
+
+             - if mode = 'open' : open the existing base, ignore the fields
+             - if mode = 'override' : erase the existing base and create a
+               new one with the specified fields
 
         Returns:
-            Returns the database (self).
+            - the database (self).
         """
         self.mode = mode = kw.get("mode", None)
         if self._table_exists():
@@ -238,22 +245,25 @@ class Table(object):
                 raise IOError("Base %s already exists" % self.name)
         sql = "CREATE TABLE %s (" % self.name
         for field in fields:
-            sql += self._validate_field(field)
-            sql += ','
+            sql += self._validate_field(field) + ','
         sql = sql[:-1] + ')'
         self.cursor.execute(sql)
         self._get_table_info()
         return self
 
     def open(self):
-        """Open an existing database"""
+        """Open an existing database."""
         return self
+
+    def commit(self):
+        """Save any changes to the database"""
+        self.db.commit()
 
     def _table_exists(self):
         return self.name in self.db
 
     def _get_table_info(self):
-        """Inspect the base to get field names"""
+        """Inspect the base to get field names."""
         self.fields = []
         self.field_info = {}
         self.cursor.execute('PRAGMA table_info (%s)' % self.name)
@@ -288,7 +298,7 @@ class Table(object):
 
     def conv(self, field_name, conv_func):
         """When a record is returned by a SELECT, ask conversion of
-        specified field value with the specified function"""
+        specified field value with the specified function."""
         if field_name not in self.fields:
             raise NameError("Unknown field %s" % field_name)
         self.conv_func[field_name] = conv_func
@@ -306,11 +316,14 @@ class Table(object):
         self.conv(field_name, to_datetime)
 
     def insert(self, *args, **kw):
-        """Insert a record in the database
+        """Insert a record in the database.
+
         Parameters can be positional or keyword arguments. If positional
-        they must be in the same order as in the create() method
-        If some of the fields are missing the value is set to None
-        Returns the record identifier
+        they must be in the same order as in the :func:`create` method.
+        If some of the fields are missing the value is set to None.
+
+        Returns:
+            - The record identifier
         """
         if args:
             if isinstance(args[0], (list, tuple)):
@@ -322,11 +335,14 @@ class Table(object):
         qm = ','.join(['?'] * len(ks))
         sql = "INSERT INTO %s (%s) VALUES (%s)" % (self.name, s1, qm)
         self.cursor.execute(sql, list(kw.values()))
-        # return last row id
         return self.cursor.lastrowid
 
     def _insert_many(self, args):
-        """Insert a list or tuple of records"""
+        """Insert a list or tuple of records
+
+        Returns:
+            - The last row id
+        """
         sql = "INSERT INTO %s" % self.name
         sql += "(%s) VALUES (%s)"
         if isinstance(args[0], dict):
@@ -344,10 +360,13 @@ class Table(object):
         return self.cursor.lastrowid
 
     def delete(self, removed):
-        """Remove a single record, or the records in an iterable
+        """Remove a single record, or the records in an iterable.
+
         Before starting deletion, test if all records are in the base
-        and don't have twice the same __id__
-        Return the number of deleted items
+        and don't have twice the same __id__.
+
+        Returns:
+             - int: the number of deleted items
         """
         sql = "DELETE FROM %s " % self.name
         if isinstance(removed, dict):
@@ -364,20 +383,20 @@ class Table(object):
             args = [r['__id__'] for r in removed]
             sql += "WHERE rowid IN (%s)" % (','.join(['?'] * len(args)))
         self.cursor.execute(sql, args)
-        self.commit()
+        self.db.commit()
         return len(removed)
 
     def update(self, record, **kw):
-        """Update the record with new keys and values"""
+        """Update the record with new keys and values."""
         vals = self._make_sql_params(kw)
         sql = "UPDATE %s SET %s WHERE rowid=?" % (self.name,
                                                   ",".join(vals))
         self.cursor.execute(sql, list(kw.values()) + [record['__id__']])
-        self.commit()
+        self.db.commit()
 
     def _make_sql_params(self, kw):
         """Make a list of strings to pass to an SQL statement
-        from the dictionary kw with Python types"""
+        from the dictionary kw with Python types."""
         return ['%s=?' % k for k in kw.keys()]
 
     def _make_record(self, row, fields=None):
@@ -390,28 +409,39 @@ class Table(object):
         return res
 
     def add_field(self, name, column_type="TEXT", default=None):
+        """Add a new column to the table.
+
+        Args:
+           - name (string): The name of the field
+           - column_type (string): The data type of the column (Defaults to TEXT)
+           - default (datatype): The default value for this field (if any)
+
+        """
         sql = "ALTER TABLE %s ADD " % self.name
         sql += self._validate_field((name, column_type, default))
         self.cursor.execute(sql)
-        self.commit()
+        self.db.commit()
         self._get_table_info()
 
     def drop_field(self, field):
         raise SQLiteError("Dropping fields is not supported by SQLite")
 
     def __call__(self, *args, **kw):
-        """Selection by field values
+        """
+        Selection by field values.
 
         db(key=value) returns the list of records where r[key] = value
 
         Args:
-            args (list): A field to filter on.
-            kw (dict): pairs of field and value to filter on.
+           - args (list): A field to filter on.
+           - kw (dict): pairs of field and value to filter on.
 
         Returns:
-            When args supplied, return a Filter object that filters on the specified field.
-            When kw supplied, return all the records where field values matches the
-            key/values in kw.
+           - When args supplied, return a :class:`Filter <pydblite.common.Filter>`
+             object that filters on the specified field.
+           - When kw supplied, return all the records where field values matches
+             the key/values in kw.
+
         """
         if args and kw:
             raise SyntaxError("Can't specify positional AND keyword arguments")
@@ -445,7 +475,7 @@ class Table(object):
             return [self._make_record(row) for row in records]
 
     def __getitem__(self, record_id):
-        """Direct access by record id"""
+        """Direct access by record id."""
         sql = "SELECT rowid,* FROM %s WHERE rowid=%s" % (self.name, record_id)
         self.cursor.execute(sql)
         res = self.cursor.fetchone()
@@ -491,7 +521,8 @@ class Table(object):
 
     def get_group_count(self, group_by, db_filter=None):
         if db_filter and str(db_filter):
-            sql = "SELECT %s, COUNT(*) FROM %s GROUP BY %s WHERE %s" % (group_by, self.name, group_by, db_filter)
+            sql = "SELECT %s, COUNT(*) FROM %s GROUP BY %s WHERE %s" % (group_by, self.name,
+                                                                        group_by, db_filter)
         else:
             sql = "SELECT %s, COUNT(*) FROM %s GROUP BY %s;" % (group_by, self.name, group_by)
         self.cursor.execute(sql)
@@ -509,13 +540,13 @@ class Table(object):
         for ic in index_columns:
             sql = "CREATE INDEX index_%s on %s (%s);" % (ic, self.name, ic)
             self.cursor.execute(sql)
-        self.commit()
+        self.db.commit()
 
     def delete_index(self, *index_columns):
         for ic in index_columns:
             sql = "DROP INDEX index_%s;" % (ic)
             self.cursor.execute(sql)
-        self.commit()
+        self.db.commit()
 
     def get_indices(self):
         indices = []

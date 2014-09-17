@@ -7,6 +7,7 @@ warnings.resetwarnings()
 
 
 class Generic(object):
+    """Generic class for unit testing :mod:`pydblite.pydblite` and :mod:`pydblite.sqlite`"""
 
     def test_create_index(self):
         indices = self.filter_db.get_indices()
@@ -192,7 +193,7 @@ class Generic(object):
         self.assertEqual(len((self.filter_db("active") != True)), 3)  # noqa
 
     def test_filter_in(self):
-        ''' Test IN ( == with a list '''
+        """Test IN ( == with a list"""
         self.setup_db_for_filter()
         self.assertEqual(len(self.filter_db("name") == ["Test4", "Test7"]), 3)
 
@@ -213,19 +214,19 @@ class Generic(object):
         self.assertEqual(len((self.filter_db("unique_id") <= 3)), 3)
 
     def test_filter_ilike(self):
-        ''' Test text case sensitive '''
+        """Test text case sensitive"""
         self.setup_db_for_filter()
         self.assertEqual(len(self.filter_db("name").ilike("Test")), 6)
         self.assertEqual(len(self.filter_db("name").ilike("Test0")), 2)
 
     def test_filter_like(self):
-        ''' Test text case insensitive '''
+        """Test text case insensitive"""
         self.setup_db_for_filter()
         self.assertEqual(len(self.filter_db("name").like("Test")), 7)
         self.assertEqual(len(self.filter_db("name").like("Test0")), 3)
 
     def test_filter_and(self):
-        ''' Test AND '''
+        """Test AND"""
         self.setup_db_for_filter()
         f = (self.filter_db.filter() &
              (self.filter_db.filter(key="name") == "Test4"))
@@ -237,7 +238,7 @@ class Generic(object):
         self.assertEqual(len(f), 1)
 
     def test_filter_or(self):
-        ''' Test OR '''
+        """Test OR"""
         self.setup_db_for_filter()
         f = (self.filter_db.filter() |
              (self.filter_db.filter(key="name") == "Test4"))

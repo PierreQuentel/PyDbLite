@@ -88,8 +88,8 @@ class PyDbFilter(Filter):
 
 
 class Index(object):
-    """Class used for indexing a base on a field
-    The instance of Index is an attribute the Base instance"""
+    """Class used for indexing a base on a field.
+    The instance of Index is an attribute of the Base instance"""
 
     def __init__(self, db, field):
         self.db = db  # database object (instance of Base)
@@ -111,15 +111,22 @@ class Index(object):
 class _Base(object):
 
     def __init__(self, path, protocol=pickle.HIGHEST_PROTOCOL, save_to_file=True):
-        """protocol as defined in pickle / pickle
-        Defaults to the highest protocol available
-        For maximum compatibility use protocol = 0"""
+        """protocol as defined in pickle / pickle.
+        Defaults to the highest protocol available.
+        For maximum compatibility use protocol = 0
+
+        """
         self.path = path
+        """The path of the database in the file system"""
         self.name = os.path.splitext(os.path.basename(path))[0]
+        """The basename of the path, stripped of its extension"""
         self.protocol = protocol
         if path is ":memory:":
             save_to_file = False
         self.save_to_file = save_to_file
+        self.fields = []
+        """The list of the fields (does not include the internal
+        fields __id__ and __version__)"""
         # if base exists, get field names
         if save_to_file and self.exists():
             if protocol == 0:
@@ -129,23 +136,26 @@ class _Base(object):
             self.fields = pickle.load(_in)
 
     def exists(self):
+        """
+        Returns:
+            - bool: if the database file exists
+        """
         return os.path.exists(self.path)
 
     def create(self, *fields, **kw):
         """
-        Create a new base with specified field names
-        A keyword argument mode can be specified ; it is used if a file
-        with the base name already exists
-        - if mode = 'open' : open the existing base, ignore the fields
-        - if mode = 'override' : erase the existing base and create a
-        new one with the specified fields
+        Create a new base with specified field names.
 
         Args:
-            fields (str): The fields names to create.
-            mode (str): the mode used when creating the database.
+            - \*fields (str): The field names to create.
+            - mode (str): the mode used when creating the database.
+
+        - if mode = 'open' : open the existing base, ignore the fields
+        - if mode = 'override' : erase the existing base and create a
+          new one with the specified fields
 
         Returns:
-            Returns the database (self).
+            - Returns the database (self).
         """
         self.mode = mode = kw.get("mode", None)
         if os.path.exists(self.path):
@@ -187,7 +197,7 @@ class _Base(object):
         prefix _ to avoid name conflicts
 
         Args:
-            *fields (str): the field(s) to index
+            - fields (list): the fields to index
         """
         reset = False
         for f in fields:
@@ -253,11 +263,11 @@ class _Base(object):
         If some of the fields are missing the value is set to None
 
         Args:
-            args (the values to insert, or a list of values): The record(s) to delete.
-            kw (dict): The field/values to insert
+            - args (the values to insert, or a list of values): The record(s) to delete.
+            - kw (dict): The field/values to insert
 
         Returns:
-            Returns the record identifier if inserting one item, else None.
+            - Returns the record identifier if inserting one item, else None.
         """
         if args:
             if isinstance(args[0], (list, tuple)):
@@ -300,10 +310,10 @@ class _Base(object):
         and don't have twice the same __id__
 
         Args:
-            remove (record or list of records): The record(s) to delete.
+            - remove (record or list of records): The record(s) to delete.
 
         Returns:
-            Return the number of deleted items
+            - Return the number of deleted items
         """
         if isinstance(remove, dict):
             remove = [remove]
@@ -344,7 +354,7 @@ class _Base(object):
         with new keys and values and update indices
 
         Args:
-            records (record or list of records): The record(s) to update.
+           - records (record or list of records): The record(s) to update.
         """
         # ignore unknown fields
         kw = dict([(k, v) for (k, v) in kw.items() if k in self.fields])
@@ -370,6 +380,7 @@ class _Base(object):
             record["__version__"] += 1
 
     def add_field(self, field, column_type="ignored", default=None):
+        """Adds a field to the database"""
         if field in self.fields + ["__id__", "__version__"]:
             raise ValueError("Field %s already defined" % field)
         if not hasattr(self, 'records'):  # base not open yet
@@ -381,6 +392,7 @@ class _Base(object):
         self.commit()
 
     def drop_field(self, field):
+        """Removes a field from the database"""
         if field in ["__id__", "__version__"]:
             raise ValueError("Can't delete field %s" % field)
         self.fields.remove(field)
@@ -396,13 +408,14 @@ class _Base(object):
         db(key=value) returns the list of records where r[key] = value
 
         Args:
-            args (list): A field to filter on.
-            kw (dict): pairs of field and value to filter on.
+            - args (list): A field to filter on.
+            - kw (dict): pairs of field and value to filter on.
 
         Returns:
-            When args supplied, return a Filter object that filters on the specified field.
-            When kw supplied, return all the records where field values matches the
-            key/values in kw.
+            - When args supplied, return a Filter object that filters on
+              the specified field.
+            - When kw supplied, return all the records where field values matches the
+              key/values in kw.
         """
         if args and kw:
             raise SyntaxError("Can't specify positional AND keyword arguments")
@@ -448,7 +461,8 @@ class _Base(object):
     def _len(self, db_filter=None):
         if db_filter is not None:
             if not type(db_filter) is PyDbExpressionGroup:
-                raise ValueError("Filter argument is not of type 'PyDbExpressionGroup': %s" % type(db_filter))
+                raise ValueError("Filter argument is not of type "
+                                 "'PyDbExpressionGroup': %s" % type(db_filter))
             if db_filter.is_filtered():
                 return len(db_filter.apply_filter(self.records))
         return len(self.records)
@@ -464,7 +478,9 @@ class _Base(object):
         return record_id in self.records
 
     def group_by(self, column, torrents_filter):
-        gropus = [(k, len(list(g))) for k, g in groupby(torrents_filter, key=lambda x: x[column])]
+        """Returns the records grouped by column"""
+        gropus = [(k, len(list(g))) for k, g in groupby(torrents_filter,
+                                                        key=lambda x: x[column])]
         result = {}
         for column, count in gropus:
             result[column] = result.get(column, 0) + count
@@ -477,20 +493,23 @@ class _Base(object):
         if db_filter is None:
             db_filter = self.filter()
 
-        gropus = [(k, len(list(g))) for k, g in groupby(db_filter, key=lambda x: x[group_by_field])]
+        gropus = [(k, len(list(g))) for k, g in groupby(db_filter,
+                                                        key=lambda x: x[group_by_field])]
         groups_dict = {}
         for group, count in gropus:
             groups_dict[group] = groups_dict.get(group, 0) + count
         return [(k, groups_dict[k]) for k in groups_dict]
 
-    def get_unique_ids(self, unique_id, db_filter=None):
+    def get_unique_ids(self, id_value, db_filter=None):
+        """Returns a set of unique values from column"""
         if db_filter is not None and db_filter.is_filtered():
             records = self(db_filter)
         else:
             records = self()
-        return set([row[unique_id] for row in records])
+        return set([row[id_value] for row in records])
 
     def get_indices(self):
+        """Returns the indices"""
         return list(self.indices)
 
 

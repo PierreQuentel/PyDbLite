@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
+
 def sqlite():
-    from PyDbLite.SQLite import Database,Table
+    from pydblite.sqlite import Database, Table
     # connect to SQLite database "test"
     db = Database(":memory:")
     # pass the table name and database path as arguments to Table creation
@@ -30,16 +31,17 @@ def sqlite():
     rec_id = records[0]['__id__']
 
     # direct access by id
-    record = table[rec_id] # the record such that record['__id__'] == rec_id
+    record = table[rec_id]  # the record such that record['__id__'] == rec_id
     # update
     table.update(record, age=24)
     # add a field
-    table.add_field('new_field') # Defaults to type 'TEXT'
+    table.add_field('new_field')  # Defaults to type 'TEXT'
     # save changes on disk
     table.commit()
 
+
 def pydblite():
-    from PyDbLite.PyDbLite import Base
+    from pydblite.pydblite import Base
     db = Base('dummy', save_to_file=False)
     # create new base with field names
     db.create('name', 'age', 'size')
@@ -91,4 +93,3 @@ def pydblite():
 if __name__ == "__main__":
     sqlite()
     pydblite()
-

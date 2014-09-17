@@ -1,0 +1,7 @@
+[html]
+directory = docs/build/htmlcoverage
+
+[run]
+source = pydblite
+omit = tests/*
+branch = True

@@ -7,10 +7,11 @@ import sys
 
 from .common_tests import Generic
 
+
 class PyDbLiteTestCase(Generic, unittest.TestCase):
 
     def setUp(self):
-        from PyDbLite.PyDbLite import Base
+        from pydblite.pydblite import Base
         self.first_record_id = 0
         filter_db = Base('test_database', save_to_file=False)
         filter_db.create('unique_id', 'name', "active", mode="override")
