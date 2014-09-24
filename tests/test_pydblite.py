@@ -9,14 +9,14 @@ from .common_tests import Generic
 
 class PyDbLiteTestCase(Generic, unittest.TestCase):
 
-    def setUp(self):
+    def setUp(self):  # NOQA
         from pydblite.pydblite import Base
         self.first_record_id = 0
         filter_db = Base('test_database', save_to_file=False)
         filter_db.create('unique_id', 'name', "active", mode="override")
         self.filter_db = filter_db
 
-    def tearDown(self):
+    def tearDown(self):  # NOQA
         pass
 
 

@@ -24,7 +24,7 @@ rec3 = {'name': unicode('éçùï', 'iso-8859-1'), 'age': 55}
 
 class TestSQLiteFunctions(unittest.TestCase):
 
-    def setUp(self):
+    def setUp(self):  # NOQA
         self.db = sqlite.Database(":memory:")
         self.db.create('table1',
                        ('name', 'TEXT'),
@@ -46,7 +46,7 @@ class TestSQLiteFunctions(unittest.TestCase):
 
         t1.is_date('birth')
 
-    def test_02_IterateOnDatabase(self):
+    def test_02_iterate_on_database(self):
         for i, table in enumerate(self.db):
             pass
         assert len(self.db.keys()) == i+1
@@ -89,7 +89,7 @@ class TestSQLiteFunctions(unittest.TestCase):
 
 class SQLiteTestCase(Generic, unittest.TestCase):
 
-    def setUp(self):
+    def setUp(self):  # NOQA
         self.first_record_id = 1
         from pydblite.sqlite import Table, Database
         db = Database(":memory:")
@@ -97,7 +97,7 @@ class SQLiteTestCase(Generic, unittest.TestCase):
         filter_db.create(('unique_id', 'INTEGER'), ('name', 'TEXT'), ('active', 'INTEGER'))
         self.filter_db = filter_db
 
-    def tearDown(self):
+    def tearDown(self):  # NOQA
         pass
 
 
