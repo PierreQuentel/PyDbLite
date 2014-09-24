@@ -51,25 +51,25 @@ except ImportError:
 try:
     set([])
 except NameError:
-    from sets import Set as set
+    from sets import Set as set  # NOQA
 
 
 # classes for CURRENT_DATE, CURRENT_TIME, CURRENT_TIMESTAMP
-class CURRENT_DATE:
+class CurrentDate:
     def __call__(self):
         return datetime.date.today().strftime('%Y-%M-%D')
 
 
-class CURRENT_TIME:
+class CurrentTime:
     def __call__(self):
         return datetime.datetime.now().strftime('%h:%m:%s')
 
 
-class CURRENT_TIMESTAMP:
+class CurrentTimestamp:
     def __call__(self):
         return datetime.datetime.now().strftime('%Y-%M-%D %h:%m:%s')
 
-DEFAULT_CLASSES = [CURRENT_DATE, CURRENT_TIME, CURRENT_TIMESTAMP]
+DEFAULT_CLASSES = [CurrentDate, CurrentTime, CurrentTimestamp]
 
 # functions to convert a value returned by a SQLite SELECT
 
@@ -126,13 +126,13 @@ def guess_default_fmt(value):
     if mo:
         h, m, s = [int(x) for x in mo.groups()]
         if (0 <= h <= 23) and (0 <= m <= 59) and (0 <= s <= 59):
-            return CURRENT_TIME
+            return CurrentTime
     mo = c_date_fmt.match(value)
     if mo:
         y, m, d = [int(x) for x in mo.groups()]
         try:
             datetime.date(y, m, d)
-            return CURRENT_DATE
+            return CurrentDate
         except:
             pass
     mo = c_tmsp_fmt.match(value)
@@ -140,7 +140,7 @@ def guess_default_fmt(value):
         y, mth, d, h, mn, s = [int(x) for x in mo.groups()]
         try:
             datetime.datetime(y, mth, d, h, mn, s)
-            return CURRENT_TIMESTAMP
+            return CurrentTimestamp
         except:
             pass
     return value

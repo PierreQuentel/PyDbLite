@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import warnings
-import unittest
 
 warnings.filterwarnings("ignore", category=RuntimeWarning)
 warnings.resetwarnings()
@@ -41,13 +40,13 @@ class Generic(object):
 
         # Check value of age field for new record with age value
         status = {"unique_id": 110, 'age': 10}
-        res = self.filter_db.insert(**status)
+        self.filter_db.insert(**status)
         record = self.filter_db(unique_id=110)[0]
         self.assertEqual(record["age"], 10)
 
         # Check value of age field for new record with no age value
         status = {"unique_id": 111}
-        res = self.filter_db.insert(**status)
+        self.filter_db.insert(**status)
         record = self.filter_db(unique_id=111)[0]
         self.assertEqual(record["age"], None)
 
@@ -62,7 +61,7 @@ class Generic(object):
 
         # Check value of age field for new record with age value
         status = {"unique_id": 110, 'age': 10}
-        res = self.filter_db.insert(**status)
+        self.filter_db.insert(**status)
         record = self.filter_db(unique_id=110)[0]
         self.assertEqual(record["age"], 10)
 

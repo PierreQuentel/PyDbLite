@@ -5,7 +5,7 @@ import os
 import pydblite
 
 
-def toCSV(pdl, out=None, write_field_names=True):
+def to_csv(pdl, out=None, write_field_names=True):
     """Conversion from the PyDbLite Base instance pdl to the file object out
     open for writing in binary mode
     If out is not specified, the field name is the same as the PyDbLite
@@ -26,7 +26,7 @@ def toCSV(pdl, out=None, write_field_names=True):
     return file_name
 
 
-def fromCSV(csvfile, out=None, fieldnames=None, fmtparams=None, conv_func={}, empty_to_None=[]):
+def from_csv(csvfile, out=None, fieldnames=None, fmtparams=None, conv_func={}, empty_to_none=[]):
     """Conversion from CSV to PyDbLite
     csvfile : name of the CSV file in the file system
 
@@ -43,7 +43,7 @@ def fromCSV(csvfile, out=None, fieldnames=None, fmtparams=None, conv_func={}, em
     instance if field "age" must be converted to an integer :
     conv_func["age"] = int
 
-    empty_to_None is a list of the fields such that when the value read in
+    empty_to_none is a list of the fields such that when the value read in
     the CSV file is the empty string, the field value is set to None
     """
     import csv
@@ -82,7 +82,7 @@ def fromCSV(csvfile, out=None, fieldnames=None, fmtparams=None, conv_func={}, em
             record["__id__"] = next_id
             next_id += 1
         # replace empty strings by None
-        for field in empty_to_None:
+        for field in empty_to_none:
             if not record[field]:
                 record[field] = None
         # type conversion
@@ -108,9 +108,8 @@ def fromCSV(csvfile, out=None, fieldnames=None, fmtparams=None, conv_func={}, em
 if __name__ == "__main__":
     os.chdir(os.path.join(os.getcwd(), 'test'))
     pdl = pydblite.Base("test.pdl").open()
-    csvfile = toCSV(pdl)
-    import datetime
-    db = fromCSV(csvfile, out="test_copy.pdl")
+    csvfile = to_csv(pdl)
+    db = from_csv(csvfile, out="test_copy.pdl")
 
     ok = nok = 0
     for r1 in pdl:

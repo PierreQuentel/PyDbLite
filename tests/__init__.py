@@ -6,7 +6,6 @@ def load_tests(loader, tests, pattern):
     '''
     import unittest
     suite = unittest.TestSuite()
-    from unittest import loader
     import unittest.loader
     for all_test_suite in unittest.defaultTestLoader.discover(
             ".",

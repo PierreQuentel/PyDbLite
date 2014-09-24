@@ -4,9 +4,6 @@
 # Author : Bro <bro.development@gmail.com>
 #
 
-import types
-import sys
-
 
 def enum(*sequential, **named):
     enums = dict(zip(sequential, range(len(sequential))), **named)

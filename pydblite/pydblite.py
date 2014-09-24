@@ -19,7 +19,7 @@ except:
 try:
     set([])
 except NameError:
-    from sets import Set as set
+    from sets import Set as set  # NOQA
 
 from .common import Expression, ExpressionGroup, Filter
 
@@ -513,20 +513,20 @@ class _Base(object):
         return list(self.indices)
 
 
-class _Base_Py2(_Base):
+class _BasePy2(_Base):
 
     def __iter__(self):
         """Iteration on the records"""
         return iter(self.records.itervalues())
 
 
-class _Base_Py3(_Base):
+class _BasePy3(_Base):
 
     def __iter__(self):
         """Iteration on the records"""
         return iter(self.records.values())
 
 if sys.version_info[0] == 2:
-    Base = _Base_Py2
+    Base = _BasePy2
 else:
-    Base = _Base_Py3
+    Base = _BasePy3
