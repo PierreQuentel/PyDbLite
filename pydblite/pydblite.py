@@ -331,8 +331,8 @@ class _Base(object):
             raise IndexError('Delete aborted. Records with these ids'
                              ' not found in the base : %s' % str(missing))
         # raise exception if duplicate ids
-        for i in range(len(_ids)-1):
-            if _ids[i] == _ids[i+1]:
+        for i in range(len(_ids) - 1):
+            if _ids[i] == _ids[i + 1]:
                 raise IndexError("Delete aborted. Duplicate id : %s" % _ids[i])
         deleted = len(remove)
         while remove:
@@ -340,7 +340,7 @@ class _Base(object):
             _id = r['__id__']
             # remove id from indices
             for indx in self.indices.keys():
-                pos = bisect.bisect(self.indices[indx][r[indx]], _id)-1
+                pos = bisect.bisect(self.indices[indx][r[indx]], _id) - 1
                 del self.indices[indx][r[indx]][pos]
                 if not self.indices[indx][r[indx]]:
                     del self.indices[indx][r[indx]]
@@ -367,7 +367,7 @@ class _Base(object):
                     continue
                 _id = record["__id__"]
                 # remove id for the old value
-                old_pos = bisect.bisect(self.indices[indx][record[indx]], _id)-1
+                old_pos = bisect.bisect(self.indices[indx][record[indx]], _id) - 1
                 del self.indices[indx][record[indx]][old_pos]
                 if not self.indices[indx][record[indx]]:
                     del self.indices[indx][record[indx]]

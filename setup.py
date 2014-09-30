@@ -1,17 +1,17 @@
 #!/usr/bin/env python
 import sys
 from setuptools import setup
-from setuptools.command.test import test as TestCommand
+from setuptools.command.test import test as TestCommand  # NOQA
 
 import pydblite
 
 package_dir = {
     'test': 'tests'
-    }
+}
 
 package_data = {
     'docs': ['Makefile', 'sources', 'themes']
-    }
+}
 
 
 class PyTest(TestCommand):

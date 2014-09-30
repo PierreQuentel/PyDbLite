@@ -49,12 +49,12 @@ class TestSQLiteFunctions(unittest.TestCase):
     def test_02_iterate_on_database(self):
         for i, table in enumerate(self.db):
             pass
-        assert len(self.db.keys()) == i+1
+        assert len(self.db.keys()) == i + 1
 
     def test_10_insert_one(self):
         t1 = self.db['table1']
         for i, val in enumerate(vals1):
-            assert t1.insert(*val) == i+1
+            assert t1.insert(*val) == i + 1
             self.db.commit()
 
     def test_11_insert_many(self):
@@ -75,8 +75,8 @@ class TestSQLiteFunctions(unittest.TestCase):
         self.insert_test_data()
         table.insert(vals2)
         table.is_date('birth')
-        for i, v in enumerate(vals1+vals2):
-            rec = table[i+1]
+        for i, v in enumerate(vals1 + vals2):
+            rec = table[i + 1]
             for j, field in enumerate(table.fields):
                 self.assertEqual(rec[field], v[j])
 

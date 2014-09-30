@@ -14,7 +14,7 @@ def to_csv(pdl, out=None, write_field_names=True):
     of the CSV file"""
     import csv
     if out is None:
-        file_name = os.path.splitext(pdl.name)[0]+".csv"
+        file_name = os.path.splitext(pdl.name)[0] + ".csv"
         out = open(file_name, "wb")
     fields = ["__id__", "__version__"] + pdl.fields
     writer = csv.DictWriter(out, fields)
