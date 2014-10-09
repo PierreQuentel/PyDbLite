@@ -29,9 +29,9 @@ except ImportError:
     def to_str(val):  # leaves a Unicode unchanged
         return val
 
-import traceback
-import re
 import datetime
+import re
+import traceback
 
 from .common import ExpressionGroup, Filter
 

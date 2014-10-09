@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 
 import datetime
-import unittest
 import os
 import sys
+import unittest
+
+from pydblite import sqlite
 
 from .common_tests import Generic
-from pydblite import sqlite
 
 if sys.version_info[0] == 3:
     def unicode(s, en):

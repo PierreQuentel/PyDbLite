@@ -6,14 +6,13 @@
 
 version = "3.0"
 
-import os
 import bisect
+import operator
+import os
 import sys
+from itertools import groupby
 
-try:
-    import cPickle as pickle
-except:
-    import pickle
+from .common import Expression, ExpressionGroup, Filter
 
 # compatibility with Python 2.3
 try:
@@ -21,10 +20,10 @@ try:
 except NameError:
     from sets import Set as set  # NOQA
 
-from .common import Expression, ExpressionGroup, Filter
-
-from itertools import groupby
-import operator
+try:
+    import cPickle as pickle
+except:
+    import pickle
 
 
 def _in(a, b):

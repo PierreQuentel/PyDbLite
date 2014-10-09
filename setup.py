@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 import sys
+
 from setuptools import setup
-from setuptools.command.test import test as TestCommand  # NOQA
+from setuptools.command.test import test as command_test
 
 import pydblite
 
@@ -14,14 +15,14 @@ package_data = {
 }
 
 
-class PyTest(TestCommand):
+class PyTest(command_test):
 
     def initialize_options(self):
-        TestCommand.initialize_options(self)
+        command_test.initialize_options(self)
         self.pytest_args = []
 
     def finalize_options(self):
-        TestCommand.finalize_options(self)
+        command_test.finalize_options(self)
         self.test_args = []
         self.test_suite = True
 
@@ -31,10 +32,10 @@ class PyTest(TestCommand):
         sys.exit(errcode)
 
 
-class Tox(TestCommand):
+class Tox(command_test):
 
     def finalize_options(self):
-        TestCommand.finalize_options(self)
+        command_test.finalize_options(self)
         self.test_args = []
         self.test_suite = True
 

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import unittest
 import os
 import sys
+import unittest
 
 from .common_tests import Generic
 
