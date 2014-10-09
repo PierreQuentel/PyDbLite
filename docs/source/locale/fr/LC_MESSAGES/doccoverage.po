@@ -1,0 +1,162 @@
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: PyDbLite 3.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-10-09 23:41+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../../source/doccoverage.rst:2
+msgid "Documentation coverage"
+msgstr ""
+
+#: ../doccoverage/python.txt:2
+msgid "Undocumented Python objects"
+msgstr ""
+
+#: ../doccoverage/python.txt:4
+msgid "pydblite.common"
+msgstr ""
+
+#: ../doccoverage/python.txt:7 ../doccoverage/python.txt:16
+#: ../doccoverage/python.txt:34
+msgid "Functions:"
+msgstr ""
+
+#: ../doccoverage/python.txt:6
+msgid "enum"
+msgstr ""
+
+#: ../doccoverage/python.txt:7
+msgid "is_iterable_but_not_str"
+msgstr ""
+
+#: ../doccoverage/python.txt:11 ../doccoverage/python.txt:25
+#: ../doccoverage/python.txt:54
+msgid "Classes:"
+msgstr ""
+
+#: ../doccoverage/python.txt:10
+msgid "Expression"
+msgstr ""
+
+#: ../doccoverage/python.txt:11
+msgid "ExpressionGroup"
+msgstr ""
+
+#: ../doccoverage/python.txt:14
+msgid "pydblite.pydblite"
+msgstr ""
+
+#: ../doccoverage/python.txt:16
+msgid "like"
+msgstr ""
+
+#: ../doccoverage/python.txt:19 ../doccoverage/python.txt:37
+msgid "Base"
+msgstr ""
+
+#: ../doccoverage/python.txt:20
+msgid "Index -- missing methods:"
+msgstr ""
+
+#: ../doccoverage/python.txt:22
+msgid "keys"
+msgstr ""
+
+#: ../doccoverage/python.txt:23
+msgid "PyDbExpression"
+msgstr ""
+
+#: ../doccoverage/python.txt:24
+msgid "PyDbExpressionGroup"
+msgstr ""
+
+#: ../doccoverage/python.txt:25
+msgid "PyDbFilter"
+msgstr ""
+
+#: ../doccoverage/python.txt:28
+msgid "pydblite.sqlite"
+msgstr ""
+
+#: ../doccoverage/python.txt:30
+msgid "guess_default_fmt"
+msgstr ""
+
+#: ../doccoverage/python.txt:31
+msgid "to_date"
+msgstr ""
+
+#: ../doccoverage/python.txt:32
+msgid "to_datetime"
+msgstr ""
+
+#: ../doccoverage/python.txt:33
+msgid "to_str"
+msgstr ""
+
+#: ../doccoverage/python.txt:34
+msgid "to_time"
+msgstr ""
+
+#: ../doccoverage/python.txt:38
+msgid "CurrentDate"
+msgstr ""
+
+#: ../doccoverage/python.txt:39
+msgid "CurrentTime"
+msgstr ""
+
+#: ../doccoverage/python.txt:40
+msgid "CurrentTimestamp"
+msgstr ""
+
+#: ../doccoverage/python.txt:41
+msgid "Database -- missing methods:"
+msgstr ""
+
+#: ../doccoverage/python.txt:43
+msgid "create"
+msgstr ""
+
+#: ../doccoverage/python.txt:44
+msgid "Table -- missing methods:"
+msgstr ""
+
+#: ../doccoverage/python.txt:46
+msgid "create_index"
+msgstr ""
+
+#: ../doccoverage/python.txt:47
+msgid "delete_index"
+msgstr ""
+
+#: ../doccoverage/python.txt:48
+msgid "drop_field"
+msgstr ""
+
+#: ../doccoverage/python.txt:49
+msgid "filter"
+msgstr ""
+
+#: ../doccoverage/python.txt:50
+msgid "get_group_count"
+msgstr ""
+
+#: ../doccoverage/python.txt:51
+msgid "get_indices"
+msgstr ""
+
+#: ../doccoverage/python.txt:52
+msgid "get_unique_ids"
+msgstr ""
+
+#: ../doccoverage/python.txt:53
+msgid "info"
+msgstr ""

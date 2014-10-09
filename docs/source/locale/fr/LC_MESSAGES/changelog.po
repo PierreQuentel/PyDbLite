@@ -1,0 +1,144 @@
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: PyDbLite 3.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-10-09 23:41+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../../source/changelog.rst:2
+msgid "Changelog"
+msgstr ""
+
+#: ../../source/changelog.rst:5
+msgid "3.0 (2014-09-18)"
+msgstr ""
+
+#: ../../source/changelog.rst:7
+msgid ""
+"pydblite and sqlite are rewritten to use a common :class:`Filter "
+"<pydblite.common.Filter>` object."
+msgstr ""
+
+#: ../../source/changelog.rst:8
+msgid "Tests have been improved and standardised in :ref:`unittests-label`."
+msgstr ""
+
+#: ../../source/changelog.rst:9
+msgid "Updated :ref:`examples-label`."
+msgstr ""
+
+#: ../../source/changelog.rst:10
+msgid ""
+"Renamed module and package names to lower case according to `PEP 8 "
+"<http://legacy.python.org/dev/peps/pep-0008/>`_."
+msgstr ""
+
+#: ../../source/changelog.rst:11
+msgid ""
+"Converted to UNIX line endings and follow `PEP 8 "
+"<http://legacy.python.org/dev/peps/pep-0008/>`_ code style."
+msgstr ""
+
+#: ../../source/changelog.rst:14
+msgid "2.6"
+msgstr ""
+
+#: ../../source/changelog.rst:16
+msgid "if db exists, read field names on instance creation"
+msgstr ""
+
+#: ../../source/changelog.rst:17
+msgid "allow add_field on an instance even if it was not open()"
+msgstr ""
+
+#: ../../source/changelog.rst:18
+msgid ""
+"attribute path is the path of the database in the file system (was called "
+"\"name\" in previous versions)"
+msgstr ""
+
+#: ../../source/changelog.rst:20
+msgid "attribute name is the base name of the database, without the extension"
+msgstr ""
+
+#: ../../source/changelog.rst:21
+msgid "adapt code to run on Python 2 and Python 3"
+msgstr ""
+
+#: ../../source/changelog.rst:24
+msgid "2.5"
+msgstr ""
+
+#: ../../source/changelog.rst:26
+msgid "test is now in folder test"
+msgstr ""
+
+#: ../../source/changelog.rst:27
+msgid "SQLite changes: - many changes to support \"legacy\" SQLite databases"
+msgstr ""
+
+#: ../../source/changelog.rst:30
+msgid "no control on types declared in CREATE TABLE or ALTER TABLE"
+msgstr ""
+
+#: ../../source/changelog.rst:31
+msgid "no control on value types in INSERT or UPDATE"
+msgstr ""
+
+#: ../../source/changelog.rst:32
+msgid "no version number in records"
+msgstr ""
+
+#: ../../source/changelog.rst:34
+msgid "add methods to specify a conversion function for fields after a SELECT"
+msgstr ""
+
+#: ../../source/changelog.rst:35
+msgid "change names to be closer to SQLite names"
+msgstr ""
+
+#: ../../source/changelog.rst:37
+msgid "a class Database to modelise the database"
+msgstr ""
+
+#: ../../source/changelog.rst:38
+msgid "a class Table (not Base) for each table in the database"
+msgstr ""
+
+#: ../../source/changelog.rst:40
+msgid "test is now in folder \"test\""
+msgstr ""
+
+#: ../../source/changelog.rst:43
+msgid "2.4"
+msgstr ""
+
+#: ../../source/changelog.rst:45
+msgid "add BSD Licence"
+msgstr ""
+
+#: ../../source/changelog.rst:46
+msgid "raise exception if unknown fields in insert"
+msgstr ""
+
+#: ../../source/changelog.rst:49
+msgid "2.3"
+msgstr ""
+
+#: ../../source/changelog.rst:51
+msgid "introduce syntax (db('name')>'f') & (db('age') == 30)"
+msgstr ""
+
+#: ../../source/changelog.rst:54
+msgid "2.2"
+msgstr ""
+
+#: ../../source/changelog.rst:56
+msgid "add __contains__"
+msgstr ""

@@ -1,0 +1,228 @@
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: PyDbLite 3.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-10-09 23:41+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../../source/sqliteengine.rst:4
+msgid "SQLite adapter"
+msgstr "Adapteur SQLite"
+
+#: ../../source/sqliteengine.rst:9
+msgid ""
+"The main difference with the pure-Python module is the syntax to identify a "
+"database and a table, and the need to specify field types on base creation"
+msgstr ""
+"La seule différence avec le module en pur Python est la syntaxe pour identifier "
+"une table et la nécessité de spécifier le type des champs quand on crée une base"
+
+#: ../../source/sqliteengine.rst:11
+msgid ""
+"For compliance with SQLite vocabulary, the module defines two classes, "
+":class:`Database <pydblite.sqlite.Database>` and :class:`Table "
+"<pydblite.sqlite.Table>`"
+msgstr ""
+"Pour rester cohérent avec le vocabulaire SQLite, le module définit deux classes, "
+":class:`Database <pydblite.sqlite.Database>` et :class:`Table <pydblite.sqlite.Table>`"
+
+#: ../../source/sqliteengine.rst:14
+msgid "Database"
+msgstr ""
+
+#: ../../source/sqliteengine.rst:16
+msgid ""
+":python:`Database(db_path[,**kw])` : db_path is the database path in the "
+"file system. The keyword arguments are the same as for the method "
+":python:`connect()` of the Python built-in module sqlite3"
+msgstr ""
+
+#: ../../source/sqliteengine.rst:18
+msgid ""
+"Instances of Database are dictionary-like objects, where keys are the table "
+"names and values are instances of the Table class"
+msgstr ""
+
+#: ../../source/sqliteengine.rst:20
+msgid ""
+":python:`db[\"foo\"]` returns the instance of the Table class for table "
+"\"foo\""
+msgstr ""
+
+#: ../../source/sqliteengine.rst:21
+msgid ":python:`db.keys()` returns the table names"
+msgstr ""
+
+#: ../../source/sqliteengine.rst:22
+msgid ":python:`if \"foo\" in db` tests if table \"foo\" exists in the database"
+msgstr ""
+
+#: ../../source/sqliteengine.rst:23
+msgid ":python:`del db[\"foo\"]` drops the table \"foo\""
+msgstr ""
+
+#: ../../source/sqliteengine.rst:25
+msgid "To create a new table"
+msgstr ""
+
+#: ../../source/sqliteengine.rst:31
+msgid ""
+"The fields must be 2-element tuples :python:`(field_name, field_type)` where"
+" field_type is an SQLite field type"
+msgstr ""
+
+#: ../../source/sqliteengine.rst:33 ../../source/sqliteengine.rst:90
+msgid "INTEGER"
+msgstr ""
+
+#: ../../source/sqliteengine.rst:34 ../../source/sqliteengine.rst:92
+msgid "REAL"
+msgstr ""
+
+#: ../../source/sqliteengine.rst:35 ../../source/sqliteengine.rst:86
+msgid "TEXT"
+msgstr ""
+
+#: ../../source/sqliteengine.rst:36 ../../source/sqliteengine.rst:88
+msgid "BLOB"
+msgstr ""
+
+#: ../../source/sqliteengine.rst:42
+msgid ""
+"If other information needs to be provided, put it in the second argument, "
+"using the SQL syntax for SQLite :"
+msgstr ""
+
+#: ../../source/sqliteengine.rst:48
+msgid ""
+"The optional keyword argument :python:`mode` specifies what you want to do "
+"if a table of the same name already exists in the database"
+msgstr ""
+
+#: ../../source/sqliteengine.rst:50
+msgid ":python:`mode=\"open\"` opens the table and ignores the field definition"
+msgstr ""
+
+#: ../../source/sqliteengine.rst:51
+msgid ""
+":python:`mode=\"override\"` erases the existing table and creates a new one "
+"with the field definition"
+msgstr ""
+
+#: ../../source/sqliteengine.rst:52
+msgid ""
+"if :python:`mode` is not specified and the table already exists, an "
+":python:`IOError` is raised"
+msgstr ""
+
+#: ../../source/sqliteengine.rst:55
+msgid "Table"
+msgstr ""
+
+#: ../../source/sqliteengine.rst:57
+msgid ""
+"For record insertion, updating, deletion and selection the syntax is the "
+"same as for the :ref:`pure-Python module <pure-python-engine>`. The SQLite "
+"primary key rowid is used like the key :python:`__id__` to identify records"
+msgstr ""
+
+#: ../../source/sqliteengine.rst:59
+msgid "To insert many records at a time,"
+msgstr ""
+
+#: ../../source/sqliteengine.rst:65
+msgid "will be much faster than"
+msgstr ""
+
+#: ../../source/sqliteengine.rst:72
+msgid ""
+"Note that you can't use the :python:`drop_field()` method, since dropping "
+"fields is not supported by SQLite"
+msgstr ""
+
+#: ../../source/sqliteengine.rst:75
+msgid "Type conversion"
+msgstr ""
+
+#: ../../source/sqliteengine.rst:77
+msgid ""
+"Conversions between Python types and SQLite field types use the behaviour of"
+" the Python SQLite module. :python:`datetime.date` and "
+":python:`datetime.datetime` instances are stored as ISO dates/datetimes"
+msgstr ""
+
+#: ../../source/sqliteengine.rst:79
+msgid ""
+"Selection methods return dictionaries, with SQLite types converted to Python"
+" types like this"
+msgstr ""
+
+#: ../../source/sqliteengine.rst:82
+msgid "SQLite type"
+msgstr ""
+
+#: ../../source/sqliteengine.rst:82
+msgid "Python type"
+msgstr ""
+
+#: ../../source/sqliteengine.rst:84
+msgid "NULL"
+msgstr ""
+
+#: ../../source/sqliteengine.rst:84
+msgid "None"
+msgstr ""
+
+#: ../../source/sqliteengine.rst:86
+msgid "unicode"
+msgstr ""
+
+#: ../../source/sqliteengine.rst:88
+msgid "str"
+msgstr ""
+
+#: ../../source/sqliteengine.rst:90
+msgid "int"
+msgstr ""
+
+#: ../../source/sqliteengine.rst:92
+msgid "float"
+msgstr ""
+
+#: ../../source/sqliteengine.rst:95
+msgid ""
+"If you want fields to be returned as instances of datetime.date, "
+"datetime.time or datetime.datetime instances, you can specify it when "
+"creating or opening the table, using methods :func:`is_date(field_name) "
+"<pydblite.sqlite.Table.is_date>`, :func:`is_time(field_name) "
+"<pydblite.sqlite.Table.is_time>` or :func:`is_datetime(field_name) "
+"<pydblite.sqlite.Table.is_datetime>`."
+msgstr ""
+
+#: ../../source/sqliteengine.rst:104
+msgid "cursor and commit"
+msgstr ""
+
+#: ../../source/sqliteengine.rst:106
+msgid ""
+"Intances of :class:`Database <pydblite.sqlite.Database>` and :class:`Table "
+"<pydblite.sqlite.Table>` have the attribute :attr:`cursor "
+"<pydblite.sqlite.Database.cursor>`, the SQLite connections cursor, so you "
+"can also execute SQL expressions by"
+msgstr ""
+
+#: ../../source/sqliteengine.rst:112
+msgid "and get the result by"
+msgstr ""
+
+#: ../../source/sqliteengine.rst:118
+msgid ""
+"the method :func:`commit() <pydblite.sqlite.Database.commit>` saves the "
+"changes to a database after a transaction"
+msgstr ""

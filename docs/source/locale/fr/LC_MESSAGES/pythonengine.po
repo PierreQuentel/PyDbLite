@@ -1,0 +1,345 @@
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: PyDbLite 3.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-10-09 23:41+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../../source/pythonengine.rst:4
+msgid "Pure-Python engine"
+msgstr "Moteur pur-Python"
+
+#: ../../source/pythonengine.rst:9
+msgid ""
+"The pure-Python engine consists of one module, pydblite.py. To use it, "
+"import the class :class:`Base <pydblite.pydblite._Base>` from this module:"
+msgstr ""
+"Le moteur pur-Python consiste en un module unique, pydblite.py. Pour "
+"l'utiliser, importer la classe :class:`Base <pydblite.pydblite._Base>` "
+"depuis ce module:"
+
+#: ../../source/pythonengine.rst:16
+msgid "Create or open a database"
+msgstr ""
+
+#: ../../source/pythonengine.rst:18
+msgid "Create a database instance, passing it a path in the file system"
+msgstr ""
+"créer une instance de base de données, en donnant un nom de fichier comme "
+"argument"
+
+#: ../../source/pythonengine.rst:24
+msgid "For a new database, define the field names"
+msgstr "Pour une nouvelle base, définissez les noms des champs"
+
+#: ../../source/pythonengine.rst:30
+msgid ""
+"You don't have to define the field types. Any value will be accepted as long"
+" as it can be serialized by the cPickle module:"
+msgstr ""
+"Vous n'avez pas à définir le type des champs. PyDbLite accepte toute valeur "
+"qui peut être sérialisée par le module cPickle"
+
+#: ../../source/pythonengine.rst:32
+msgid "strings"
+msgstr ""
+
+#: ../../source/pythonengine.rst:33
+msgid "Unicode strings"
+msgstr ""
+
+#: ../../source/pythonengine.rst:34
+msgid "integers"
+msgstr ""
+
+#: ../../source/pythonengine.rst:35
+msgid "floats"
+msgstr ""
+
+#: ../../source/pythonengine.rst:36
+msgid ""
+"dates and datetimes (instances of the date and datetime classes in the "
+"datetime module)"
+msgstr ""
+
+#: ../../source/pythonengine.rst:37
+msgid "user-defined classes"
+msgstr ""
+
+#: ../../source/pythonengine.rst:42
+msgid "if the base exists, open it"
+msgstr "si la base existe déjà, pour l'ouvrir"
+
+#: ../../source/pythonengine.rst:49
+msgid ""
+"You can pass a parameter \"mode\" to the :func:`create() "
+"<pydblite.pydblite._Base.create>` method, to specify what you want to do if "
+"the base already exists in the file system"
+msgstr ""
+"on peut passer un paramètre \"mode\" à la méthode :func:`create() <pydblite.pydblite._Base.create>`"
+"pour indiquer ce qu'il faut faire si la base existe déjà sur le disque"
+
+#: ../../source/pythonengine.rst:51
+msgid ""
+"mode = \"open\" : :python:`db.create('name', 'age', 'size', mode=\"open\")` "
+"opens the database and ignores the field definition"
+msgstr ""
+"mode = \"open\" : :python:`db.create('name', 'age', 'size', mode=\"open\")` "
+"ouvre la base en ignorant la définition des champs"
+
+#: ../../source/pythonengine.rst:52
+msgid ""
+"mode = \"override\" : :python:`db.create('name', 'age', 'size', "
+"mode=\"override\")` erases the existing base and creates a new one with the "
+"field definition"
+msgstr ""
+"mode = \"override\" : :python:`db.create('name', 'age', 'size', "
+"mode=\"override\")`  efface la base existante et en crée une nouvelle avec les définitions de champs"
+
+#: ../../source/pythonengine.rst:53
+msgid ""
+"if :python:`mode` is not specified and the base already exists, an "
+":python:`IOError` is raised"
+msgstr ""
+"si le :python:`mode` n'est pas précisé et que la base existe déjà, "
+"une exception :python:`IOError` est déclenchée"
+
+#: ../../source/pythonengine.rst:56
+msgid "Insert, update, delete a record"
+msgstr ""
+
+#: ../../source/pythonengine.rst:59
+msgid "insert a new record"
+msgstr ""
+
+#: ../../source/pythonengine.rst:62
+msgid "by keywords"
+msgstr ""
+
+#: ../../source/pythonengine.rst:68
+msgid "If some fields are missing, they are initialized with the value None"
+msgstr ""
+
+#: ../../source/pythonengine.rst:71
+msgid "by positional arguments"
+msgstr ""
+
+#: ../../source/pythonengine.rst:77
+msgid ""
+"The arguments must be provided in the same order as in the "
+":python:`create()` method"
+msgstr ""
+
+#: ../../source/pythonengine.rst:80
+msgid "save the changes on disk"
+msgstr ""
+
+#: ../../source/pythonengine.rst:86
+msgid ""
+"If you don't commit the changes, the insertion, deletion and update "
+"operations will not be saved on disk. As long as changes are not commited, "
+"use :python:`open()` to restore the values as they are currently on disk "
+"(this is equivalent to rollback in transactional databases)"
+msgstr ""
+
+#: ../../source/pythonengine.rst:89
+msgid "delete a record"
+msgstr ""
+
+#: ../../source/pythonengine.rst:95
+msgid "or, if you know the record identifier"
+msgstr ""
+
+#: ../../source/pythonengine.rst:102
+msgid "to delete a list of records"
+msgstr ""
+
+#: ../../source/pythonengine.rst:108
+msgid ""
+"where list_of_records can be any iterable (list, tuple, set, etc) yielding "
+"records"
+msgstr ""
+
+#: ../../source/pythonengine.rst:111
+msgid "to update a record"
+msgstr ""
+
+#: ../../source/pythonengine.rst:118
+msgid ""
+"besides the fields passed to the :python:`create()` method, an internal "
+"field called :python:`__id__` is added. It is an integer which is guaranteed"
+" to be unique and unchanged for each record in the base, so that it can be "
+"used as the record identifier"
+msgstr ""
+
+#: ../../source/pythonengine.rst:119
+msgid ""
+"another internal field called :python:`__version__` is also managed by the "
+"database engine. It is an integer which is set to 0 when the record is "
+"created, then incremented by 1 each time the record is updated. This is used"
+" to detect concurrency control, for instance in a web application where 2 "
+"users select the same record and want to update it at the same time"
+msgstr ""
+
+#: ../../source/pythonengine.rst:123
+msgid "Selection"
+msgstr ""
+
+#: ../../source/pythonengine.rst:125
+msgid "The instance of Base is a Python iterator"
+msgstr ""
+
+#: ../../source/pythonengine.rst:128
+msgid "to iterate on all the records"
+msgstr ""
+
+#: ../../source/pythonengine.rst:136
+msgid "Direct access"
+msgstr ""
+
+#: ../../source/pythonengine.rst:138
+msgid "A record can be accessed by its identifier"
+msgstr ""
+
+#: ../../source/pythonengine.rst:144
+msgid "returns the record such that :python:`record['__id__'] == rec_id`"
+msgstr ""
+
+#: ../../source/pythonengine.rst:147
+msgid "Simple selections"
+msgstr ""
+
+#: ../../source/pythonengine.rst:149
+msgid ""
+":python:`db(key1=val1, key2=val2)` returns the list of records where the "
+"keys take the given values"
+msgstr ""
+
+#: ../../source/pythonengine.rst:150
+msgid ""
+":python:`db(key) >= val` returns an iterator on all records where the value "
+"of the field key is greater than or equal to val."
+msgstr ""
+
+#: ../../source/pythonengine.rst:152
+msgid "Example"
+msgstr ""
+
+#: ../../source/pythonengine.rst:159
+msgid ""
+"such \"rich comparison\" operations can be combined with & (AND) and | (OR)"
+msgstr ""
+
+#: ../../source/pythonengine.rst:167
+msgid "List comprehension"
+msgstr ""
+
+#: ../../source/pythonengine.rst:169
+msgid "The selection of records can use Python list comprehension syntax"
+msgstr ""
+
+#: ../../source/pythonengine.rst:175
+msgid ""
+"Returns the records in the base where the age is between 18 and 30, and size"
+" is below 2 meters. The record is a dictionary, where the key is the field "
+"name and value is the field value"
+msgstr ""
+
+#: ../../source/pythonengine.rst:177
+msgid "Python generator expression syntax can also be used"
+msgstr ""
+
+#: ../../source/pythonengine.rst:184
+msgid "iterates on the records where the name is one of 'homer' or 'marge'"
+msgstr ""
+
+#: ../../source/pythonengine.rst:187
+msgid "Index"
+msgstr ""
+
+#: ../../source/pythonengine.rst:189
+msgid ""
+"To speed up selections, an index can be created on a field using "
+":func:`create_index('field') <pydblite.pydblite._Base.create_index>`"
+msgstr ""
+
+#: ../../source/pythonengine.rst:195
+msgid ""
+"When an index is created, the database instance has an attribute (here "
+":python:`_age` : note the heading underscore, to avoid name conflicts with "
+"internal names). This attribute is a dictionary-like object, where keys are "
+"the values taken by the field, and values are the records whose field values"
+" are egal to the key :"
+msgstr ""
+
+#: ../../source/pythonengine.rst:197
+msgid ""
+":python:`records = db._age[23]` returns the list of records with "
+":python:`age == 23`"
+msgstr ""
+
+#: ../../source/pythonengine.rst:199
+msgid ""
+"If no record has this value, lookup by this value returns an empty list"
+msgstr ""
+
+#: ../../source/pythonengine.rst:201
+msgid ""
+"The index supports iteration on the field values, and the :python:`keys()` "
+"method returns all existing values for the field"
+msgstr ""
+
+#: ../../source/pythonengine.rst:204
+msgid "Other attributes and methods"
+msgstr ""
+
+#: ../../source/pythonengine.rst:206
+msgid ""
+":func:`add_field('new_field'[,default=v]) "
+"<pydblite.pydblite._Base.add_field>`: adds a new field to an existing base. "
+":python:`default` is an optional default value ; set to :python:`None` if "
+"not specified"
+msgstr ""
+
+#: ../../source/pythonengine.rst:207
+msgid ""
+":func:`drop_field('field') <pydblite.pydblite._Base.drop_field>`: drops an "
+"existing field"
+msgstr ""
+
+#: ../../source/pythonengine.rst:208
+msgid ""
+":attr:`db.path <pydblite.pydblite._Base.path>`: the path of the database in "
+"the file system"
+msgstr ""
+
+#: ../../source/pythonengine.rst:209
+msgid ""
+":attr:`db.name <pydblite.pydblite._Base.name>`: the database name : the "
+"basename of the path, stripped of its extension"
+msgstr ""
+
+#: ../../source/pythonengine.rst:210
+msgid ""
+":attr:`db.fields <pydblite.pydblite._Base.fields>`: the list of the fields "
+"(does not include the internal fields :python:`__id__` and "
+":python:`__version__`)"
+msgstr ""
+
+#: ../../source/pythonengine.rst:211
+msgid ":python:`len(db)` : number of records in the base"
+msgstr ""
+
+#: ../../source/pythonengine.rst:40
+msgid ""
+":func:`db.exists() <pydblite.pydblite._Base.exists>` indicates if the base "
+"exists."
+msgstr ""
+":func:`db.exists() <pydblite.pydblite._Base.exists>` indique si la base existe "
+"exists."

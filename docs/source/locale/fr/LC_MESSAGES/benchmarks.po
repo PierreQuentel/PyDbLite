@@ -1,0 +1,170 @@
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: PyDbLite 3.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-10-09 23:41+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../../source/benchmarks.rst:2
+msgid "Benchmarks"
+msgstr ""
+
+#: ../../source/benchmarks.rst:4
+msgid ""
+"PyDbLite has been measured by the time taken by various operations for 3 "
+"pure-Python database modules (PyDbLite, buzhug and Gadfly) and compared them"
+" with SQLite."
+msgstr ""
+
+#: ../../source/benchmarks.rst:6
+msgid ""
+"The tests are those described on the SQLite comparisons pages, which "
+"compares performance of SQLite to that of MySQL and PostGreSQL"
+msgstr ""
+
+#: ../../source/benchmarks.rst:10
+msgid "insert"
+msgstr ""
+
+#: ../../source/benchmarks.rst:11
+msgid ""
+"create the base and insert n elements (n= 1000, 25,000 or 100,000) in it"
+msgstr ""
+
+#: ../../source/benchmarks.rst:13
+msgid "The database has 3 fields:"
+msgstr ""
+
+#: ../../source/benchmarks.rst:15
+msgid "a (integer, from 1 to n)"
+msgstr ""
+
+#: ../../source/benchmarks.rst:16
+msgid "b (random integer between 1 and 100000)"
+msgstr ""
+
+#: ../../source/benchmarks.rst:17
+msgid "c (a string, value = 'fifty nine' if b=59)"
+msgstr ""
+
+#: ../../source/benchmarks.rst:19
+msgid ""
+"For PyDbLite, gadfly and SQLite two options are possible : with an index on "
+"field a, or without index"
+msgstr ""
+
+#: ../../source/benchmarks.rst:21
+msgid "The values of a, b, c are stored in a list recs"
+msgstr ""
+
+#: ../../source/benchmarks.rst:24 ../../source/benchmarks.rst:80
+#: ../../source/benchmarks.rst:106 ../../source/benchmarks.rst:134
+#: ../../source/benchmarks.rst:155 ../../source/benchmarks.rst:175
+#: ../../source/benchmarks.rst:198
+msgid "SQL statements"
+msgstr ""
+
+#: ../../source/benchmarks.rst:36
+msgid "PyDbLite code"
+msgstr ""
+
+#: ../../source/benchmarks.rst:48 ../../source/benchmarks.rst:90
+#: ../../source/benchmarks.rst:116 ../../source/benchmarks.rst:143
+#: ../../source/benchmarks.rst:164 ../../source/benchmarks.rst:185
+#: ../../source/benchmarks.rst:208
+msgid "buzhug code"
+msgstr ""
+
+#: ../../source/benchmarks.rst:58
+msgid "gadfly code"
+msgstr ""
+
+#: ../../source/benchmarks.rst:76
+msgid "select1"
+msgstr ""
+
+#: ../../source/benchmarks.rst:77
+msgid ""
+"100 selections to count the number of records and the average of field b for"
+" values of b between 10*n and 10*n + 1000 for n = 1 to 100"
+msgstr ""
+
+#: ../../source/benchmarks.rst:102
+msgid "select2"
+msgstr ""
+
+#: ../../source/benchmarks.rst:103
+msgid ""
+"100 selections to count the number of records and the average of field b for"
+" values of c with the string 'one', 'two', ...,'ninety nine' inside. It uses"
+" the keyword LIKE for SQL database (I couldn't do the test for Gadfly which "
+"doesn't support LIKE) ; for buzhug I use regular expressions. The strings "
+"for each number between 0 and 99 are stored in the list num_strings"
+msgstr ""
+
+#: ../../source/benchmarks.rst:129
+msgid "delete1"
+msgstr ""
+
+#: ../../source/benchmarks.rst:130
+msgid ""
+"delete all the records where the field c contains the string 'fifty'. There "
+"again I couldn't do the test for gadfly"
+msgstr ""
+
+#: ../../source/benchmarks.rst:151
+msgid "delete2"
+msgstr ""
+
+#: ../../source/benchmarks.rst:152
+msgid "delete all the records for which the field a is > 10 and < 20000"
+msgstr ""
+
+#: ../../source/benchmarks.rst:171
+msgid "update1"
+msgstr ""
+
+#: ../../source/benchmarks.rst:172
+msgid ""
+"1000 updates, multiply b by 2 for records where 10*n <= a < 10 * (n + 1) for"
+" n = 0 to 999"
+msgstr ""
+
+#: ../../source/benchmarks.rst:194
+msgid "update2"
+msgstr ""
+
+#: ../../source/benchmarks.rst:195
+msgid ""
+"1000 updates to set c to a random value where a = 1 to 1000 New values of "
+"field c are stored in a list new_c"
+msgstr ""
+
+#: ../../source/benchmarks.rst:216
+msgid ""
+"The tests were made on a Windows XP machine, with Python 2.5 (except gadfly "
+": using the compile kjbuckets.pyd requires Python 2.2)"
+msgstr ""
+
+#: ../../source/benchmarks.rst:218
+msgid ""
+"Versions : PyDbLite 2.5, buzhug 1.6, gadfly 1.0.0, SQLite 3.0 embedded in "
+"Python 2.5 Results"
+msgstr ""
+
+#: ../../source/benchmarks.rst:221
+msgid "Here are the results"
+msgstr ""
+
+#: ../../source/benchmarks.rst:273
+msgid ""
+"Conclusions PyDblite is as fast, and even faster than SQLite for small "
+"databases. It is faster than gadfly in all cases. buzhug is faster on most "
+"operations when size grows"
+msgstr ""

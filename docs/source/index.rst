@@ -28,10 +28,6 @@ To install the package, just download it and install it by running
 
    python setup.py install
 
-Compatibillity
-
-Supported systems: Any
-
 Supported Python versions: 2.6, 2.7, 3.3, 3.4
 
 .. toctree::

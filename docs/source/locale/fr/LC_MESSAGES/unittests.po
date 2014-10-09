@@ -1,0 +1,63 @@
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: PyDbLite 3.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-10-09 23:41+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../../source/unittests.rst:4
+msgid "Unit tests"
+msgstr ""
+
+#: ../../source/unittests.rst:6
+msgid "Check the `test coverage <../htmlcoverage/index.html>`_."
+msgstr ""
+
+#: ../../../tests/common_tests.pydocstring of tests.common_tests.Generic:1
+msgid ""
+"Generic class for unit testing :mod:`pydblite.pydblite` and "
+":mod:`pydblite.sqlite`"
+msgstr ""
+
+#: ../../../tests/common_tests.pydocstring of
+#: tests.common_tests.Generic.test_filter_and:1
+msgid "Test AND"
+msgstr ""
+
+#: ../../../tests/common_tests.pydocstring of
+#: tests.common_tests.Generic.test_filter_ilike:1
+msgid "Test text case sensitive"
+msgstr ""
+
+#: ../../../tests/common_tests.pydocstring of
+#: tests.common_tests.Generic.test_filter_in:1
+msgid "Test IN ( == with a list"
+msgstr ""
+
+#: ../../../tests/common_tests.pydocstring of
+#: tests.common_tests.Generic.test_filter_like:1
+msgid "Test text case insensitive"
+msgstr ""
+
+#: ../../../tests/common_tests.pydocstring of
+#: tests.common_tests.Generic.test_filter_or:1
+msgid "Test OR"
+msgstr ""
+
+#: ../../../tests/test_pydblite.pydocstring of
+#: tests.test_pydblite.PyDbLiteTestCase:1
+#: ../../../tests/test_pydblite_sqlite.pydocstring of
+#: tests.test_pydblite_sqlite.SQLiteTestCase:1
+#: ../../../tests/test_pydblite_sqlite.pydocstring of
+#: tests.test_pydblite_sqlite.TestSQLiteFunctions:1
+msgid ""
+"Create an instance of the class that will use the named test method when "
+"executed. Raises a ValueError if the instance does not have a method with "
+"the specified name."
+msgstr ""

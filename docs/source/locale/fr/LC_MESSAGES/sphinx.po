@@ -1,0 +1,79 @@
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: PyDbLite 3.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-10-09 23:41+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../../source/_templates/testing.html:1
+msgid "Tests and Documentation"
+msgstr ""
+
+#: ../../source/_templates/testing.html:4
+#: ../../source/_templates/testing.html:4
+msgid "Unit tests"
+msgstr ""
+
+#: ../../source/_templates/testing.html:5
+#: ../../source/_templates/testing.html:5
+msgid "Unit tests coverage"
+msgstr ""
+
+#: ../../source/_templates/testing.html:6
+#: ../../source/_templates/testing.html:6
+msgid "Benchmarks"
+msgstr ""
+
+#: ../../source/_templates/testing.html:7
+#: ../../source/_templates/testing.html:7
+msgid "Documentation coverage"
+msgstr ""
+
+#: ../../source/_templates/testing.html:8
+#: ../../source/_templates/testing.html:8
+msgid "Documention as PDF"
+msgstr ""
+
+#: ../../source/_templates/contact.html:1
+msgid "Contact"
+msgstr ""
+
+#: ../../source/_templates/contact.html:4
+#: ../../source/_templates/contact.html:4
+msgid "Mailing list"
+msgstr ""
+
+#: ../../source/_templates/contact.html:5
+#: ../../source/_templates/contact.html:5
+msgid "Authors"
+msgstr ""
+
+#: ../../source/_templates/code.html:1
+msgid "Code"
+msgstr ""
+
+#: ../../source/_templates/code.html:4 ../../source/_templates/code.html:4
+msgid "Download"
+msgstr "Téléchargement"
+
+#: ../../source/_templates/code.html:5
+msgid "Browse source"
+msgstr ""
+
+#: ../../source/_templates/code.html:5
+msgid "Browse source on Github"
+msgstr ""
+
+#: ../../source/_templates/code.html:6 ../../source/_templates/code.html:6
+msgid "Changelog"
+msgstr ""
+
+#: ../../source/_templates/code.html:7 ../../source/_templates/code.html:7
+msgid "License"
+msgstr ""

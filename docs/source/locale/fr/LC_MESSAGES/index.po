@@ -1,0 +1,73 @@
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: PyDbLite 3.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-10-09 23:41+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../../source/index.rst:18
+msgid "PyDbLite"
+msgstr "PyDbLite"
+
+#: ../../source/index.rst:22
+msgid ""
+"a fast, :ref:`pure-Python <pure-python-engine>`, untyped, in-memory database"
+" engine, compatible with Python 2.3 and above, using Python syntax to manage"
+" data, instead of SQL"
+msgstr ""
+"un moteur de base de données en mémoire, rapide, non typée, en pur Python, "
+"compatible avec Python 2.3 et au-dessus, qui utilise la syntaxe de Python "
+"pour toutes les opérations de gestion de la base au lieu de SQL. Il consiste"
+" en un petit module, PyDbLite.py"
+
+#: ../../source/index.rst:23
+msgid ""
+"a pythonic interface to SQLite (:ref:`sqlite-adapter`) and MySQL, using the "
+"same syntax as the pure-Python engine for most operations (except database "
+"connection and table creation because of each database specificities)"
+msgstr ""
+"une interface pythonique à SQLite et à MySQL, avec la même syntaxe que le moteur "
+"en pur Python pour la plupart des opérations (à l'exception de la connection à la "
+"base et de la création de tables, à cause des spécificités de ces bases de données) "
+
+#: ../../source/index.rst:25
+msgid "To install the package, just download it and install it by running"
+msgstr "Pour l'installer, il suffit de le télécharger et de l'installer par la commande"
+
+#: ../../source/index.rst:31
+msgid "Compatibillity"
+msgstr ""
+
+#: ../../source/index.rst:33
+msgid "Supported systems: Any"
+msgstr ""
+
+#: ../../source/index.rst:35
+msgid "Supported Python versions: 2.6, 2.7, 3.3, 3.4"
+msgstr ""
+
+#: ../../source/index.rst:58
+msgid "Indices and tables"
+msgstr ""
+
+#: ../../source/index.rst:60
+msgid ":ref:`genindex`"
+msgstr ""
+
+#: ../../source/index.rst:61
+msgid ":ref:`modindex`"
+msgstr ""
+
+#: ../../source/index.rst:62
+msgid ":ref:`search`"
+msgstr ""
+
+#: ../../source/index.rst:20
+msgid "PyDbLite is:"
+msgstr "PyDbLite est:"
