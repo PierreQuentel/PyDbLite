@@ -136,6 +136,16 @@ man:
 	@echo
 	@echo "Build finished. The manual pages are in $(BUILDDIR)/man."
 
+readme:
+	$(SPHINXBUILD) -b rst $(ALLSPHINXOPTS) $(BUILDDIR)/rst source/readme.rst
+	@echo
+	@echo "Build finished. The readme.rst page is in $(BUILDDIR)/rst."
+
+pypi:
+	$(SPHINXBUILD) -b rst $(ALLSPHINXOPTS) $(BUILDDIR)/rst source/pypi_description.rst
+	@echo
+	@echo "Build finished. The readme.rst page is in $(BUILDDIR)/rst."
+
 texinfo:
 	$(SPHINXBUILD) -b texinfo $(ALLSPHINXOPTS) $(BUILDDIR)/texinfo
 	@echo

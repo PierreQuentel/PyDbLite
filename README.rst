@@ -1,21 +1,55 @@
+.. |build-status| image:: https://api.travis-ci.org/bendikro/PyDbLite.svg
+    :target: https://travis-ci.org/bendikro/PyDbLite
+
+.. |docs| image:: https://readthedocs.org/projects/pydblite/badge/?version=latest
+    :target: https://pydblite.readthedocs.org
+    :alt: Documentation Status
+
+.. |pypi| image:: http://img.shields.io/pypi/v/pydblite.png
+    :alt: PYPI Package
+    :target: https://pypi.python.org/pypi/PyDbLite
+
 PyDbLite
 =============
 
-PyDbLite is an in-memory database management library, with selection
-by list comprehension or generator expression
+PyDbLite is
 
-One can choose between native python or SQLite backend.
+* a fast, pure-Python, untyped, in-memory database engine, using
+  Python syntax to manage data, instead of SQL
+* a pythonic interface to SQLite using the same syntax as the
+  pure-Python engine for most operations (except database connection
+  and table creation because of each database specificities)
 
-Authors:
-     - Pierre Quentel (pierre.quentel@gmail.com)
-     - Bendik Rønning Opstad (bro.devlopment@gmail.com)
-
-Read the documentation: |docs|
+Supported Python versions: 2.6+
 
 Build status: |build-status|
 
+Latest Pypi release: |pypi|
 
-Changelog: `docs/source/changelog.rst <docs/source/changelog.rst>`_
+Read the documentation: |docs|
+
+Installation
+---------------
+
+PIP
+~~~~~~~~~
+
+.. code-block:: bash
+
+    pip install pydblite
+
+Manually
+~~~~~~~~~
+
+Download the source and execute
+
+.. code-block:: bash
+
+    python setup.py install
+
+Changelog
+---------------
+`docs/source/changelog.rst <docs/source/changelog.rst>`_
 
 Tests
 ---------------
@@ -42,9 +76,6 @@ Run tests for python 2.7 and 3.4, pep8 verification and documentation with
 
     tox
 
-.. |build-status| image:: https://api.travis-ci.org/bendikro/PyDbLite.svg
-    :target: https://travis-ci.org/bendikro/PyDbLite
-
-.. |docs| image:: https://readthedocs.org/projects/pydblite/badge/?version=latest
-    :target: https://readthedocs.org/projects/pydblite/?badge=latest
-    :alt: Documentation Status
+Authors:
+  * Pierre Quentel (pierre.quentel@gmail.com)
+  * Bendik Rønning Opstad (bro.development@gmail.com)

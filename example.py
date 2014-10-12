@@ -1,4 +1,9 @@
 #!/usr/bin/env python
+#
+# BSD licence
+#
+# Author : Pierre Quentel (pierre.quentel@gmail.com)
+#
 
 
 def sqlite():

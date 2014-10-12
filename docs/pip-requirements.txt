@@ -1,4 +1,5 @@
 # Requirements file for readthedocs.org
 sphinxcontrib-inlinesyntaxhighlight
 sphinxcontrib-fulltoc
+sphinxcontrib-restbuilder
 cloud_sptheme

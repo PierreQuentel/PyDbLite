@@ -44,6 +44,7 @@ extensions = [
     'cloud_sptheme.ext.index_styling',
     'cloud_sptheme.ext.relbar_toc',
     'sphinx.ext.coverage',
+    'sphinxcontrib.restbuilder',
 ]
 
 inline_highlight_respect_highlight = True
@@ -317,3 +318,46 @@ texinfo_documents = [
 
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 # texinfo_no_detailmenu = False
+
+import sphinxcontrib.writers.rst
+from sphinxcontrib.writers.rst import RstTranslator
+from docutils import nodes
+
+
+class RstTranslator2(sphinxcontrib.writers.rst.RstTranslator):
+
+    def __init__(self, document, builder):
+        RstTranslator.__init__(self, document, builder)
+
+    def visit_raw(self, node):
+        if 'rst' in node.get('format', '').split():
+            self.new_state(0)
+            self.add_text(node.astext())
+            self.end_state(wrap=False)
+        raise nodes.SkipNode
+
+    def visit_reference(self, node):
+
+        if 'refuri' not in node:
+            pass  # Don't add these anchors
+        elif 'internal' not in node:
+            pass  # Don't add external links (they are automatically added by the reST spec)
+        elif 'reftitle' in node:
+            # Include node as text, rather than with markup.
+            # reST seems unable to parse a construct like ` ``literal`` <url>`_
+            # Hence we revert to the more simple `literal <url>`_
+            if node.astext() == "Filter":
+                self.add_text('%s' % (node.astext()))
+            else:
+                RstTranslator.visit_reference(self, node)
+            # self.end_state(wrap=False)
+            raise nodes.SkipNode
+        else:
+            if node.astext() == "Unit tests":
+                node['refuri'] = "http://pydblite.readthedocs.org/en/latest/unittests.html"
+            elif node.astext() == "Example code":
+                node['refuri'] = "http://pydblite.readthedocs.org/en/latest/examples.html"
+            RstTranslator.visit_reference(self, node)
+            raise nodes.SkipNode
+
+sphinxcontrib.writers.rst.RstTranslator = RstTranslator2

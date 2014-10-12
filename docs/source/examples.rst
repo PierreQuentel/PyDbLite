@@ -8,7 +8,7 @@ Pure Python
 
 .. literalinclude:: ../../example.py
    :language: python
-   :lines: 1,2,41-89,90,91,93
+   :lines: 1,48-99,100,102
 
 
 SQLite
@@ -16,4 +16,4 @@ SQLite
 
 .. literalinclude:: ../../example.py
    :language: python
-   :lines: 1-40,91-92
+   :lines: 1,8-47,100-101

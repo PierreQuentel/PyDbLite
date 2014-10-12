@@ -14,12 +14,6 @@ from itertools import groupby
 
 from .common import Expression, ExpressionGroup, Filter
 
-# compatibility with Python 2.3
-try:
-    set([])
-except NameError:
-    from sets import Set as set  # NOQA
-
 try:
     import cPickle as pickle
 except:

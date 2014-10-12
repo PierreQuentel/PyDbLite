@@ -176,7 +176,7 @@ class Generic(object):
         self.status.append({"unique_id": 6, "active": False, "name": "Test6"})
         self.status.append({"unique_id": 7, "active": False, "name": "Test7"})
         res = self.filter_db.insert(self.status)
-        self.assertEqual(res, None)
+        self.assertTrue(res is None or res == 7)  # Depends on the database driver...
 
     def test_filter_len(self):
         self.setup_db_for_filter()
