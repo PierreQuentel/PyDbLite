@@ -48,7 +48,8 @@ help:
 	@echo "  doccoverage    to generate doc coverage"
 	@echo "  update-fr-po   to update the french translated po files"
 	@echo "  html-fr        to build html with french translation"
-
+	@echo "  readme         to create the readme.rst file"
+	@echo "  pypi           to create the pypi_description.rst file"
 
 clean:
 	rm -rf $(BUILDDIR)/*
