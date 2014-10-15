@@ -42,40 +42,50 @@ msgid ""
 "file system. The keyword arguments are the same as for the method "
 ":python:`connect()` of the Python built-in module sqlite3"
 msgstr ""
+":python:`Database(db_path[,**kw])` : db_path est le chemin de la base de "
+"données dans le système de fichiers. Les arguments par mots-clés sont les "
+"mêmes que pour la méthode :python:`connect()` du module Python pour SQLite"
 
 #: ../../source/sqliteengine.rst:18
 msgid ""
 "Instances of Database are dictionary-like objects, where keys are the table "
-"names and values are instances of the Table class"
+"names and values are instances of the :class:`Table <pydblite.sqlite.Table>` class"
 msgstr ""
+"Les instances de Database sont des objets similaires à des dictionnaires, où "
+"les clés sont les noms des tables et les valeurs sont des instances de la classe "
+":class:`Table <pydblite.sqlite.Table>`"
 
 #: ../../source/sqliteengine.rst:20
 msgid ""
 ":python:`db[\"foo\"]` returns the instance of the Table class for table "
 "\"foo\""
 msgstr ""
+":python:`db[\"foo\"]` renvoie l'instance de la classe Table pour la table"
+"\"foo\""
 
 #: ../../source/sqliteengine.rst:21
 msgid ":python:`db.keys()` returns the table names"
-msgstr ""
+msgstr ":python:`db.keys()` renvoie les noms de tables"
 
 #: ../../source/sqliteengine.rst:22
 msgid ":python:`if \"foo\" in db` tests if table \"foo\" exists in the database"
-msgstr ""
+msgstr ":python:`if \"foo\" in db` teste si la table \"foo\" existe dans la base de données"
 
 #: ../../source/sqliteengine.rst:23
 msgid ":python:`del db[\"foo\"]` drops the table \"foo\""
-msgstr ""
+msgstr ":python:`del db[\"foo\"]` supprime la table \"foo\""
 
 #: ../../source/sqliteengine.rst:25
 msgid "To create a new table"
-msgstr ""
+msgstr "Pour créer une nouvelle table"
 
 #: ../../source/sqliteengine.rst:31
 msgid ""
 "The fields must be 2-element tuples :python:`(field_name, field_type)` where"
 " field_type is an SQLite field type"
 msgstr ""
+"Les champs doivent être des tuples à 2 éléments (nom_champ, type_champ) où "
+"type_champ est un type de champ SQLite"
 
 #: ../../source/sqliteengine.rst:33 ../../source/sqliteengine.rst:90
 msgid "INTEGER"
@@ -96,30 +106,38 @@ msgstr ""
 #: ../../source/sqliteengine.rst:42
 msgid ""
 "If other information needs to be provided, put it in the second argument, "
-"using the SQL syntax for SQLite :"
+"using the SQL syntax for SQLite"
 msgstr ""
+"S'il faut fournir d'autres informations, les mettre dans le deuxième "
+"argument, avec la syntaxe SQL propre à SQLite"
 
 #: ../../source/sqliteengine.rst:48
 msgid ""
 "The optional keyword argument :python:`mode` specifies what you want to do "
 "if a table of the same name already exists in the database"
 msgstr ""
+"Le mot-clé optionnel :python:`mode` spécifie ce qu'il faut faire si une "
+"table du même nom existe déjà"
 
 #: ../../source/sqliteengine.rst:50
 msgid ":python:`mode=\"open\"` opens the table and ignores the field definition"
-msgstr ""
+msgstr ":python:`mode=\"open\"` ouvre la table et ignore les définitions de champs"
 
 #: ../../source/sqliteengine.rst:51
 msgid ""
 ":python:`mode=\"override\"` erases the existing table and creates a new one "
 "with the field definition"
 msgstr ""
+":python:`mode=\"override\"` efface la table existante et en crée une nouvelle "
+"avec les définitions de champs"
 
 #: ../../source/sqliteengine.rst:52
 msgid ""
 "if :python:`mode` is not specified and the table already exists, an "
 ":python:`IOError` is raised"
 msgstr ""
+"si :python:`mode` n'est pas spécifié et que la table existe déjà, une "
+"exception :python:`IOError` est déclenchée"
 
 #: ../../source/sqliteengine.rst:55
 msgid "Table"
@@ -131,20 +149,24 @@ msgid ""
 "same as for the :ref:`pure-Python module <pure-python-engine>`. The SQLite "
 "primary key rowid is used like the key :python:`__id__` to identify records"
 msgstr ""
+"Pour l'insertion, la sélection, la mise à jour et la suppression, la syntaxe "
+"est la même que pour le :ref:`module en pur Python <pure-python-engine>`."
 
 #: ../../source/sqliteengine.rst:59
 msgid "To insert many records at a time,"
-msgstr ""
+msgstr "Pour insérer de nombreux enregistrements en une seule fois,"
 
 #: ../../source/sqliteengine.rst:65
 msgid "will be much faster than"
-msgstr ""
+msgstr "sera beaucoup plus rapide que"
 
 #: ../../source/sqliteengine.rst:72
 msgid ""
 "Note that you can't use the :python:`drop_field()` method, since dropping "
 "fields is not supported by SQLite"
 msgstr ""
+"La seule différence est qu'on ne peut pas utiliser la méthode :python:`drop_field()`, "
+"parce que la suppression de champs n'est pas supportée par SQLite"
 
 #: ../../source/sqliteengine.rst:75
 msgid "Type conversion"
@@ -153,15 +175,21 @@ msgstr ""
 #: ../../source/sqliteengine.rst:77
 msgid ""
 "Conversions between Python types and SQLite field types use the behaviour of"
-" the Python SQLite module. :python:`datetime.date` and "
+" the Python SQLite module. :python:`datetime.date`, :python:`datetime.time` and "
 ":python:`datetime.datetime` instances are stored as ISO dates/datetimes"
 msgstr ""
+"Si vous voulez que des champs soient renvoyés comme instances de "
+":python:`datetime.date`, :python:`datetime.time` ou :python:`datetime.datetime`, "
+"vous devez le spécifier quand vous créez ou ouvrez la table, en utilisant les "
+"méthodes is_date(nom_champ), is_time(nom_champ) ou is_datetime(nom_champ)"
 
 #: ../../source/sqliteengine.rst:79
 msgid ""
 "Selection methods return dictionaries, with SQLite types converted to Python"
 " types like this"
 msgstr ""
+"Les méthodes de sélection renvoient des dictionnaires, dans lesquels les types "
+"SQLite sont convertis en types Python de cette façon"
 
 #: ../../source/sqliteengine.rst:82
 msgid "SQLite type"
@@ -204,25 +232,37 @@ msgid ""
 "<pydblite.sqlite.Table.is_time>` or :func:`is_datetime(field_name) "
 "<pydblite.sqlite.Table.is_datetime>`."
 msgstr ""
+"Si vous voulez que des champs soient renvoyés comme instances de datetime.date, "
+"datetime.time ou datetime.datetime, vous devez le spécifier quand vous créez ou "
+"ouvrez la table, en utilisant les méthodes :func:`is_date(field_name) "
+"<pydblite.sqlite.Table.is_date>`, :func:`is_time(field_name) "
+"<pydblite.sqlite.Table.is_time>` ou :func:`is_datetime(field_name) "
+"<pydblite.sqlite.Table.is_datetime>`."
 
 #: ../../source/sqliteengine.rst:104
 msgid "cursor and commit"
-msgstr ""
+msgstr "cursor et commit"
 
 #: ../../source/sqliteengine.rst:106
 msgid ""
-"Intances of :class:`Database <pydblite.sqlite.Database>` and :class:`Table "
+"Instances of :class:`Database <pydblite.sqlite.Database>` and :class:`Table "
 "<pydblite.sqlite.Table>` have the attribute :attr:`cursor "
 "<pydblite.sqlite.Database.cursor>`, the SQLite connections cursor, so you "
 "can also execute SQL expressions by"
 msgstr ""
+"Les intances de :class:`Database <pydblite.sqlite.Database>` et :class:`Table "
+"<pydblite.sqlite.Table>` ont toutes l'attribut :attr:`cursor "
+"<pydblite.sqlite.Database.cursor>`, le curseur de la connection SQLite. "
+"On peut donc exécuter des expressions SQL par"
 
 #: ../../source/sqliteengine.rst:112
 msgid "and get the result by"
-msgstr ""
+msgstr "et récupérer les résultats par"
 
 #: ../../source/sqliteengine.rst:118
 msgid ""
 "the method :func:`commit() <pydblite.sqlite.Database.commit>` saves the "
 "changes to a database after a transaction"
 msgstr ""
+"la méthode :func:`commit() <pydblite.sqlite.Database.commit>` pour "
+"confirmer les changements à la base de données en fin de transaction"

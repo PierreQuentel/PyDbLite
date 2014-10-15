@@ -15,7 +15,7 @@ Database
 
 :python:`Database(db_path[,**kw])` : db_path is the database path in the file system. The keyword arguments are the same as for the method :python:`connect()` of the Python built-in module sqlite3
 
-Instances of Database are dictionary-like objects, where keys are the table names and values are instances of the Table class
+Instances of Database are dictionary-like objects, where keys are the table names and values are instances of the :class:`Table <pydblite.sqlite.Table>` class
 
 - :python:`db["foo"]` returns the instance of the Table class for table "foo"
 - :python:`db.keys()` returns the table names
@@ -39,7 +39,7 @@ The fields must be 2-element tuples :python:`(field_name, field_type)` where fie
 
     db.create('test', ('name', 'TEXT'), ('age', 'INTEGER'), ('size', 'REAL'))
 
-If other information needs to be provided, put it in the second argument, using the SQL syntax for SQLite :
+If other information needs to be provided, put it in the second argument, using the SQL syntax for SQLite
 
 .. code-block:: python
 
@@ -74,7 +74,7 @@ Note that you can't use the :python:`drop_field()` method, since dropping fields
 Type conversion
 ~~~~~~~~~~~~~~~~~~~
 
-Conversions between Python types and SQLite field types use the behaviour of the Python SQLite module. :python:`datetime.date` and :python:`datetime.datetime` instances are stored as ISO dates/datetimes
+Conversions between Python types and SQLite field types use the behaviour of the Python SQLite module. :python:`datetime.date`, :python:`datetime.time` and :python:`datetime.datetime` instances are stored as ISO dates/datetimes
 
 Selection methods return dictionaries, with SQLite types converted to Python types like this
 
@@ -103,7 +103,7 @@ If you want fields to be returned as instances of datetime.date, datetime.time o
 cursor and commit
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Intances of :class:`Database <pydblite.sqlite.Database>` and :class:`Table <pydblite.sqlite.Table>` have the attribute :attr:`cursor <pydblite.sqlite.Database.cursor>`, the SQLite connections cursor, so you can also execute SQL expressions by
+Instances of :class:`Database <pydblite.sqlite.Database>` and :class:`Table <pydblite.sqlite.Table>` have the attribute :attr:`cursor <pydblite.sqlite.Database.cursor>`, the SQLite connections cursor, so you can also execute SQL expressions by
 
 .. code-block:: python
 

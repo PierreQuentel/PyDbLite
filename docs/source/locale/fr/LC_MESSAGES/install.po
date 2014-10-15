@@ -1,0 +1,28 @@
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: PyDbLite 3.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-10-15 01:22+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../../source/install.rst:2
+msgid "Installation"
+msgstr ""
+
+#: ../../source/install.rst:5
+msgid "PIP"
+msgstr ""
+
+#: ../../source/install.rst:12
+msgid "Manually"
+msgstr ""
+
+#: ../../source/install.rst:14
+msgid "Download the source and execute"
+msgstr ""

@@ -46,23 +46,34 @@ msgstr ""
 msgid "Create a new base with specified field names."
 msgstr ""
 
+#: ../../../pydblite/pydblite.pydocstring of pydblite.pydblite._Base.create:5
+#: ../../../pydblite/pydblite.pydocstring of
+#: pydblite.pydblite._Base.create_index:11
+#: ../../../pydblite/pydblite.pydocstring of pydblite.pydblite._Base.delete:7
+#: ../../../pydblite/pydblite.pydocstring of pydblite.pydblite._Base.insert:9
+#: ../../../pydblite/pydblite.pydocstring of pydblite.pydblite._Base.update:4
+#: ../../../pydblite/sqlite.pydocstring of pydblite.sqlite.Database:6
 #: ../../../pydblite/sqlite.pydocstring of pydblite.sqlite.Table:1
+#: ../../../pydblite/sqlite.pydocstring of pydblite.sqlite.Table.__call__:7
+#: ../../../pydblite/sqlite.pydocstring of pydblite.sqlite.Table.__init__:1
+#: ../../../pydblite/sqlite.pydocstring of pydblite.sqlite.Table.add_field:5
+#: ../../../pydblite/sqlite.pydocstring of pydblite.sqlite.Table.create:17
 msgid "Args:"
 msgstr ""
 
 #: ../../../pydblite/pydblite.pydocstring of pydblite.pydblite._Base.create:7
-#: ../../../pydblite/sqlite.pydocstring of pydblite.sqlite.Table.create:14
+#: ../../../pydblite/sqlite.pydocstring of pydblite.sqlite.Table.create:15
 msgid "if mode = 'open' : open the existing base, ignore the fields"
 msgstr ""
 
 #: ../../../pydblite/pydblite.pydocstring of pydblite.pydblite._Base.create:8
-#: ../../../pydblite/sqlite.pydocstring of pydblite.sqlite.Table.create:15
+#: ../../../pydblite/sqlite.pydocstring of pydblite.sqlite.Table.create:16
 msgid ""
 "if mode = 'override' : erase the existing base and create a new one with the"
 " specified fields"
 msgstr ""
 
-#: ../../../pydblite/pydblite.pydocstring of pydblite.pydblite._Base.create:11
+#: ../../../pydblite/pydblite.pydocstring of pydblite.pydblite._Base.create:12
 msgid "Returns the database (self)."
 msgstr ""
 
@@ -96,7 +107,7 @@ msgid ""
 " twice the same __id__"
 msgstr ""
 
-#: ../../../pydblite/pydblite.pydocstring of pydblite.pydblite._Base.delete:9
+#: ../../../pydblite/pydblite.pydocstring of pydblite.pydblite._Base.delete:10
 msgid "Return the number of deleted items"
 msgstr ""
 
@@ -110,7 +121,7 @@ msgstr ""
 msgid "Removes a field from the database"
 msgstr ""
 
-#: ../../../pydblite/pydblite.pydocstring of pydblite.pydblite._Base.exists:1
+#: ../../../pydblite/pydblite.pydocstring of pydblite.pydblite._Base.exists:2
 msgid "bool: if the database file exists"
 msgstr ""
 
@@ -146,7 +157,7 @@ msgid ""
 "missing the value is set to None"
 msgstr ""
 
-#: ../../../pydblite/pydblite.pydocstring of pydblite.pydblite._Base.insert:11
+#: ../../../pydblite/pydblite.pydocstring of pydblite.pydblite._Base.insert:12
 msgid "Returns the record identifier if inserting one item, else None."
 msgstr ""
 
@@ -222,10 +233,12 @@ msgid "The SQLite connections cursor"
 msgstr ""
 
 #: ../../../pydblite/sqlite.pydocstring of pydblite.sqlite.Table:3
+#: ../../../pydblite/sqlite.pydocstring of pydblite.sqlite.Table.__init__:3
 msgid "table_name (str): The name of the SQLite table."
 msgstr ""
 
 #: ../../../pydblite/sqlite.pydocstring of pydblite.sqlite.Table:4
+#: ../../../pydblite/sqlite.pydocstring of pydblite.sqlite.Table.__init__:4
 msgid "db (:class:`Database <pydblite.sqlite.Database>`): The database."
 msgstr ""
 
@@ -233,29 +246,23 @@ msgstr ""
 msgid "Selection by field values."
 msgstr ""
 
-#: ../../../pydblite/pydblite.pydocstring of
-#: pydblite.pydblite._Base.__call__:3 ../../../pydblite/sqlite.pydocstring of
-#: pydblite.sqlite.Table.__call__:3
+#: ../../../pydblite/sqlite.pydocstring of pydblite.sqlite.Table.__call__:3
 msgid "db(key=value) returns the list of records where r[key] = value"
 msgstr ""
 
-#: ../../../pydblite/sqlite.pydocstring of pydblite.sqlite.Table.__call__:9
+#: ../../../pydblite/sqlite.pydocstring of pydblite.sqlite.Table.__call__:10
 msgid ""
 "When args supplied, return a :class:`Filter <pydblite.common.Filter>` object"
 " that filters on the specified field."
 msgstr ""
 
-#: ../../../pydblite/pydblite.pydocstring of
-#: pydblite.pydblite._Base.__call__:11 ../../../pydblite/sqlite.pydocstring of
-#: pydblite.sqlite.Table.__call__:11
+#: ../../../pydblite/sqlite.pydocstring of pydblite.sqlite.Table.__call__:12
 msgid ""
 "When kw supplied, return all the records where field values matches the "
 "key/values in kw."
 msgstr ""
 
-#: ../../../pydblite/pydblite.pydocstring of
-#: pydblite.pydblite._Base.__delitem__:1 ../../../pydblite/sqlite.pydocstring
-#: of pydblite.sqlite.Table.__delitem__:1
+#: ../../../pydblite/sqlite.pydocstring of pydblite.sqlite.Table.__delitem__:1
 msgid "Delete by record id"
 msgstr ""
 
@@ -281,22 +288,22 @@ msgstr ""
 msgid "Create a new table."
 msgstr ""
 
-#: ../../../pydblite/sqlite.pydocstring of pydblite.sqlite.Table.create:6
+#: ../../../pydblite/sqlite.pydocstring of pydblite.sqlite.Table.create:7
 msgid "the field name"
 msgstr ""
 
-#: ../../../pydblite/sqlite.pydocstring of pydblite.sqlite.Table.create:7
+#: ../../../pydblite/sqlite.pydocstring of pydblite.sqlite.Table.create:8
 msgid ""
 "a string with additional information like field type + other information "
 "using the SQLite syntax eg  ('name', 'TEXT NOT NULL'), ('date', 'BLOB "
 "DEFAULT CURRENT_DATE')"
 msgstr ""
 
-#: ../../../pydblite/sqlite.pydocstring of pydblite.sqlite.Table.create:12
+#: ../../../pydblite/sqlite.pydocstring of pydblite.sqlite.Table.create:13
 msgid "mode is only used if a database file already exists."
 msgstr ""
 
-#: ../../../pydblite/sqlite.pydocstring of pydblite.sqlite.Table.create:19
+#: ../../../pydblite/sqlite.pydocstring of pydblite.sqlite.Table.create:20
 msgid "the database (self)."
 msgstr ""
 
@@ -310,7 +317,7 @@ msgid ""
 " twice the same __id__."
 msgstr ""
 
-#: ../../../pydblite/sqlite.pydocstring of pydblite.sqlite.Table.delete:6
+#: ../../../pydblite/sqlite.pydocstring of pydblite.sqlite.Table.delete:7
 msgid "int: the number of deleted items"
 msgstr ""
 
@@ -325,7 +332,7 @@ msgid ""
 "are missing the value is set to None."
 msgstr ""
 
-#: ../../../pydblite/sqlite.pydocstring of pydblite.sqlite.Table.insert:7
+#: ../../../pydblite/sqlite.pydocstring of pydblite.sqlite.Table.insert:8
 msgid "The record identifier"
 msgstr ""
 
@@ -418,122 +425,81 @@ msgstr ""
 msgid "Perform LIKE operation"
 msgstr ""
 
-#: ../../../pydblite/pydblite.pydocstring of
-#: pydblite.pydblite.Index.__getitem__:1
-msgid ""
-"Lookup by key : return the list of records where field value is equal to "
-"this key, or an empty list"
+#: ../../../pydblite/pydblite.pydocstring of pydblite.pydblite._Base.create:4
+msgid "\\*fields (str): The field names to create."
 msgstr ""
 
-#: ../../../pydblite/pydblite.pydocstring of
-#: pydblite.pydblite._Base.__call__:1
-msgid "Selection by field values"
-msgstr ""
-
-#: ../../../pydblite/pydblite.pydocstring of
-#: pydblite.pydblite._Base.__call__:9
-msgid ""
-"- When args supplied, return a Filter object that filters on   the specified"
-" field. - When kw supplied, return all the records where field values "
-"matches the   key/values in kw."
-msgstr ""
-
-#: ../../../pydblite/pydblite.pydocstring of
-#: pydblite.pydblite._Base.__call__:9
-msgid ""
-"When args supplied, return a Filter object that filters on the specified "
-"field."
+#: ../../../pydblite/pydblite.pydocstring of pydblite.pydblite._Base.create:5
+msgid "mode (str): the mode used when creating the database."
 msgstr ""
 
 #: ../../../pydblite/pydblite.pydocstring of pydblite.pydblite._Base.create:11
-msgid "- Returns the database (self)."
-msgstr ""
-
 #: ../../../pydblite/pydblite.pydocstring of pydblite.pydblite._Base.delete:9
-msgid "- Return the number of deleted items"
-msgstr ""
-
 #: ../../../pydblite/pydblite.pydocstring of pydblite.pydblite._Base.exists:1
-msgid "- bool: if the database file exists"
-msgstr ""
-
 #: ../../../pydblite/pydblite.pydocstring of pydblite.pydblite._Base.insert:11
-msgid "- Returns the record identifier if inserting one item, else None."
+#: ../../../pydblite/sqlite.pydocstring of pydblite.sqlite.Table.__call__:12
+#: ../../../pydblite/sqlite.pydocstring of pydblite.sqlite.Table.create:19
+#: ../../../pydblite/sqlite.pydocstring of pydblite.sqlite.Table.delete:6
+#: ../../../pydblite/sqlite.pydocstring of pydblite.sqlite.Table.insert:7
+msgid "Returns:"
 msgstr ""
 
-#: ../../../pydblite/sqlite.pydocstring of pydblite.sqlite.Table.__call__:9
+#: ../../../pydblite/pydblite.pydocstring of
+#: pydblite.pydblite._Base.create_index:12
+msgid "fields (list): the fields to index"
+msgstr ""
+
+#: ../../../pydblite/pydblite.pydocstring of pydblite.pydblite._Base.delete:7
+msgid "remove (record or list of records): The record(s) to delete."
+msgstr ""
+
+#: ../../../pydblite/pydblite.pydocstring of pydblite.pydblite._Base.insert:8
 msgid ""
-"- When args supplied, return a :class:`Filter <pydblite.common.Filter>`   "
-"object that filters on the specified field. - When kw supplied, return all "
-"the records where field values matches   the key/values in kw."
+"args (the values to insert, or a list of values): The record(s) to delete."
+msgstr ""
+
+#: ../../../pydblite/pydblite.pydocstring of pydblite.pydblite._Base.insert:9
+msgid "kw (dict): The field/values to insert"
+msgstr ""
+
+#: ../../../pydblite/pydblite.pydocstring of pydblite.pydblite._Base.update:5
+msgid "records (record or list of records): The record(s) to update."
+msgstr ""
+
+#: ../../../pydblite/sqlite.pydocstring of pydblite.sqlite.Database:4
+msgid "filename (str): The name of the database file, or ':memory:'"
+msgstr ""
+
+#: ../../../pydblite/sqlite.pydocstring of pydblite.sqlite.Database:5
+msgid "kw (dict): Arguments forwarded to sqlite3.connect"
+msgstr ""
+
+#: ../../../pydblite/sqlite.pydocstring of pydblite.sqlite.Table.__call__:6
+msgid "args (list): A field to filter on."
+msgstr ""
+
+#: ../../../pydblite/sqlite.pydocstring of pydblite.sqlite.Table.__call__:7
+msgid "kw (dict): pairs of field and value to filter on."
+msgstr ""
+
+#: ../../../pydblite/sqlite.pydocstring of pydblite.sqlite.Table.add_field:4
+msgid "name (string): The name of the field"
+msgstr ""
+
+#: ../../../pydblite/sqlite.pydocstring of pydblite.sqlite.Table.add_field:5
+msgid "column_type (string): The data type of the column (Defaults to TEXT)"
+msgstr ""
+
+#: ../../../pydblite/sqlite.pydocstring of pydblite.sqlite.Table.add_field:6
+msgid "default (datatype): The default value for this field (if any)"
 msgstr ""
 
 #: ../../../pydblite/sqlite.pydocstring of pydblite.sqlite.Table.create:4
-msgid "For each field, a 2-element tuple must be provided:"
+msgid ""
+"fields (list of tuples): The fields names/types to create. For each field, a"
+" 2-element tuple must be provided:"
 msgstr ""
 
-#: ../../../pydblite/sqlite.pydocstring of pydblite.sqlite.Table.create:19
-msgid "- the database (self)."
+#: ../../../pydblite/sqlite.pydocstring of pydblite.sqlite.Table.create:13
+msgid "mode (str): The mode used when creating the database."
 msgstr ""
-
-#: ../../../pydblite/sqlite.pydocstring of pydblite.sqlite.Table.delete:6
-msgid "- int: the number of deleted items"
-msgstr ""
-
-#: ../../../pydblite/sqlite.pydocstring of pydblite.sqlite.Table.insert:7
-msgid "- The record identifier"
-msgstr ""
-
-#~ msgid "\\*fields (str): The field names to create."
-#~ msgstr ""
-
-#~ msgid "mode (str): the mode used when creating the database."
-#~ msgstr ""
-
-#~ msgid "Returns:"
-#~ msgstr ""
-
-#~ msgid "fields (list): the fields to index"
-#~ msgstr ""
-
-#~ msgid "remove (record or list of records): The record(s) to delete."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "args (the values to insert, or a list of values): The record(s) to delete."
-#~ msgstr ""
-
-#~ msgid "kw (dict): The field/values to insert"
-#~ msgstr ""
-
-#~ msgid "records (record or list of records): The record(s) to update."
-#~ msgstr ""
-
-#~ msgid "filename (str): The name of the database file, or ':memory:'"
-#~ msgstr ""
-
-#~ msgid "kw (dict): Arguments forwarded to sqlite3.connect"
-#~ msgstr ""
-
-#~ msgid "args (list): A field to filter on."
-#~ msgstr ""
-
-#~ msgid "kw (dict): pairs of field and value to filter on."
-#~ msgstr ""
-
-#~ msgid "name (string): The name of the field"
-#~ msgstr ""
-
-#~ msgid "column_type (string): The data type of the column (Defaults to TEXT)"
-#~ msgstr ""
-
-#~ msgid "default (datatype): The default value for this field (if any)"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "fields (list of tuples): The fields names/types to create. For each field, a"
-#~ " 2-element tuple must be provided:"
-#~ msgstr ""
-
-#~ msgid "mode (str): The mode used when creating the database."
-#~ msgstr ""

@@ -15,148 +15,110 @@ msgstr ""
 msgid "Documentation coverage"
 msgstr ""
 
-#: ../doccoverage/python.txt:2
-msgid "Undocumented Python objects"
-msgstr ""
+#~ msgid "Undocumented Python objects"
+#~ msgstr ""
 
-#: ../doccoverage/python.txt:4
-msgid "pydblite.common"
-msgstr ""
+#~ msgid "pydblite.common"
+#~ msgstr ""
 
-#: ../doccoverage/python.txt:7 ../doccoverage/python.txt:16
-#: ../doccoverage/python.txt:34
-msgid "Functions:"
-msgstr ""
+#~ msgid "Functions:"
+#~ msgstr ""
 
-#: ../doccoverage/python.txt:6
-msgid "enum"
-msgstr ""
+#~ msgid "enum"
+#~ msgstr ""
 
-#: ../doccoverage/python.txt:7
-msgid "is_iterable_but_not_str"
-msgstr ""
+#~ msgid "is_iterable_but_not_str"
+#~ msgstr ""
 
-#: ../doccoverage/python.txt:11 ../doccoverage/python.txt:25
-#: ../doccoverage/python.txt:54
-msgid "Classes:"
-msgstr ""
+#~ msgid "Classes:"
+#~ msgstr ""
 
-#: ../doccoverage/python.txt:10
-msgid "Expression"
-msgstr ""
+#~ msgid "Expression"
+#~ msgstr ""
 
-#: ../doccoverage/python.txt:11
-msgid "ExpressionGroup"
-msgstr ""
+#~ msgid "ExpressionGroup"
+#~ msgstr ""
 
-#: ../doccoverage/python.txt:14
-msgid "pydblite.pydblite"
-msgstr ""
+#~ msgid "pydblite.pydblite"
+#~ msgstr ""
 
-#: ../doccoverage/python.txt:16
-msgid "like"
-msgstr ""
+#~ msgid "like"
+#~ msgstr ""
 
-#: ../doccoverage/python.txt:19 ../doccoverage/python.txt:37
-msgid "Base"
-msgstr ""
+#~ msgid "Base"
+#~ msgstr ""
 
-#: ../doccoverage/python.txt:20
-msgid "Index -- missing methods:"
-msgstr ""
+#~ msgid "Index -- missing methods:"
+#~ msgstr ""
 
-#: ../doccoverage/python.txt:22
-msgid "keys"
-msgstr ""
+#~ msgid "keys"
+#~ msgstr ""
 
-#: ../doccoverage/python.txt:23
-msgid "PyDbExpression"
-msgstr ""
+#~ msgid "PyDbExpression"
+#~ msgstr ""
 
-#: ../doccoverage/python.txt:24
-msgid "PyDbExpressionGroup"
-msgstr ""
+#~ msgid "PyDbExpressionGroup"
+#~ msgstr ""
 
-#: ../doccoverage/python.txt:25
-msgid "PyDbFilter"
-msgstr ""
+#~ msgid "PyDbFilter"
+#~ msgstr ""
 
-#: ../doccoverage/python.txt:28
-msgid "pydblite.sqlite"
-msgstr ""
+#~ msgid "pydblite.sqlite"
+#~ msgstr ""
 
-#: ../doccoverage/python.txt:30
-msgid "guess_default_fmt"
-msgstr ""
+#~ msgid "guess_default_fmt"
+#~ msgstr ""
 
-#: ../doccoverage/python.txt:31
-msgid "to_date"
-msgstr ""
+#~ msgid "to_date"
+#~ msgstr ""
 
-#: ../doccoverage/python.txt:32
-msgid "to_datetime"
-msgstr ""
+#~ msgid "to_datetime"
+#~ msgstr ""
 
-#: ../doccoverage/python.txt:33
-msgid "to_str"
-msgstr ""
+#~ msgid "to_str"
+#~ msgstr ""
 
-#: ../doccoverage/python.txt:34
-msgid "to_time"
-msgstr ""
+#~ msgid "to_time"
+#~ msgstr ""
 
-#: ../doccoverage/python.txt:38
-msgid "CurrentDate"
-msgstr ""
+#~ msgid "CurrentDate"
+#~ msgstr ""
 
-#: ../doccoverage/python.txt:39
-msgid "CurrentTime"
-msgstr ""
+#~ msgid "CurrentTime"
+#~ msgstr ""
 
-#: ../doccoverage/python.txt:40
-msgid "CurrentTimestamp"
-msgstr ""
+#~ msgid "CurrentTimestamp"
+#~ msgstr ""
 
-#: ../doccoverage/python.txt:41
-msgid "Database -- missing methods:"
-msgstr ""
+#~ msgid "Database -- missing methods:"
+#~ msgstr ""
 
-#: ../doccoverage/python.txt:43
-msgid "create"
-msgstr ""
+#~ msgid "create"
+#~ msgstr ""
 
-#: ../doccoverage/python.txt:44
-msgid "Table -- missing methods:"
-msgstr ""
+#~ msgid "Table -- missing methods:"
+#~ msgstr ""
 
-#: ../doccoverage/python.txt:46
-msgid "create_index"
-msgstr ""
+#~ msgid "create_index"
+#~ msgstr ""
 
-#: ../doccoverage/python.txt:47
-msgid "delete_index"
-msgstr ""
+#~ msgid "delete_index"
+#~ msgstr ""
 
-#: ../doccoverage/python.txt:48
-msgid "drop_field"
-msgstr ""
+#~ msgid "drop_field"
+#~ msgstr ""
 
-#: ../doccoverage/python.txt:49
-msgid "filter"
-msgstr ""
+#~ msgid "filter"
+#~ msgstr ""
 
-#: ../doccoverage/python.txt:50
-msgid "get_group_count"
-msgstr ""
+#~ msgid "get_group_count"
+#~ msgstr ""
 
-#: ../doccoverage/python.txt:51
-msgid "get_indices"
-msgstr ""
+#~ msgid "get_indices"
+#~ msgstr ""
 
-#: ../doccoverage/python.txt:52
-msgid "get_unique_ids"
-msgstr ""
+#~ msgid "get_unique_ids"
+#~ msgstr ""
 
-#: ../doccoverage/python.txt:53
-msgid "info"
-msgstr ""
+#~ msgid "info"
+#~ msgstr ""

@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PyDbLite 3.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-09 23:41+0200\n"
+"POT-Creation-Date: 2014-10-15 01:22+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -31,6 +31,14 @@ msgstr ""
 
 #: ../../source/changelog.rst:9
 msgid "Updated :ref:`examples-label`."
+msgstr ""
+
+#: ../../source/changelog.rst:10
+msgid "Renamed module and package names to lower case according to :PEP:`8`"
+msgstr ""
+
+#: ../../source/changelog.rst:11
+msgid "Converted to UNIX line endings and follow :PEP:`8` code style."
 msgstr ""
 
 #: ../../source/changelog.rst:14
@@ -63,6 +71,18 @@ msgstr ""
 msgid "2.5"
 msgstr ""
 
+#: ../../source/changelog.rst:26
+msgid "test is now in folder \"test\""
+msgstr ""
+
+#: ../../source/changelog.rst:27
+msgid "SQLite changes:"
+msgstr ""
+
+#: ../../source/changelog.rst:29
+msgid "many changes to support \"legacy\" SQLite databases"
+msgstr ""
+
 #: ../../source/changelog.rst:31
 msgid "no control on types declared in CREATE TABLE or ALTER TABLE"
 msgstr ""
@@ -91,10 +111,6 @@ msgstr ""
 msgid "a class Table (not Base) for each table in the database"
 msgstr ""
 
-#: ../../source/changelog.rst:26
-msgid "test is now in folder \"test\""
-msgstr ""
-
 #: ../../source/changelog.rst:42
 msgid "2.4"
 msgstr ""
@@ -121,20 +137,4 @@ msgstr ""
 
 #: ../../source/changelog.rst:55
 msgid "add __contains__"
-msgstr ""
-
-#: ../../source/changelog.rst:10
-msgid "Renamed module and package names to lower case according to :PEP:`8`"
-msgstr ""
-
-#: ../../source/changelog.rst:11
-msgid "Converted to UNIX line endings and follow :PEP:`8` code style."
-msgstr ""
-
-#: ../../source/changelog.rst:27
-msgid "SQLite changes:"
-msgstr ""
-
-#: ../../source/changelog.rst:29
-msgid "many changes to support \"legacy\" SQLite databases"
 msgstr ""

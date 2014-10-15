@@ -1,0 +1,35 @@
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: PyDbLite 3.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-10-15 01:22+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../../source/tests.rst:2
+msgid "Tests"
+msgstr ""
+
+#: ../../source/tests.rst:4
+msgid "Run tests with"
+msgstr ""
+
+#: ../../source/tests.rst:10
+msgid "Run individual tests like this:"
+msgstr ""
+
+#: ../../source/tests.rst:18
+msgid ""
+"The tests will not pass for Python 3.0-3.2 due to the unicode literal being "
+"invalid syntax"
+msgstr ""
+
+#: ../../source/tests.rst:20
+msgid ""
+"Run tests for python 2.7 and 3.4, pep8 verification and documentation with"
+msgstr ""

@@ -1,0 +1,43 @@
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: PyDbLite 3.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-10-15 01:22+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../../source/long_description.rst:2
+msgid "PyDbLite"
+msgstr ""
+
+#: ../../source/long_description.rst:4
+msgid "PyDbLite is"
+msgstr ""
+
+#: ../../source/long_description.rst:6
+msgid ""
+"a fast, pure-Python, untyped, in-memory database engine, using Python syntax"
+" to manage data, instead of SQL"
+msgstr ""
+
+#: ../../source/long_description.rst:8
+msgid ""
+"a pythonic interface to SQLite using the same syntax as the pure-Python "
+"engine for most operations (except database connection and table creation "
+"because of each database specificities)"
+msgstr ""
+
+#: ../../source/long_description.rst:12
+msgid ""
+"PyDbLite is suitable for a small set of data where a fully fledged DB would "
+"be overkill."
+msgstr ""
+
+#: ../../source/long_description.rst:14
+msgid "Supported Python versions: 2.6+"
+msgstr ""

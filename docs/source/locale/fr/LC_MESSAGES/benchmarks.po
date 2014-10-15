@@ -13,7 +13,7 @@ msgstr ""
 
 #: ../../source/benchmarks.rst:2
 msgid "Benchmarks"
-msgstr ""
+msgstr "Comparaisons"
 
 #: ../../source/benchmarks.rst:4
 msgid ""
