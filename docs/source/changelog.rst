@@ -4,11 +4,14 @@ Changelog
 3.0 (2014-09-18)
 --------------------------
 
+Note: Some changes in this release are not backwards compatible with 2.X versions.
+
 - pydblite and sqlite are rewritten to use a common :class:`Filter <pydblite.common.Filter>` object.
 - Tests have been improved and standardised in :ref:`unittests-label`.
 - Updated :ref:`examples-label`.
 - Renamed module and package names to lower case according to :PEP:`8`
 - Converted to UNIX line endings and follow :PEP:`8` code style.
+- MySQL adapter has been dropped until it can be tested with unit tests.
 
 2.6
 --------------------------
