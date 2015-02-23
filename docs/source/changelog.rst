@@ -1,6 +1,12 @@
 Changelog
 ====================
 
+3.0.1 (2015-02-23)
+--------------------------
+
+- Fixed bug in :class:`Base <pydblite.pydblite._Base>` where opening
+  existing database would fail.
+
 3.0 (2014-09-18)
 --------------------------
 

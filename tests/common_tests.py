@@ -166,7 +166,7 @@ class Generic(object):
         self.assertEqual(self.filter_db(name='non-existent'), [])
         self.assertEqual(len(self.filter_db), 0)
 
-    def setup_db_for_filter(self):
+    def reset_status_values_for_filter(self):
         self.status = []
         self.status.append({"unique_id": 1, "active": True, "name": "Test0"})
         self.status.append({"unique_id": 2, "active": True, "name": "Test0"})
@@ -175,6 +175,9 @@ class Generic(object):
         self.status.append({"unique_id": 5, "active": False, "name": "Test4"})
         self.status.append({"unique_id": 6, "active": False, "name": "Test6"})
         self.status.append({"unique_id": 7, "active": False, "name": "Test7"})
+
+    def setup_db_for_filter(self):
+        self.reset_status_values_for_filter()
         res = self.filter_db.insert(self.status)
         self.assertTrue(res is None or res == 7)  # Depends on the database driver...
 

@@ -4,8 +4,6 @@
 # Author : Pierre Quentel (pierre.quentel@gmail.com)
 #
 
-version = "3.0"
-
 import bisect
 import operator
 import os
@@ -18,6 +16,8 @@ try:
     import cPickle as pickle
 except:
     import pickle
+
+version = "3.0.1"
 
 
 def _in(a, b):
@@ -103,7 +103,8 @@ class Index(object):
 
 class _Base(object):
 
-    def __init__(self, path, protocol=pickle.HIGHEST_PROTOCOL, save_to_file=True):
+    def __init__(self, path, protocol=pickle.HIGHEST_PROTOCOL, save_to_file=True,
+                 sqlite_compat=False):
         """protocol as defined in pickle / pickle.
         Defaults to the highest protocol available.
         For maximum compatibility use protocol = 0
@@ -114,9 +115,11 @@ class _Base(object):
         self.name = os.path.splitext(os.path.basename(path))[0]
         """The basename of the path, stripped of its extension"""
         self.protocol = protocol
-        if path is ":memory:":
+        self.mode = None
+        if path == ":memory:":
             save_to_file = False
         self.save_to_file = save_to_file
+        self.sqlite_compat = sqlite_compat
         self.fields = []
         """The list of the fields (does not include the internal
         fields __id__ and __version__)"""
@@ -133,7 +136,7 @@ class _Base(object):
         Returns:
             - bool: if the database file exists
         """
-        return os.path.exists(self.path)
+        return os.path.isfile(self.path)
 
     def create(self, *fields, **kw):
         """
@@ -151,7 +154,7 @@ class _Base(object):
             - Returns the database (self).
         """
         self.mode = mode = kw.get("mode", None)
-        if os.path.exists(self.path):
+        if self.save_to_file and os.path.exists(self.path):
             if not os.path.isfile(self.path):
                 raise IOError("%s exists and is not a file" % self.path)
             elif mode is None:
@@ -160,16 +163,21 @@ class _Base(object):
                 return self.open()
             elif mode == "override":
                 os.remove(self.path)
+            else:
+                raise ValueError("Invalid value given for 'open': '%s'" % open)
 
         self.fields = []
-        self.field_values = {}
+        self.default_values = {}
         for field in fields:
             if type(field) is dict:
                 self.fields.append(field["name"])
-                self.field_values[field["name"]] = field.get("default", None)
+                self.default_values[field["name"]] = field.get("default", None)
+            elif type(field) is tuple:
+                self.fields.append(field[0])
+                self.default_values[field[0]] = field[1]
             else:
                 self.fields.append(field)
-                self.field_values[field] = None
+                self.default_values[field] = None
 
         self.records = {}
         self.next_id = 0
@@ -230,6 +238,11 @@ class _Base(object):
         self.next_id = pickle.load(_in)
         self.records = pickle.load(_in)
         self.indices = pickle.load(_in)
+        try:
+            # If loading an old database, the default values do not exist
+            self.default_values = pickle.load(_in)
+        except EOFError:
+            self.default_values = {}
         for f in self.indices.keys():
             setattr(self, '_' + f, Index(self, f))
         _in.close()
@@ -238,13 +251,14 @@ class _Base(object):
 
     def commit(self):
         """Write the database to a file"""
-        if not self.save_to_file:
+        if self.save_to_file is False:
             return
         out = open(self.path, 'wb')
         pickle.dump(self.fields, out, self.protocol)
         pickle.dump(self.next_id, out, self.protocol)
         pickle.dump(self.records, out, self.protocol)
         pickle.dump(self.indices, out, self.protocol)
+        pickle.dump(self.default_values, out, self.protocol)
         out.close()
 
     def insert(self, *args, **kw):
@@ -256,25 +270,26 @@ class _Base(object):
         If some of the fields are missing the value is set to None
 
         Args:
-            - args (the values to insert, or a list of values): The record(s) to delete.
+            - args (values, or a list/tuple of values): The record(s) to insert.
             - kw (dict): The field/values to insert
 
         Returns:
             - Returns the record identifier if inserting one item, else None.
         """
+        if not self.mode:
+            raise RuntimeError("Database columns have not been setup!")
         if args:
-            if isinstance(args[0], (list, tuple)):
-                inserted = []
+            if self.sqlite_compat and isinstance(args[0], (list, tuple)):
                 for e in args[0]:
                     if type(e) is dict:
-                        inserted.append(self.insert(**e))
+                        self.insert(**e)
                     else:
-                        inserted.append(self.insert(*e))
+                        self.insert(*e)
                 return None
             kw = dict([(f, arg) for f, arg in zip(self.fields, args)])
-        # initialize all fields to None
+        # initialize all fields to the default values
         import copy
-        record = copy.deepcopy(self.field_values)
+        record = copy.deepcopy(self.default_values)
         # raise exception if unknown field
         for key in kw:
             if key not in self.fields:
@@ -381,7 +396,7 @@ class _Base(object):
         for r in self:
             r[field] = default
         self.fields.append(field)
-        self.field_values[field] = default
+        self.default_values[field] = default
         self.commit()
 
     def drop_field(self, field):

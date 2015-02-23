@@ -236,13 +236,15 @@ class Table(object):
             - the database (self).
         """
         self.mode = mode = kw.get("mode", None)
+
         if self._table_exists():
             if mode == "override":
                 self.cursor.execute("DROP TABLE %s" % self.name)
             elif mode == "open":
                 return self.open()
             else:
-                raise IOError("Base %s already exists" % self.name)
+                raise IOError("Base '%s' already exists" % self.name)
+
         sql = "CREATE TABLE %s (" % self.name
         for field in fields:
             sql += self._validate_field(field) + ','
@@ -320,7 +322,6 @@ class Table(object):
 
         Parameters can be positional or keyword arguments. If positional
         they must be in the same order as in the :func:`create` method.
-        If some of the fields are missing the value is set to None.
 
         Returns:
             - The record identifier
@@ -513,7 +514,8 @@ class Table(object):
         msg = "Exception for table %s.%s\n" % (self.db, self.name)
         msg += 'SQL request %s\n' % sql
         if args:
-            msg += 'Arguments : %s\n' % args
+            import pprint
+            msg += 'Arguments : %s\n' % pprint.saferepr(args)
         out = io.StringIO()
         traceback.print_exc(file=out)
         msg += out.getvalue()

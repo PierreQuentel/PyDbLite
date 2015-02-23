@@ -13,6 +13,7 @@ if sys.version_info[0] == 3:
     def unicode(s, en):
         return s
 
+test_db_name = 'test_database_sqlite'
 
 vals1 = [('simon', datetime.date(1984, 8, 17), 26)]
 vals2 = [('camille', datetime.date(1986, 12, 12), 24),
@@ -92,14 +93,43 @@ class SQLiteTestCase(Generic, unittest.TestCase):
 
     def setUp(self):  # NOQA
         self.first_record_id = 1
-        from pydblite.sqlite import Table, Database
-        db = Database(":memory:")
-        filter_db = Table('test_database', db)
+        db = sqlite.Database(":memory:")
+        filter_db = sqlite.Table('test_database', db)
         filter_db.create(('unique_id', 'INTEGER'), ('name', 'TEXT'), ('active', 'INTEGER'))
         self.filter_db = filter_db
 
     def tearDown(self):  # NOQA
-        pass
+        if os.path.isfile(test_db_name):
+            os.remove(test_db_name)
+
+    def test_open_existing(self):
+        db = sqlite.Database(test_db_name)
+        filter_db = sqlite.Table('test_table', db)
+        filter_db.create(('unique_id', 'INTEGER'), ('name', 'TEXT'), ('active', 'INTEGER'))
+        filter_db.insert("123", "N", True)
+        filter_db.commit()
+
+        db = sqlite.Database(test_db_name)
+        filter_db = sqlite.Table('test_table', db)
+
+        # May not create a new db file when it already exists on disk
+        self.assertRaises(IOError, filter_db.create,
+                          ('unique_id', 'INTEGER'), ('name', 'TEXT'), ('active', 'INTEGER'))
+
+        db = sqlite.Database(test_db_name)
+        filter_db = sqlite.Table('test_table', db)
+
+        # Will open existing database and skip creating a new table with the specified columns
+        filter_db.create(('unique_id', 'INTEGER'), ('name', 'TEXT'), ('active', 'INTEGER'),
+                         mode="open")
+        records = filter_db(unique_id="123")
+        self.assertEqual(records[0], {'active': 1, '__id__': 1, 'unique_id': 123, 'name': u'N'})
+
+        # Overwrites existing db
+        filter_db.create(('unique_id', 'INTEGER'), ('name', 'TEXT'), ('active', 'INTEGER'),
+                         mode="override")
+        records = filter_db(unique_id="123")
+        self.assertEqual(records, [])
 
 
 if __name__ == "__main__":
