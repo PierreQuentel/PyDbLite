@@ -9,7 +9,6 @@ from setuptools.command.test import test as command_test
 
 import pydblite
 
-
 package_data = {
     'tests': ["test_pydblite.py", "*.py"],
 }
