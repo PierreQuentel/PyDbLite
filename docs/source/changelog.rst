@@ -1,14 +1,14 @@
 Changelog
-====================
+---------------
 
 3.0.1 (2015-02-23)
---------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 - Fixed bug in :class:`Base <pydblite.pydblite._Base>` where opening
   existing database would fail.
 
 3.0 (2014-09-18)
---------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 Note: Some changes in this release are not backwards compatible with 2.X versions.
 
@@ -20,7 +20,7 @@ Note: Some changes in this release are not backwards compatible with 2.X version
 - MySQL adapter has been dropped until it can be tested with unit tests.
 
 2.6
---------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 - if db exists, read field names on instance creation
 - allow add_field on an instance even if it was not open()
@@ -30,7 +30,7 @@ Note: Some changes in this release are not backwards compatible with 2.X version
 - adapt code to run on Python 2 and Python 3
 
 2.5
---------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 - test is now in folder "test"
 - SQLite changes:
@@ -48,17 +48,17 @@ Note: Some changes in this release are not backwards compatible with 2.X version
     - a class Table (not Base) for each table in the database
 
 2.4
---------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 - add BSD Licence
 - raise exception if unknown fields in insert
 
 2.3
---------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 - introduce syntax (db('name')>'f') & (db('age') == 30)
 
 2.2
---------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 - add __contains__
