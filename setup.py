@@ -9,12 +9,9 @@ from setuptools.command.test import test as command_test
 
 import pydblite
 
-package_dir = {
-    'test': 'tests'
-}
 
 package_data = {
-    'docs': ['Makefile', 'sources', 'themes']
+    'tests': ["test_pydblite.py", "*.py"],
 }
 
 
@@ -88,9 +85,7 @@ setup(name='PyDbLite',
       license="BSD",
       platforms=["Platform-independent, runs with Python2.6+"],
       keywords="Python database engine SQLite",
-      packages=['pydblite', 'tests'],
-      # package_dir=package_dir,
-      # package_data=package_data,
+      packages=['pydblite'],
       cmdclass={'test': PyTest, 'register': RegisterCommand},
       tests_require=['pytest'],
       # tests_require=['tox'],
