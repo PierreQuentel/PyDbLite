@@ -31,6 +31,11 @@ class PyDbLiteTestCase(Generic, unittest.TestCase):
             res = self.filter_db.insert(**d)
         self.assertEquals(res, 6)
 
+    def test_open(self):
+        db = Base('dummy', save_to_file=False)
+        db.create('name', 'age', 'size')
+        db.insert(name='homer', age=23, size=1.84)
+
     def test_open_file_with_existing_dir(self):
         os.mkdir(test_db_name)
         db = Base(test_db_name, save_to_file=True)

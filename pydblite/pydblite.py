@@ -1,7 +1,10 @@
+# -*- coding: utf-8 -*-
 #
 # BSD licence
 #
-# Author : Pierre Quentel (pierre.quentel@gmail.com)
+# Copyright (c) <2008-2011> Pierre Quentel (pierre.quentel@gmail.com)
+# Copyright (c) <2014-2015> Bendik Rønning Opstad <bro.devel@gmail.com>.
+#
 #
 
 import bisect
@@ -17,7 +20,7 @@ try:
 except:
     import pickle
 
-version = "3.0.1"
+version = "3.0.2"
 
 
 def _in(a, b):
@@ -146,22 +149,23 @@ class _Base(object):
             - \*fields (str): The field names to create.
             - mode (str): the mode used when creating the database.
 
+        - if mode = 'create' : create a new base (the default value)
         - if mode = 'open' : open the existing base, ignore the fields
         - if mode = 'override' : erase the existing base and create a
           new one with the specified fields
 
         Returns:
-            - Returns the database (self).
+            - the database (self).
         """
-        self.mode = mode = kw.get("mode", None)
+        self.mode = kw.get("mode", 'create')
         if self.save_to_file and os.path.exists(self.path):
             if not os.path.isfile(self.path):
                 raise IOError("%s exists and is not a file" % self.path)
-            elif mode is None:
+            elif self.mode is 'create':
                 raise IOError("Base %s already exists" % self.path)
-            elif mode == "open":
+            elif self.mode == "open":
                 return self.open()
-            elif mode == "override":
+            elif self.mode == "override":
                 os.remove(self.path)
             else:
                 raise ValueError("Invalid value given for 'open': '%s'" % open)

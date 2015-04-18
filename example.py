@@ -1,8 +1,10 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 #
 # BSD licence
 #
-# Author : Pierre Quentel (pierre.quentel@gmail.com)
+# Copyright (c) <2008-2011> Pierre Quentel (pierre.quentel@gmail.com)
+# Copyright (c) <2014-2015> Bendik Rønning Opstad <bro.devel@gmail.com>.
 #
 
 

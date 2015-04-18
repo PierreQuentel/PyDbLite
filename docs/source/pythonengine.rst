@@ -10,7 +10,7 @@ The pure-Python engine consists of one module, pydblite.py. To use it, import th
 
 .. code-block:: python
 
-    from pydblite.pydblite import Base
+    from pydblite import Base
 
 Create or open a database
 ----------------------------------------

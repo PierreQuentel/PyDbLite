@@ -1,9 +1,10 @@
+# -*- coding: utf-8 -*-
 #
 # BSD licence
 #
-# Author : Pierre Quentel (pierre.quentel@gmail.com)
+# Copyright (c) <2008-2011> Pierre Quentel (pierre.quentel@gmail.com)
+# Copyright (c) <2014-2015> Bendik Rønning Opstad <bro.devel@gmail.com>.
 #
-
 
 """
 Main differences from :mod:`pydblite.pydblite`:
@@ -13,7 +14,7 @@ Main differences from :mod:`pydblite.pydblite`:
 - in :func:`create() <pydblite.sqlite.Table.create>` field definitions must specify a type.
 - no `drop_field` (not supported by SQLite)
 - the :class:`Table <pydblite.sqlite.Table>` instance has a
-  :attr:`cursor <pydblite.sqlite.Database.cursor>` attribute, so that raw SQL requests can
+  :attr:`cursor <pydblite.sqlite.Database.Table.cursor>` attribute, so that raw SQL requests can
   be executed.
 """
 

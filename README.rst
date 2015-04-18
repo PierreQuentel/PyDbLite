@@ -1,4 +1,4 @@
-.. |build-status| image:: https://api.travis-ci.org/bendikro/PyDbLite.svg
+.. |build-status| image:: https://api.travis-ci.org/bendikro/PyDbLite.svg?branch=master
     :target: https://travis-ci.org/bendikro/PyDbLite
 
 .. |docs| image:: https://readthedocs.org/projects/pydblite/badge/?version=latest
@@ -80,4 +80,4 @@ Run tests for python 2.7 and 3.4, pep8 verification and documentation with
 
 Authors:
   * Pierre Quentel (pierre.quentel@gmail.com)
-  * Bendik Rønning Opstad (bro.development@gmail.com)
+  * Bendik Rønning Opstad (bro.devel@gmail.com)

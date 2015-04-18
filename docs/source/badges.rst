@@ -1,4 +1,4 @@
-.. |build-status| image:: https://api.travis-ci.org/bendikro/PyDbLite.svg
+.. |build-status| image:: https://api.travis-ci.org/bendikro/PyDbLite.svg?branch=master
     :target: https://travis-ci.org/bendikro/PyDbLite
 
 .. |docs| image:: https://readthedocs.org/projects/pydblite/badge/?version=latest

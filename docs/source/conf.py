@@ -98,7 +98,8 @@ gettext_compact = False     # optional.
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = []
+exclude_patterns = ['long_description.rst', "description.rst", "pypi_description.rst",
+                    "install.rst", "tests.rst", "readme.rst", "badges.rst"]
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents.
@@ -322,6 +323,16 @@ texinfo_documents = [
 
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 # texinfo_no_detailmenu = False
+
+# Monkey patch sphinx to ignore the warning "nonlocal image URI found"
+import sphinx.environment
+from docutils.utils import get_source_line
+
+def _warn_node(self, msg, node):
+    if not msg.startswith('nonlocal image URI found:'):
+        self._warnfunc(msg, '%s:%s' % get_source_line(node))
+
+sphinx.environment.BuildEnvironment.warn_node = _warn_node
 
 import sphinxcontrib.writers.rst
 from sphinxcontrib.writers.rst import RstTranslator
