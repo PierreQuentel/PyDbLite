@@ -2,4 +2,5 @@
 sphinxcontrib-inlinesyntaxhighlight
 sphinxcontrib-fulltoc
 sphinxcontrib-restbuilder
+sphinxcontrib-issuetracker
 cloud_sptheme

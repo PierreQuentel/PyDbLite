@@ -4,7 +4,7 @@ Changelog
 3.0.2 (2015-04-18)
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-- Fixed bug in :class:`Base <pydblite.pydblite._Base>` where calling
+- Fixed bug (#1) in :class:`Base <pydblite.pydblite._Base>` where calling
   :func:`db.create() <pydblite.pydblite._Base.create>` without supplying
   a value for the "mode" parameter with give an error.
 
