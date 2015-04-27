@@ -104,7 +104,7 @@ gettext_compact = False     # optional.
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = ['long_description.rst', "description.rst", "pypi_description.rst",
+exclude_patterns = ['long_description.rst', "description.rst",
                     "install.rst", "tests.rst", "readme.rst", "badges.rst"]
 
 # The reST default role (used for this markup: `text`) to use for all
@@ -345,7 +345,7 @@ from sphinxcontrib.writers.rst import RstTranslator
 from docutils import nodes
 
 
-class RstTranslator2(sphinxcontrib.writers.rst.RstTranslator):
+class RstTranslator2(RstTranslator):
 
     def __init__(self, document, builder):
         RstTranslator.__init__(self, document, builder)

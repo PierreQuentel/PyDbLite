@@ -145,7 +145,7 @@ readme:
 pypi:
 	$(SPHINXBUILD) -b rst $(ALLSPHINXOPTS) $(BUILDDIR)/rst source/pypi_description.rst
 	@echo
-	@echo "Build finished. The readme.rst page is in $(BUILDDIR)/rst."
+	@echo "Build finished. The pypi_description.rst page is in $(BUILDDIR)/rst."
 
 texinfo:
 	$(SPHINXBUILD) -b texinfo $(ALLSPHINXOPTS) $(BUILDDIR)/texinfo
