@@ -20,7 +20,7 @@ try:
 except:
     import pickle
 
-version = "3.0.2"
+version = "3.0.3"
 
 
 def _in(a, b):
@@ -472,9 +472,9 @@ class _Base(object):
 
     def _len(self, db_filter=None):
         if db_filter is not None:
-            if not type(db_filter) is PyDbExpressionGroup:
-                raise ValueError("Filter argument is not of type "
-                                 "'PyDbExpressionGroup': %s" % type(db_filter))
+            if type(db_filter) is not PyDbExpressionGroup and type(db_filter) is not PyDbFilter:
+                raise ValueError("Filter argument should be of type 'PyDbExpressionGroup'"
+                                 " or 'PyDbFilter': %s" % type(db_filter))
             if db_filter.is_filtered():
                 return len(db_filter.apply_filter(self.records))
         return len(self.records)

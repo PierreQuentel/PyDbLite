@@ -14,7 +14,7 @@ Main differences from :mod:`pydblite.pydblite`:
 - in :func:`create() <pydblite.sqlite.Table.create>` field definitions must specify a type.
 - no `drop_field` (not supported by SQLite)
 - the :class:`Table <pydblite.sqlite.Table>` instance has a
-  :attr:`cursor <pydblite.sqlite.Database.Table.cursor>` attribute, so that raw SQL requests can
+  :attr:`cursor <pydblite.sqlite.Table.cursor>` attribute, so that raw SQL requests can
   be executed.
 """
 
@@ -402,7 +402,7 @@ class Table(object):
         return ['%s=?' % k for k in kw.keys()]
 
     def _make_record(self, row, fields=None):
-        """Make a record dictionary from the result of a fetch_"""
+        """Make a record dictionary from the result of a fetch"""
         if fields is None:
             fields = self.fields_with_id
         res = dict(zip(fields, row))
@@ -490,7 +490,8 @@ class Table(object):
         return Filter(self, key)
 
     def _len(self, db_filter=None):
-        if db_filter and str(db_filter):
+        """Return number of matching entries"""
+        if db_filter is not None and db_filter.is_filtered():
             sql = "SELECT COUNT(*) AS count FROM %s WHERE %s" % (self.name, db_filter)
         else:
             sql = "SELECT COUNT(*) AS count FROM %s;" % self.name
@@ -523,17 +524,19 @@ class Table(object):
         return msg
 
     def get_group_count(self, group_by, db_filter=None):
-        if db_filter and str(db_filter):
-            sql = "SELECT %s, COUNT(*) FROM %s GROUP BY %s WHERE %s" % (group_by, self.name,
-                                                                        group_by, db_filter)
+        """Return the grouped by count of the values of a column"""
+        if db_filter is not None and db_filter.is_filtered():
+            sql = "SELECT %s, COUNT(*) FROM %s WHERE %s GROUP BY %s " % (group_by, self.name,
+                                                                         db_filter, group_by)
         else:
             sql = "SELECT %s, COUNT(*) FROM %s GROUP BY %s;" % (group_by, self.name, group_by)
         self.cursor.execute(sql)
         return self.cursor.fetchall()
 
     def get_unique_ids(self, unique_id, db_filter=None):
+        """Return all the unique values of a column"""
         sql = "SELECT rowid,%s FROM %s" % (unique_id, self.name)
-        if db_filter and str(db_filter):
+        if db_filter is not None and db_filter.is_filtered():
             sql += " WHERE %s" % db_filter
         self.cursor.execute(sql)
         records = self.cursor.fetchall()

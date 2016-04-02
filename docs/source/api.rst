@@ -27,6 +27,7 @@ PyDbLite.SQLite API
 .. autoclass:: pydblite.sqlite.Table
    :members:
    :special-members:
+   :private-members:
    :exclude-members: __weakref__
 
 

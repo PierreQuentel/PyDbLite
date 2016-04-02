@@ -1,6 +1,15 @@
 Changelog
 ---------------
 
+3.0.3 (2016-04-02)
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+- Fixed bug where db_filter argument of function
+  :func:`_len() <pydblite.sqlite.Table._len>`,
+  :func:`get_unique_ids() <pydblite.sqlite.Table.get_unique_ids>`, and
+  :func:`get_group_count() <pydblite.sqlite.Table.get_group_count>` was
+  ignored if filter returns 0 matches.
+
 3.0.2 (2015-04-18)
 ~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -20,9 +20,6 @@ import os
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 # sys.path.insert(0, os.path.abspath('.'))
 
-# print "adding to path:", os.path.abspath('../..')
-sys.path.insert(0, os.path.abspath('../..'))
-
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -42,7 +39,7 @@ extensions = [
     'sphinxcontrib.inlinesyntaxhighlight',
     'sphinxcontrib.fulltoc',
     'cloud_sptheme.ext.index_styling',
-    'cloud_sptheme.ext.relbar_toc',
+#    'cloud_sptheme.ext.relbar_toc',
     'sphinx.ext.coverage',
     'sphinxcontrib.restbuilder',
     'sphinxcontrib.issuetracker',
@@ -79,7 +76,7 @@ version = None  # Fetched from pydblite
 version_info = '' # alpha/beta/rc tags.
 
 try:
-    sys.path.insert(0, '../..')
+    sys.path.insert(0, os.path.abspath('../..'))
     import pydblite
     version = "%s" % pydblite.__version__
     print("Building docs for pydblite v%s" % version)
@@ -338,7 +335,7 @@ def _warn_node(self, msg, node):
     if not msg.startswith('nonlocal image URI found:'):
         self._warnfunc(msg, '%s:%s' % get_source_line(node))
 
-sphinx.environment.BuildEnvironment.warn_node = _warn_node
+#sphinx.environment.BuildEnvironment.warn_node = _warn_node
 
 import sphinxcontrib.writers.rst
 from sphinxcontrib.writers.rst import RstTranslator
