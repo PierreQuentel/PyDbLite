@@ -38,8 +38,6 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinxcontrib.inlinesyntaxhighlight',
     'sphinxcontrib.fulltoc',
-    'cloud_sptheme.ext.index_styling',
-#    'cloud_sptheme.ext.relbar_toc',
     'sphinx.ext.coverage',
     'sphinxcontrib.restbuilder',
     'sphinxcontrib.issuetracker',
