@@ -187,6 +187,10 @@ class Database(dict):
         """Save any changes to the database"""
         self.conn.commit()
 
+    def close(self):
+        """Closes the database"""
+        self.conn.close()
+
     def __delitem__(self, table):
         # drop table
         if isinstance(table, Table):
