@@ -251,16 +251,63 @@ class Generic(object):
         self.assertEqual(str(f), "((active = 0) OR (name = 'Test4'))")
         self.assertEqual(len(f), 4)
 
+    def test_len_with_filter(self):
+        self.setup_db_for_filter()
+        f = self.filter_db.filter()
+        f |= (self.filter_db("active") == True)  # noqa
+        self.assertEquals(self.filter_db._len(f), 4)
+
+    def test_len_with_filter_non_matching(self):
+        self.setup_db_for_filter()
+        f = self.filter_db.filter()
+        f |= (self.filter_db("unique_id") == -1)  # Will not match any entries
+        self.assertEqual(self.filter_db._len(f), 0)
+
     def test_filter_get_unique_ids(self):
         self.setup_db_for_filter()
-        ids = self.filter_db.get_unique_ids("unique_id")
-        self.assertEqual(ids, set([1, 2, 3, 4, 5, 6, 7]))
+        ids = self.filter_db.get_unique_ids("name")
+        self.assertEqual(ids, set(['Test0', 'Test6', 'Test4', 'Test7', 'test0']))
+
+    def test_filter_get_unique_ids_with_filter(self):
+        self.setup_db_for_filter()
+        f = self.filter_db.filter()
+        f |= (self.filter_db("active") == True)  # noqa
+        ids = self.filter_db.get_unique_ids("name", f)
+        self.assertEquals(ids, set(['Test0', 'Test4', 'test0']))
+
+    def test_filter_get_unique_ids_with_filter_non_matching(self):
+        self.setup_db_for_filter()
+        f = self.filter_db.filter() | (self.filter_db("unique_id") == -1)  # Will not match any
+        ids = self.filter_db.get_unique_ids("name", f)
+        self.assertEqual(ids, set())
+
+    def make_group_count_result(self, key, test_key=None, test_val=None):
+        counts = {}
+        for e in self.status:
+            if test_key and e[test_key] != test_val:
+                continue
+            counts[e[key]] = counts.get(e[key], 0) + 1
+        return counts
 
     def test_get_group_count(self):
         self.setup_db_for_filter()
+        counts = self.make_group_count_result("name")
         result = self.filter_db.get_group_count("name")
-        counts = {}
-        for e in self.status:
-            counts[e["name"]] = counts.get(e["name"], 0) + 1
+        for name, count in result:
+            self.assertEqual(count, counts[name])
+
+    def test_get_group_count_with_filter(self):
+        self.setup_db_for_filter()
+        counts = self.make_group_count_result("name", test_key="active", test_val=True)
+        f = self.filter_db.filter() | (self.filter_db("active") == True)  # noqa
+        result = self.filter_db.get_group_count("name", f)
+        for name, count in result:
+            self.assertEqual(count, counts[name])
+
+    def test_get_group_count_with_filter_non_matching(self):
+        self.setup_db_for_filter()
+        counts = self.make_group_count_result("name", test_key="unique_id", test_val=-1)
+        f = self.filter_db.filter() | (self.filter_db("unique_id") == -1)
+        result = self.filter_db.get_group_count("name", f)
         for name, count in result:
             self.assertEqual(count, counts[name])

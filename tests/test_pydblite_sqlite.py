@@ -131,6 +131,10 @@ class SQLiteTestCase(Generic, unittest.TestCase):
         records = filter_db(unique_id="123")
         self.assertEqual(records, [])
 
+    def test_with_statment(self):
+        with sqlite.Database(":memory:") as db:
+            pass
+
 
 if __name__ == "__main__":
     sys.path.insert(0, os.getcwd())

@@ -23,10 +23,14 @@ PyDbLite.SQLite API
 
 .. autoclass:: pydblite.sqlite.Database
    :members:
+   :special-members:
+   :private-members:
+
 
 .. autoclass:: pydblite.sqlite.Table
    :members:
    :special-members:
+   :private-members:
    :exclude-members: __weakref__
 
 
