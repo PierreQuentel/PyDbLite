@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
 # BSD licence
@@ -26,7 +25,7 @@ def sqlite():
     # records are dictionaries with a unique integer key __id__
     # selection by list comprehension
     res = [r for r in table if 30 > r['age'] >= 18 and r['size'] < 2]
-    print "res:", res
+    print("res:", res)
     # or generator expression
     for r in (r for r in table if r['name'] in ('homer', 'marge')):
         pass
@@ -60,7 +59,7 @@ def pydblite():
     records = db(name="homer")
     # complex selection by list comprehension
     res = [r for r in db if 30 > r['age'] >= 18 and r['size'] < 2]
-    print "res:", res
+    print("res:", res)
     # delete a record or a list of records
     r = records[0]
     db.delete(r)

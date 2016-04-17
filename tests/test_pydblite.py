@@ -29,7 +29,7 @@ class PyDbLiteTestCase(Generic, unittest.TestCase):
         self.reset_status_values_for_filter()
         for d in self.status:
             res = self.filter_db.insert(**d)
-        self.assertEquals(res, 6)
+        self.assertEqual(res, 6)
 
     def test_open(self):
         db = Base('dummy', save_to_file=False)

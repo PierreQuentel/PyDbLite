@@ -20,7 +20,7 @@ try:
 except:
     import pickle
 
-version = "3.0.2"
+version = "3.0.3"
 
 
 def _in(a, b):

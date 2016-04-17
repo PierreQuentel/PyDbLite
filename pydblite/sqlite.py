@@ -194,6 +194,14 @@ class Database(dict):
         self.cursor.execute('DROP TABLE %s' % table)
         dict.__delitem__(self, table)
 
+    # The instance can be used as a context manager, to make sure that it is
+    # closed even if an exception is raised during operations
+    def __enter__(self):
+        return self
+    
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.conn.close()
+        return exc_type is None
 
 class Table(object):
 
