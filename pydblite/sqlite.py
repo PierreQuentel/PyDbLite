@@ -392,14 +392,20 @@ class Table(object):
             sql += "WHERE rowid = ?"
             args = (_id,)
             removed = [removed]
+            self.cursor.execute(sql, args)
         else:
             # convert iterable into a list
             removed = [r for r in removed]
             if not removed:
                 return 0
-            args = [r['__id__'] for r in removed]
-            sql += "WHERE rowid IN (%s)" % (','.join(['?'] * len(args)))
-        self.cursor.execute(sql, args)
+            # max number of arguments for SQLITE is 999
+            for _removed in (removed[500*i:500*(i+1)] 
+                for i in range((len(removed)//500)+1)):
+                args = [r['__id__'] for r in _removed]
+                sql = "DELETE FROM %s " % self.name
+                sql += "WHERE rowid IN (%s)" % (','.join(['?'] * len(args)))
+                self.cursor.execute(sql, args)
+                
         self.db.commit()
         return len(removed)
 
