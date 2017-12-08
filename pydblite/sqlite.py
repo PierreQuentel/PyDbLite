@@ -170,6 +170,9 @@ class Database(dict):
         for table_name in self._tables():
             self[table_name] = Table(table_name, self)
 
+    def __contains__(self, table):
+        return table in self._tables()
+
     def __delitem__(self, table):
         # drop table
         if isinstance(table, Table):
@@ -417,7 +420,7 @@ class Table(object):
             - the database (self).
         """
         self.mode = mode = kw.get("mode", None)
-
+        
         if self._table_exists():
             if mode == "override":
                 self.cursor.execute("DROP TABLE %s" % self.name)
@@ -463,13 +466,13 @@ class Table(object):
             if not removed:
                 return 0
             # max number of arguments for SQLITE is 999
-            for _removed in (removed[500*i:500*(i+1)] 
+            for _removed in (removed[500*i:500*(i+1)]
                 for i in range((len(removed)//500)+1)):
                 args = [r['__id__'] for r in _removed]
                 sql = "DELETE FROM %s " % self.name
                 sql += "WHERE rowid IN (%s)" % (','.join(['?'] * len(args)))
                 self.cursor.execute(sql, args)
-                
+
         self.db.commit()
         return len(removed)
 
