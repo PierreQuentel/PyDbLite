@@ -2,7 +2,7 @@
 #
 # BSD licence
 #
-# Copyright (c) <2008-2011> Pierre Quentel (pierre.quentel@gmail.com)
+# Copyright (c) <2008-2011> <2017-> Pierre Quentel (quentel.pierre@orange.fr)
 # Copyright (c) <2014-2015> Bendik Rønning Opstad <bro.devel@gmail.com>.
 #
 #
@@ -20,7 +20,7 @@ try:
 except:
     import pickle
 
-version = "3.0.4"
+version = "3.0.5"
 
 
 def _in(a, b):
@@ -35,12 +35,13 @@ class PyDbExpression(Expression):
 
     def __init__(self, **kwargs):
         super(PyDbExpression, self).__init__(**kwargs)
-        self.operations = {'AND': 'AND', 'OR': 'OR',
-                           'LIKE': like,
-                           'GLOB': operator.contains,
+        self.operations = {"AND": "AND", "OR": "OR",
+                           "LIKE": like,
+                           "GLOB": operator.contains,
                            "IN": _in,
-                           '=': operator.eq, '!=': operator.ne, '<': operator.lt,
-                           '<=': operator.le, '>': operator.gt, '>=': operator.ge}
+                           "=": operator.eq, "!=": operator.ne,
+                           "<": operator.lt, "<=": operator.le,
+                           ">": operator.gt, ">=": operator.ge}
 
     def apply(self, records):
         operation = self.operations[self.operator]
@@ -106,33 +107,30 @@ class Index(object):
 
 class _Base(object):
 
-    def __init__(self, path, protocol=pickle.HIGHEST_PROTOCOL, save_to_file=True,
-                 sqlite_compat=False):
+    def __init__(self, path, protocol=pickle.HIGHEST_PROTOCOL,
+            save_to_file=True, sqlite_compat=False):
         """protocol as defined in pickle / pickle.
         Defaults to the highest protocol available.
-        For maximum compatibility use protocol = 0
-
+        For maximum compatibility use protocol = 0.
         """
+        # Path of the database in the file system.
         self.path = path
-        """The path of the database in the file system"""
+        # Basename of the path, stripped of its extension.
         self.name = os.path.splitext(os.path.basename(path))[0]
-        """The basename of the path, stripped of its extension"""
         self.protocol = protocol
         self.mode = None
         if path == ":memory:":
             save_to_file = False
         self.save_to_file = save_to_file
         self.sqlite_compat = sqlite_compat
+        # List of the fields (does not include the internal fields __id__ and
+        # __version__).
         self.fields = []
-        """The list of the fields (does not include the internal
-        fields __id__ and __version__)"""
-        # if base exists, get field names
+        # If base exists, get field names.
         if save_to_file and self.exists():
-            if protocol == 0:
-                _in = open(self.path)  # don't specify binary mode !
-            else:
-                _in = open(self.path, 'rb')
-            self.fields = pickle.load(_in)
+            mode = "r" if protocol == 0 else "rb"
+            with open(self.path, mode) as _in:
+                self.fields = pickle.load(_in)
 
     def exists(self):
         """
@@ -157,18 +155,17 @@ class _Base(object):
         Returns:
             - the database (self).
         """
-        self.mode = kw.get("mode", 'create')
+        self.mode = kw.get("mode", "create")
+        if not self.mode in ["create", "open", "override"]:
+            msg = "Invalid value given for 'open': '{}'"
+            raise ValueError(msg.format(self.mode))
         if self.save_to_file and os.path.exists(self.path):
             if not os.path.isfile(self.path):
-                raise IOError("%s exists and is not a file" % self.path)
+                raise IOError("{} exists and is not a file".format(self.path))
             elif self.mode is 'create':
-                raise IOError("Base %s already exists" % self.path)
+                raise IOError("Base {} already exists".format(self.path))
             elif self.mode == "open":
                 return self.open()
-            elif self.mode == "override":
-                os.remove(self.path)
-            else:
-                raise ValueError("Invalid value given for 'open': '%s'" % open)
 
         self.fields = []
         self.default_values = {}
@@ -207,7 +204,8 @@ class _Base(object):
         reset = False
         for f in fields:
             if f not in self.fields:
-                raise NameError("%s is not a field name %s" % (f, self.fields))
+                raise NameError("{} is not a field name {}".format(f,
+                    self.fields))
             # initialize the indices
             if self.mode == "open" and f in self.indices:
                 continue
@@ -218,7 +216,7 @@ class _Base(object):
                 bisect.insort(self.indices[f].setdefault(record[f], []), _id)
             # create a new attribute of self, used to find the records
             # by this index
-            setattr(self, '_' + f, Index(self, f))
+            setattr(self, "_" + f, Index(self, f))
         if reset:
             self.commit()
 
@@ -226,7 +224,7 @@ class _Base(object):
         """Delete the index on the specified fields"""
         for f in fields:
             if f not in self.indices:
-                raise ValueError("No index on field %s" % f)
+                raise ValueError("No index on field {}".format(f))
         for f in fields:
             del self.indices[f]
         self.commit()
@@ -234,22 +232,19 @@ class _Base(object):
     def open(self):
         """Open an existing database and load its content into memory"""
         # guess protocol
-        if self.protocol == 0:
-            _in = open(self.path)  # don't specify binary mode !
-        else:
-            _in = open(self.path, 'rb')
-        self.fields = pickle.load(_in)
-        self.next_id = pickle.load(_in)
-        self.records = pickle.load(_in)
-        self.indices = pickle.load(_in)
-        try:
-            # If loading an old database, the default values do not exist
-            self.default_values = pickle.load(_in)
-        except EOFError:
-            self.default_values = {}
-        for f in self.indices.keys():
-            setattr(self, '_' + f, Index(self, f))
-        _in.close()
+        mode = "r" if self.protocol == 0 else "rb"
+        with open(self.path, mode) as _in:
+            self.fields = pickle.load(_in)
+            self.next_id = pickle.load(_in)
+            self.records = pickle.load(_in)
+            self.indices = pickle.load(_in)
+            try:
+                # If loading an old database, the default values do not exist
+                self.default_values = pickle.load(_in)
+            except EOFError:
+                self.default_values = {}
+            for f in self.indices.keys():
+                setattr(self, "_" + f, Index(self, f))
         self.mode = "open"
         return self
 
@@ -257,13 +252,12 @@ class _Base(object):
         """Write the database to a file"""
         if self.save_to_file is False:
             return
-        out = open(self.path, 'wb')
-        pickle.dump(self.fields, out, self.protocol)
-        pickle.dump(self.next_id, out, self.protocol)
-        pickle.dump(self.records, out, self.protocol)
-        pickle.dump(self.indices, out, self.protocol)
-        pickle.dump(self.default_values, out, self.protocol)
-        out.close()
+        with open(self.path, "wb") as out:
+            pickle.dump(self.fields, out, self.protocol)
+            pickle.dump(self.next_id, out, self.protocol)
+            pickle.dump(self.records, out, self.protocol)
+            pickle.dump(self.indices, out, self.protocol)
+            pickle.dump(self.default_values, out, self.protocol)
 
     def insert(self, *args, **kw):
         """
@@ -297,22 +291,23 @@ class _Base(object):
         # raise exception if unknown field
         for key in kw:
             if key not in self.fields:
-                raise NameError("Invalid field name : %s" % key)
+                raise NameError("Invalid field name : {}".format(key))
         # set keys and values
         for (k, v) in kw.items():
             record[k] = v
         # add the key __id__ : record identifier
-        record['__id__'] = self.next_id
+        record["__id__"] = self.next_id
         # add the key __version__ : version number
-        record['__version__'] = 0
+        record["__version__"] = 0
         # create an entry in the dictionary self.records, indexed by __id__
         self.records[self.next_id] = record
         # update index
         for ix in self.indices.keys():
-            bisect.insort(self.indices[ix].setdefault(record[ix], []), self.next_id)
+            bisect.insort(self.indices[ix].setdefault(record[ix], []),
+                self.next_id)
         # increment the next __id__
         self.next_id += 1
-        return record['__id__']
+        return record["__id__"]
 
     def delete(self, remove):
         """
@@ -334,18 +329,19 @@ class _Base(object):
             remove = [r for r in remove]
         if not remove:
             return 0
-        _ids = [r['__id__'] for r in remove]
+        _ids = [r["__id__"] for r in remove]
         _ids.sort()
         keys = set(self.records.keys())
         # check if the records are in the base
         if not set(_ids).issubset(keys):
             missing = list(set(_ids).difference(keys))
-            raise IndexError('Delete aborted. Records with these ids'
-                             ' not found in the base : %s' % str(missing))
+            raise IndexError("Delete aborted. Records with these ids not "
+                             "found in the base : {}".format(str(missing)))
         # raise exception if duplicate ids
         for i in range(len(_ids) - 1):
             if _ids[i] == _ids[i + 1]:
-                raise IndexError("Delete aborted. Duplicate id : %s" % _ids[i])
+                msg = "Delete aborted. Duplicate id : {}"
+                raise IndexError(msg.format(_ids[i]))
         deleted = len(remove)
         while remove:
             r = remove.pop()
@@ -379,12 +375,14 @@ class _Base(object):
                     continue
                 _id = record["__id__"]
                 # remove id for the old value
-                old_pos = bisect.bisect(self.indices[indx][record[indx]], _id) - 1
+                old_pos = bisect.bisect(self.indices[indx][record[indx]],
+                    _id) - 1
                 del self.indices[indx][record[indx]][old_pos]
                 if not self.indices[indx][record[indx]]:
                     del self.indices[indx][record[indx]]
                 # insert new value
-                bisect.insort(self.indices[indx].setdefault(kw[indx], []), _id)
+                bisect.insort(self.indices[indx].setdefault(kw[indx], []),
+                    _id)
         for record in records:
             # update record values
             record.update(kw)
@@ -394,8 +392,8 @@ class _Base(object):
     def add_field(self, field, column_type="ignored", default=None):
         """Adds a field to the database"""
         if field in self.fields + ["__id__", "__version__"]:
-            raise ValueError("Field %s already defined" % field)
-        if not hasattr(self, 'records'):  # base not open yet
+            raise ValueError("Field {} already defined".format(field))
+        if not hasattr(self, "records"):  # base not open yet
             self.open()
         for r in self:
             r[field] = default
@@ -406,7 +404,7 @@ class _Base(object):
     def drop_field(self, field):
         """Removes a field from the database"""
         if field in ["__id__", "__version__"]:
-            raise ValueError("Can't delete field %s" % field)
+            raise ValueError("Can't delete field {}".format(field))
         self.fields.remove(field)
         for r in self:
             del r[field]
@@ -435,10 +433,11 @@ class _Base(object):
         if args:
             if len(args) > 1:
                 raise SyntaxError("Only one field can be specified")
-            elif (type(args[0]) is PyDbExpressionGroup or type(args[0]) is PyDbFilter):
+            elif (type(args[0]) is PyDbExpressionGroup
+                    or type(args[0]) is PyDbFilter):
                 return args[0].apply_filter(self.records)
             elif args[0] not in self.fields:
-                raise ValueError("%s is not a field" % args[0])
+                raise ValueError("{} is not a field".format(args[0]))
             else:
                 return PyDbFilter(self, args[0])
         if not kw:
@@ -463,8 +462,9 @@ class _Base(object):
             res = set([r["__id__"] for r in self if r[field] == kw[field]])
         # selection on non-index fields
         for field in no_ix:
-            res = res & set([_id for _id in res if self.records[_id][field] == kw[field]])
-        return [self[_id] for _id in res]
+            res = res & set([_id for _id in res
+                if self.records[_id][field] == kw[field]])
+        return [self.records[_id] for _id in res]
 
     def __getitem__(self, key):
         # direct access by record id
@@ -472,9 +472,11 @@ class _Base(object):
 
     def _len(self, db_filter=None):
         if db_filter is not None:
-            if type(db_filter) is not PyDbExpressionGroup and type(db_filter) is not PyDbFilter:
-                raise ValueError("Filter argument should be of type 'PyDbExpressionGroup'"
-                                 " or 'PyDbFilter': %s" % type(db_filter))
+            if (type(db_filter) is not PyDbExpressionGroup
+                    and type(db_filter) is not PyDbFilter):
+                msg = ("Filter argument should be of type "
+                    "'PyDbExpressionGroup' or 'PyDbFilter': {}")
+                raise ValueError(msg.format(type(db_filter)))
             if db_filter.is_filtered():
                 return len(db_filter.apply_filter(self.records))
         return len(self.records)
@@ -491,8 +493,9 @@ class _Base(object):
 
     def group_by(self, column, torrents_filter):
         """Returns the records grouped by column"""
-        gropus = [(k, len(list(g))) for k, g in groupby(torrents_filter,
-                                                        key=lambda x: x[column])]
+        gropus = [(k, len(list(g)))
+                    for k, g in groupby(torrents_filter,
+                                        key=lambda x: x[column])]
         result = {}
         for column, count in gropus:
             result[column] = result.get(column, 0) + count
@@ -505,8 +508,9 @@ class _Base(object):
         if db_filter is None:
             db_filter = self.filter()
 
-        gropus = [(k, len(list(g))) for k, g in groupby(db_filter,
-                                                        key=lambda x: x[group_by_field])]
+        gropus = [(k, len(list(g)))
+                    for k, g in groupby(db_filter,
+                                        key=lambda x: x[group_by_field])]
         groups_dict = {}
         for group, count in gropus:
             groups_dict[group] = groups_dict.get(group, 0) + count
