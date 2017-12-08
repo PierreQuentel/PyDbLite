@@ -40,7 +40,12 @@ class PyDbLiteTestCase(Generic, unittest.TestCase):
         os.mkdir(test_db_name)
         db = Base(test_db_name, save_to_file=True)
         # A dir with that name exists
-        self.assertRaises(IOError, db.create, 'unique_id', 'name', "active", mode="open")
+        self.assertRaises(IOError, db.create, 'unique_id', 'name', "active",
+            mode="open")
+
+    def test_open_wrong_mode(self):
+        db = Base(test_db_name, save_to_file=True)
+        self.assertRaises(ValueError, db.create, 'name', mode="fancy")
 
     def test_open_existing(self):
         db = Base(test_db_name, save_to_file=True)

@@ -93,7 +93,7 @@ class SQLiteTestCase(Generic, unittest.TestCase):
 
     def setUp(self):  # NOQA
         self.first_record_id = 1
-        db = sqlite.Database(":memory:")
+        self.db = db = sqlite.Database(":memory:")
         filter_db = sqlite.Table('test_database', db)
         filter_db.create(('unique_id', 'INTEGER'), ('name', 'TEXT'), ('active', 'INTEGER'))
         self.filter_db = filter_db
@@ -130,6 +130,7 @@ class SQLiteTestCase(Generic, unittest.TestCase):
                          mode="override")
         records = filter_db(unique_id="123")
         self.assertEqual(records, [])
+        db.close()
 
     def test_with_statment(self):
         with sqlite.Database(":memory:") as db:

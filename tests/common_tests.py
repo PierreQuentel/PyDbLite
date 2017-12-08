@@ -179,7 +179,7 @@ class Generic(object):
     def setup_db_for_filter(self):
         self.reset_status_values_for_filter()
         res = self.filter_db.insert(self.status)
-        self.assertTrue(res is None or res == 7)  # Depends on the database driver...
+        self.assertTrue(not res or res == 7)  # Depends on the database driver...
 
     def test_filter_len(self):
         self.setup_db_for_filter()
@@ -255,7 +255,7 @@ class Generic(object):
         self.setup_db_for_filter()
         f = self.filter_db.filter()
         f |= (self.filter_db("active") == True)  # noqa
-        self.assertEquals(self.filter_db._len(f), 4)
+        self.assertEqual(self.filter_db._len(f), 4)
 
     def test_len_with_filter_non_matching(self):
         self.setup_db_for_filter()
@@ -273,7 +273,7 @@ class Generic(object):
         f = self.filter_db.filter()
         f |= (self.filter_db("active") == True)  # noqa
         ids = self.filter_db.get_unique_ids("name", f)
-        self.assertEquals(ids, set(['Test0', 'Test4', 'test0']))
+        self.assertEqual(ids, set(['Test0', 'Test4', 'test0']))
 
     def test_filter_get_unique_ids_with_filter_non_matching(self):
         self.setup_db_for_filter()
