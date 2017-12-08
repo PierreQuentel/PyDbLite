@@ -420,13 +420,14 @@ class Table(object):
             - the database (self).
         """
         self.mode = mode = kw.get("mode", None)
-        
+
         if self._table_exists():
             if mode == "override":
                 self.cursor.execute("DROP TABLE %s" % self.name)
             elif mode == "open":
                 return self.open()
             else:
+                self.db.close()
                 raise IOError("Base '%s' already exists" % self.name)
 
         sql = "CREATE TABLE %s (" % self.name
