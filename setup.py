@@ -53,7 +53,7 @@ def load_files(files):
     for fn in files:
         try:
             with open("docs/%s.rst" % fn) as f:
-                info[os.path.basename(fn)] = f.read()
+                info[os.path.basename(fn)] = f.read().splitlines()
         except IOError as err:  # NOQA
             print("Error when reading file '%s'" % fn)
             info[os.path.basename(fn)] = ""
