@@ -1,4 +1,4 @@
-_This project is not maintained anymore_
+*This project is not maintained anymore*
 ======================================
 
 .. |build-status| image:: https://api.travis-ci.org/bendikro/PyDbLite.svg?branch=master
