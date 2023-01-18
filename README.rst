@@ -1,3 +1,6 @@
+This project is not maintained anymore
+======================================
+
 .. |build-status| image:: https://api.travis-ci.org/bendikro/PyDbLite.svg?branch=master
     :target: https://travis-ci.org/bendikro/PyDbLite
 
